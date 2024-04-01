@@ -162,6 +162,3 @@ String.prototype.divide = function (arg) {
     return res;
 }
 // console.log('12432432524355324553244233234'.divide('12'));
-
-//git config --global user.email "you@example.com"
-// git config --global user.name "Your Name"
