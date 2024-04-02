@@ -32,15 +32,16 @@ String.prototype.plus = function (arg) {
 
 //examples:
 // console.log("4231".plus('3262621'))
-// console.log("979999991".plus('11'))
+// console.log("979995325525129991".plus('14231452155215351'))
 
 // String.minus(string): This function should take another string as input 
 // and return the result of subtracting the second string from the first string.
 // Note that the first parameter will always be greater than the second parameter.
 String.prototype.minus = function (arg) {
-    if (+numStr(this) <= +numStr(arg)) {
+    if (+numStr(this) < +numStr(arg)) {
         return;
     }
+
 
     //get equal length arrs of num digits
     const [numArr1, numArr2] = [
@@ -154,6 +155,7 @@ String.prototype.divide = function (arg) {
         dividendPart = dividendPart.minus(curDivisor);
         if (dividendPart == undefined) { dividendPart = '' }
         res += quotientPart;
+        
         quotientPart = 0;
     }
     while (res[0] == '0') {
@@ -161,4 +163,6 @@ String.prototype.divide = function (arg) {
     }
     return res;
 }
-// console.log('12432432524355324553244233234'.divide('12'));
+//  console.log('53289457903284579823475903247509843275983420752345'.divide('1232142134123441232'));
+//  console.log('3333333333333333333333333333333'.divide('3'));
+
