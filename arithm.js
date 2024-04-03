@@ -126,23 +126,27 @@ String.prototype.divide = function (arg) {
     let dividendPart = '';
     let curDivisor = divisor;
     let quotientPart = 0;
+    let first = true;
     while (dividend.length > 0) {
-        //add '0' to result if we need to add another digit
-        if (dividendPart.length == 0) {
-            res += '0';
+        if (+dividend == 0) {
+            res += dividend;
+            break;
         }
-        //add digits from the dividend till can subtract
         while (+dividendPart < +divisor) {
             dividendPart += dividend[0];
+            if (!first) {
+                res += '0';
+            }
+            first = false;
             if (dividend.length > 1) {
                 dividend = dividend.substring(1);
-            }
-            else {
+            } else {
                 dividend = '';
+                break;
             }
         }
         if (dividendPart == undefined) {
-            break
+            break;
         }
 
         //multiply divisor by the digit which will go to result
@@ -155,14 +159,14 @@ String.prototype.divide = function (arg) {
         dividendPart = dividendPart.minus(curDivisor);
         if (dividendPart == undefined) { dividendPart = '' }
         res += quotientPart;
-        
         quotientPart = 0;
+        first = true;
     }
     while (res[0] == '0') {
         res = res.slice(1);
     }
     return res;
 }
-//  console.log('53289457903284579823475903247509843275983420752345'.divide('1232142134123441232'));
-//  console.log('3333333333333333333333333333333'.divide('3'));
-
+// console.log('53289457903284579823475903247509843275983420752345'.divide('1232142134123441232'));
+// console.log('432785632485763248790000000532458952345432000'.divide('2'));
+// console.log("123456789".divide("123456"));
