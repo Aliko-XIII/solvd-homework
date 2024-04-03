@@ -151,7 +151,7 @@ String.prototype.divide = function (arg) {
 
         //multiply divisor by the digit which will go to result
         while (quotientPart.toString().plus('1').multiply(divisor) <= +dividendPart) {
-            quotientPart++;
+            quotientPart = Number.parseInt(quotientPart.toString().plus('1'));
         }
         curDivisor = quotientPart.toString().multiply(divisor);
 
