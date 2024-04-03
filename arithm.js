@@ -150,7 +150,7 @@ String.prototype.divide = function (arg) {
         }
 
         //multiply divisor by the digit which will go to result
-        while (+(quotientPart + 1).toString().multiply(divisor) <= +dividendPart) {
+        while (quotientPart.toString().plus('1').multiply(divisor) <= +dividendPart) {
             quotientPart++;
         }
         curDivisor = quotientPart.toString().multiply(divisor);
@@ -169,4 +169,4 @@ String.prototype.divide = function (arg) {
 }
 // console.log('53289457903284579823475903247509843275983420752345'.divide('1232142134123441232'));
 // console.log('432785632485763248790000000532458952345432000'.divide('2'));
-// console.log("123456789".divide("123456"));
+// console.log("123456789".divide("12345"));
