@@ -336,3 +336,41 @@ const testCoerceToType = () => {
 // (Optional) Implement additional functions of your choice that demonstrate advanced
 //  type conversion scenarios or cater to specific use cases related to primitive types.
 //  You are encouraged to explore complex scenarios and push the limits of type conversion.
+
+
+/**
+* Returns val multiplied by mult number with the logic like in Python
+* Objects are multiplied by multiplying their inner values with recursion
+*
+* @param {any} val The value to be multiplied.
+* @param {number} mult The multiplier, must be a natural number.
+* @return {any} Value multiplied by mult.
+*/
+function multiply(val, mult) {
+    if (typeof val == 'number') {
+        return val * mult;
+    }
+    else if (typeof val == 'bigint') {
+        return val * BigInt(mult);
+    }
+    else if (typeof val == 'string') {
+        return Array(mult).fill(val).join('');
+    }
+    else if (typeof val == 'object') {
+        const res = {};
+        Object.keys(val).forEach(key => {
+            res[key] = multiply(val[key], mult);
+        })
+        return res;
+    }
+    return val;
+}
+// console.log(multiply({
+//     a: '1',
+//     b: {
+//         d: 4n,
+//         e: [0, 1, 'a']
+//     },
+//     c: 3
+// },
+//     3));
