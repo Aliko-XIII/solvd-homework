@@ -121,7 +121,6 @@ const testStringifyValue = () => {
     //symbols
     console.log(stringifyValue(Symbol('mySymbol')));
 };
-testStringifyValue();
 
 // invertBoolean: Accepts a single boolean argument and returns its inverted value.
 //  If the argument is not a boolean, it should throw an error.
@@ -169,8 +168,11 @@ function convertToNumber(arg) {
         || typeof arg == 'undefined') {
         throw new Error(`Value cannot be converted to number`)
     }
-    if (typeof arg == 'number' || typeof arg == 'bigint') {
+    if (typeof arg == 'number') {
         return arg;
+    }
+    if (typeof arg == 'bigint') {
+        return Number(arg)
     }
     if (typeof arg == 'string') {
         if (parseFloat(arg) == arg) {
@@ -190,6 +192,8 @@ const testConvertToNumber = () => {
     //number
     console.log(convertToNumber(3));
     console.log(convertToNumber(3.1));
+    //bigint
+    console.log(convertToNumber(3n));
     //string
     console.log(convertToNumber('3'));
     console.log(convertToNumber('3.1'));
