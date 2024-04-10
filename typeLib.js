@@ -107,7 +107,7 @@ const testStringifyValue = () => {
     //number
     console.log(stringifyValue(3))
     //bigint
-    console.log(stringifyValue(3234534278543257865623478562347856732845683245))
+    console.log(stringifyValue(BigInt(32452345325234)))
     //boolean
     console.log(stringifyValue(true))
     //undefined
@@ -121,6 +121,7 @@ const testStringifyValue = () => {
     //symbols
     console.log(stringifyValue(Symbol('mySymbol')));
 };
+testStringifyValue();
 
 // invertBoolean: Accepts a single boolean argument and returns its inverted value.
 //  If the argument is not a boolean, it should throw an error.
@@ -374,3 +375,76 @@ function multiply(val, mult) {
 //     c: 3
 // },
 //     3));
+
+/**
+* Converts the string with number written as words to number
+* In this example numbers only less then 1 billion
+*
+* @param {string} str The string to convert.
+* @return {number} number gotten from str.
+*/
+function wordToNum(str) {
+    const numDict = {
+        'one': 1,
+        'two': 2,
+        'three': 3,
+        'four': 4,
+        'five': 5,
+        'six': 6,
+        'seven': 7,
+        'eight': 8,
+        'nine': 9,
+        'ten': 10,
+        'eleven': 11,
+        'twelve': 12,
+        'thirteen': 13,
+        'fourteen': 14,
+        'fifteen': 15,
+        'sixteen': 16,
+        'seventeen': 17,
+        'eighteen': 18,
+        'nineteen': 19,
+        'twenty': 20,
+        'thirty': 30,
+        'forty': 40,
+        'fifty': 50,
+        'sixty': 60,
+        'seventy': 70,
+        'eighty': 80,
+        'ninety': 90,
+        'hundred': 100,
+        'thousand': 1000,
+        'million': 10 ** 6
+    };
+    str = str.toLowerCase()
+    const numWords = str.split(' ');
+    let res = Array(numWords.length).fill(0);
+    let i = 0;
+    numWords.forEach(num => {
+        if (num == 'hundred' || num == 'thousand' || num == 'million') {
+            res[i] *= numDict[num]
+        }
+        else if (num.indexOf('-') != -1) {
+            const numParts = num.split('-');
+            res[i] += numDict[numParts[0]] + numDict[numParts[1]];
+        }
+        else {
+            res[i] += numDict[num];
+        }
+        if (num == 'thousand' || num == 'million') {
+            i++;
+        }
+    })
+    return res.reduce((acc, val) => acc + val);
+}
+//123451213
+// console.log(wordToNum('One hundred twenty-three million four hundred fifty-one thousand two hundred thirteen'));
+
+//1,852,062
+// console.log(wordToNum('One million eight hundred fifty-two thousand sixty-two'));
+
+//23,125
+// console.log(wordToNum('Twenty-three thousand one hundred twenty-five'));
+
+//812
+// console.log(wordToNum('Eight hundred twelve'));
