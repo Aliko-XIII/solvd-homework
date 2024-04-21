@@ -1,10 +1,16 @@
-
+// Implement a pure function called calculateDiscountedPrice that takes
+//  an array of products and a discount percentage as arguments. The
+//  function should return a new array of products with discounted prices
+//  based on the given percentage, without modifying the original products.
 function calculateDiscountedPrice(products, percent) {
     const productsCopy = JSON.parse(JSON.stringify(products));
     return productsCopy.map(
         product => { product['price'] *= (1 - percent); return product; });
 }
 
+// Create a pure function called calculateTotalPrice that takes an array of
+//  products as an argument. The function should return the total price of
+//  all products, without modifying the original array or its items.
 function calculateTotalPrice(products) {
     const productsCopy = JSON.parse(JSON.stringify(products));
     return productsCopy.reduce((acc, val) => acc + val['price'], 0);
@@ -45,7 +51,6 @@ console.log(getFullName(myPerson));
 // Create a function called filterUniqueWords that takes a string of text
 //  and returns an array of unique words, sorted in alphabetical order,
 //  without using explicit loops. Use function composition and point-free style.
-
 const removeSymbols = text => text.replace(/[^a-zA-Z\s]/g, '');
 
 const getWordsArr = text =>
@@ -67,7 +72,6 @@ console.log(filterUniqueWords('Create a A function called filterUniqueWords' +
 //  objects, each containing a name and grades property. The function should
 // return the average grade of all students, without modifying the original
 //  array or its items. Use function composition and point-free style.
-
 const students = [
     { name: 'Alice', grades: [8, 7, 6, 9, 8] },
     { name: 'Bob', grades: [6, 7, 8, 7, 9] },
@@ -122,16 +126,20 @@ const repeatFunction = (fn, num) => {
         else { setInterval(fn, 1000); }
     }
 }
-const test = () => { console.log('1') }
-const repeated = repeatFunction(test, -1);
-// repeated();
+const repeatedFin = repeatFunction(() => { console.log('hi') }, 5);
+const repeatedInfin = repeatFunction(() => { console.log('1') }, -1);
+// repeatedFin();
 
 // Implement a recursive function called calculateFactorial that calculates
 // the factorial of a given number. Optimize the function to use tail call
 // optimization to avoid stack overflow for large input numbers.
-const calculateFactorial = (num) => {
-
+const calculateFactorial = (n, acc = 1) => {
+    if (n <= 1)
+        return acc
+    return calculateFactorial(n - 1, n * acc)
 }
+
+console.log(calculateFactorial(123));
 
 // Create a recursive function called power that takes a base and an exponent
 //  as arguments. The function should calculate the power of the base to the
@@ -144,6 +152,33 @@ const power = (base, exp) => {
 
 console.log(power(2, 1012));
 
+
+// Implement a lazy evaluation function called lazyMap that takes an
+//  array and a mapping function. The function should return a lazy
+//  generator that applies the mapping function to each element of
+//  the array one at a time.
+
+const lazyMap = (arr, mapFn) => {
+    let fnArr = arr;
+    let i = 0;
+    return function next() {
+        if (i >= fnArr.length) {
+            return;
+        }
+        fnArr[i] = mapFn(fnArr[i]);
+        i++;
+    }
+};
+
+const arr = [1, 2, 3];
+console.log(arr);
+const next = lazyMap(arr, num => num += 1);
+next();
+console.log(arr);
+next();
+console.log(arr);
+next();
+console.log(arr);
 
 
 // Create a lazy generator function called fibonacciGenerator that 
@@ -160,13 +195,10 @@ const fibonacciGenerator = (() => {
     }
 })();
 
-{
-    {
-        console.log(fibonacciGenerator());
-        console.log(fibonacciGenerator());
-        console.log(fibonacciGenerator());
-        console.log(fibonacciGenerator());
-        console.log(fibonacciGenerator());
-        console.log(fibonacciGenerator());
-    }
-}
+console.log(fibonacciGenerator());
+console.log(fibonacciGenerator());
+console.log(fibonacciGenerator());
+console.log(fibonacciGenerator());
+console.log(fibonacciGenerator());
+console.log(fibonacciGenerator());
+
