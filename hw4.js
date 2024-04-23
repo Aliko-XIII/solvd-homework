@@ -169,14 +169,97 @@ console.log(Object.getOwnPropertyDescriptors(immut1));
 // Use the observeObject function to create a proxy for the person object from Task 1. The 
 // callback function should log the property name and the action (get or set) performed 
 // on the object.
+function observeObject(obj, fn) {
+    const proxy = {
+        get obj() {
+            return this._obj;
+        },
+        set obj(val) {
+            this._obj = val;
+        }
+    };
+    proxy.obj = obj;
+    Object.keys(proxy.obj).forEach(key => {
+        Object.defineProperty(proxy, key,
+            {
+                get: function get() {
+                    fn(proxy.obj, 'get');
+                    return proxy.obj[key];
+                },
+                set: function set(val) {
+                    fn(proxy.obj, 'set');
+                    proxy.obj[key] = val;
+                }
+            });
+    })
+
+    return proxy;
+}
+const proxy = observeObject(person, (obj, method) => {
+    console.log(`You use ${method} for property of person ${obj.firstName} ${obj.lastName}`);
+})
+console.log(proxy.firstName);
+proxy.firstName = 'jake';
 
 // Task 6: Object Deep Cloning
 // Implement a function called deepCloneObject that takes an object as an argument and returns
 //  a deep copy of the object. The function should handle circular references and complex nested
 //  structures. Do not use JSON methods.
+function deepCloneObject(clonedObj) {
+    let globalNewObj = {};
+    function copyFields(curObj) {
+        const newObj = Array.isArray(curObj) ? [] : {};
+        const descriptors = Object.getOwnPropertyDescriptors(curObj);
+
+        Object.keys(descriptors).forEach(key => {
+            let val;
+            if (typeof descriptors[key].value == 'object') {
+                val = copyFields(descriptors[key].value);
+            }
+            else {
+                val = descriptors[key].value == clonedObj ? globalNewObj : descriptors[key].value;
+            }
+            Object.defineProperty(newObj, key,
+                {
+                    value: val,
+                    writable: descriptors[key].writable,
+                    enumerable: descriptors[key].enumerable,
+                    configurable: descriptors[key].configurable,
+                    get: descriptors[key].get,
+                    set: descriptors[key].set,
+                });
+        })
+        return newObj;
+    }
+    globalNewObj = copyFields(clonedObj);
+    return;
+}
+
+{
+    {
+        const obj1 = {
+
+        };
+        console.log(deepCloneObject(obj1));
+    }
+}
 
 // Task 7: Object Property Validation
 // Implement a function called validateObject that takes an object and a validation schema
 //  as arguments. The schema should define the required properties, their types, and any
 //  additional validation rules. The function should return true if the object matches the
 //  schema, and false otherwise. You can choose any schema you want.
+function validateObject(obj, schema) {
+
+}
+
+const schema = {
+    // object of properties and their types
+    propTypes: {
+        //propName: typeStr
+    },
+    // object of properties and their restrictions defined as boolean functions
+    propRestricts: {
+
+    }
+}
