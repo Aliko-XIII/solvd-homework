@@ -140,7 +140,6 @@ console.log(acc2.formattedBalance);
 //  property descriptors. The function should handle nested objects and arrays recursively.
 // Use the createImmutableObject function to create an immutable version of the person object
 //  from Task 1.
-
 function createImmutableObject(obj) {
     const newObj = Array.isArray(obj) ? [] : {};
     const descriptors = Object.getOwnPropertyDescriptors(obj);
