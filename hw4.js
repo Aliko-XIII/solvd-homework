@@ -256,20 +256,44 @@ console.log(clone == clone.c.f);
 
 // Task 7: Object Property Validation
 // Implement a function called validateObject that takes an object and a validation schema
-//  as arguments. The schema should define the required properties, their types, and any
+//  as arguments. The schema sh ould define the required properties, their types, and any
 //  additional validation rules. The function should return true if the object matches the
 //  schema, and false otherwise. You can choose any schema you want.
 function validateObject(obj, schema) {
-    let valid = true;
+    const checkType = (key) => (
+        typeof obj[key] == schema[key].type && schema[key].type != 'array')
+        || (schema[key].type == 'array' && Array.isArray(obj[key]));
+
     for (let key in obj) {
         //check type
-        console.log(
-            typeof obj[key] == schema[key].type && schema[key].type != 'array' || (schema[key].type == 'array' && Array.isArray(obj[key])))
-        const typeValid = ((typeof obj[key] == schema[key].type && schema[key].type != 'array')
-            || (schema[key].type == 'array' && Array.isArray(obj[key])));
-        console.log(typeValid);
-        if (!typeValid) {
+        if (!checkType(key)) {
             return false;
+        }
+
+        //check array inner types
+        if (schema[key].innerTypes != undefined) {
+            for (let value of obj[key]) {
+                if (!schema[key].innerTypes.includes(typeof value)) {
+                    return false;
+                }
+            }
+        }
+
+        //check additional validators
+        if (schema[key].additionalValidators != undefined) {
+            for (let validator of schema[key].additionalValidators) {
+                if (!validator(obj[key])) {
+                    return false;
+                }
+            }
+        }
+
+        //check inner schema
+        if (schema[key].innerSchema != undefined) {
+            let innerCheck = validateObject(obj[key], schema[key].innerSchema);
+            if (!innerCheck) {
+                return false;
+            }
         }
     }
     return true;
@@ -297,7 +321,7 @@ const book = {
 
 const schema = {
     name: {
-        type: 'strg',
+        type: 'string',
         additionalValidators: [
             val => val.length < 100,
             val => val.length > 0
@@ -308,7 +332,7 @@ const schema = {
         additionalValidators: [
             val => val.length < 100,
             val => val.length > 0,
-            val => (/\d/).test(val)
+            val => !(/\d/).test(val)
         ]
     },
     year: {
@@ -385,8 +409,4 @@ const schema = {
     }
 }
 
-{
-    {
-        console.log(validateObject(book, schema));
-    }
-}
+console.log(validateObject(book, schema));
