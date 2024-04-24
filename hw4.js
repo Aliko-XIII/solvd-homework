@@ -409,4 +409,4 @@ const schema = {
     }
 }
 
-console.log(validateObject(book, schema));
+console.log(validateObject(book, schema)); 
