@@ -311,7 +311,7 @@ const book = {
     },
     chapterLengthes: {
         introduction: 5,
-        chapt1: 15,
+        chapt1: 5,
         chapt2: 14,
         chapt3: 17,
         final: 10
@@ -402,7 +402,8 @@ const schema = {
                     };
                 })
                 return true;
-            }
+            },
+            val => val > 0
         ]
 
     }
