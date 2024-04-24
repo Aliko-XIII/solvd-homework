@@ -260,15 +260,133 @@ console.log(clone == clone.c.f);
 //  additional validation rules. The function should return true if the object matches the
 //  schema, and false otherwise. You can choose any schema you want.
 function validateObject(obj, schema) {
+    let valid = true;
+    for (let key in obj) {
+        //check type
+        console.log(
+            typeof obj[key] == schema[key].type && schema[key].type != 'array' || (schema[key].type == 'array' && Array.isArray(obj[key])))
+        const typeValid = ((typeof obj[key] == schema[key].type && schema[key].type != 'array')
+            || (schema[key].type == 'array' && Array.isArray(obj[key])));
+        console.log(typeValid);
+        if (!typeValid) {
+            return false;
+        }
+    }
+    return true;
+}
 
+const book = {
+    name: 'BookName',
+    author: 'John Smith',
+    year: 2001,
+    characters: ['Jake', 'Mike', 'Leonard'],
+    saleProps: {
+        retailers: ['BookWorld', 'FantasyPages'],
+        default: 500,
+        softCover: 350,
+        soldOut: false
+    },
+    chapterLengthes: {
+        introduction: 5,
+        chapt1: 15,
+        chapt2: 14,
+        chapt3: 17,
+        final: 10
+    }
 }
 
 const schema = {
-    // object of properties and their types
-    propTypes: {
-        //propName: typeStr
+    name: {
+        type: 'strg',
+        additionalValidators: [
+            val => val.length < 100,
+            val => val.length > 0
+        ]
     },
-    // object of properties and their restrictions defined as boolean functions
-    propRestricts: {
+    author: {
+        type: 'string',
+        additionalValidators: [
+            val => val.length < 100,
+            val => val.length > 0,
+            val => (/\d/).test(val)
+        ]
+    },
+    year: {
+        type: 'number',
+        additionalValidators: [
+            val => val > 0,
+            val => val <= (new Date).getFullYear(),
+            val => (/\d/).test(val)
+        ]
+    },
+    characters: {
+        type: 'array',
+        innerTypes: ['string'],
+        additionalValidators: [
+            val => {
+                val.forEach(el => {
+                    if ((typeof el == 'string') && el.length <= 0) {
+                        return false;
+                    };
+                })
+                return true;
+            }
+        ]
+    },
+    saleProps: {
+        type: 'object',
+        innerSchema: {
+            retailers: {
+                type: 'array',
+                innerTypes: ['string'],
+                additionalValidators: [
+                    val => {
+                        val.forEach(el => {
+                            if ((typeof el == 'string') && el.length <= 0) {
+                                return false;
+                            };
+                        })
+                        return true;
+                    }
+                ]
+            },
+            default: {
+                type: 'number',
+                additionalValidators: [
+                    val => val > 0,
+                ]
+            },
+            softCover: {
+                type: 'number',
+                additionalValidators: [
+                    val => val > 0,
+                ]
+            },
+            soldOut: {
+                type: 'boolean',
+                additionalValidators: [
+                ]
+            },
+        }
+    },
+    chapterLengthes: {
+        type: 'object',
+        additionalValidators: [
+            val => {
+                Object.values(val).forEach(el => {
+                    if ((typeof el == 'string') && el.length <= 0) {
+                        return false;
+                    };
+                })
+                return true;
+            }
+        ]
+
+    }
+}
+
+{
+    {
+        console.log(validateObject(book, schema));
     }
 }
