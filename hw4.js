@@ -206,43 +206,56 @@ proxy.firstName = 'jake';
 //  a deep copy of the object. The function should handle circular references and complex nested
 //  structures. Do not use JSON methods.
 function deepCloneObject(clonedObj) {
-    let globalNewObj = {};
+    let globalNewObj;
+    let firstIter = true;
     function copyFields(curObj) {
         const newObj = Array.isArray(curObj) ? [] : {};
+        if (firstIter) {
+            globalNewObj = newObj;
+            firstIter = false;
+        }
         const descriptors = Object.getOwnPropertyDescriptors(curObj);
 
         Object.keys(descriptors).forEach(key => {
             let val;
             if (typeof descriptors[key].value == 'object') {
-                val = copyFields(descriptors[key].value);
+                if (descriptors[key].value == clonedObj) {
+                    val = globalNewObj
+                }
+                else {
+                    val = copyFields(descriptors[key].value);
+                }
             }
             else {
-                val = descriptors[key].value == clonedObj ? globalNewObj : descriptors[key].value;
+                val = descriptors[key].value;
             }
-            Object.defineProperty(newObj, key,
-                {
-                    value: val,
-                    writable: descriptors[key].writable,
-                    enumerable: descriptors[key].enumerable,
-                    configurable: descriptors[key].configurable,
-                    get: descriptors[key].get,
-                    set: descriptors[key].set,
-                });
+            Object.defineProperty(newObj, key, {
+                value: val,
+                writable: descriptors[key].writable,
+                enumerable: descriptors[key].enumerable,
+                configurable: descriptors[key].enumerable,
+            });
         })
         return newObj;
     }
-    globalNewObj = copyFields(clonedObj);
-    return;
+    copyFields(clonedObj);
+    return globalNewObj;
 }
 
-{
-    {
-        const obj1 = {
-
-        };
-        console.log(deepCloneObject(obj1));
+const obj1 = {
+    a: 3,
+    b: 2,
+    c: {
+        d: 6,
+        e: 51
     }
-}
+};
+Object.defineProperty(obj1.c, 'f', { value: obj1, enumerable: true });
+
+const clone = deepCloneObject(obj1);
+console.log(clone);
+console.log(clone == obj1);
+console.log(clone == clone.c.f);
 
 // Task 7: Object Property Validation
 // Implement a function called validateObject that takes an object and a validation schema
@@ -260,6 +273,5 @@ const schema = {
     },
     // object of properties and their restrictions defined as boolean functions
     propRestricts: {
-
     }
 }
