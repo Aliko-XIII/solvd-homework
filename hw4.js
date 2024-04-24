@@ -214,17 +214,14 @@ function deepCloneObject(clonedObj) {
             globalNewObj = newObj;
             firstIter = false;
         }
-        const descriptors = Object.getOwnPropertyDescriptors(curObj);
 
+        const descriptors = Object.getOwnPropertyDescriptors(curObj);
         Object.keys(descriptors).forEach(key => {
             let val;
             if (typeof descriptors[key].value == 'object') {
-                if (descriptors[key].value == clonedObj) {
-                    val = globalNewObj
-                }
-                else {
-                    val = copyFields(descriptors[key].value);
-                }
+                val = descriptors[key].value == clonedObj ?
+                    globalNewObj :
+                    copyFields(descriptors[key].value)
             }
             else {
                 val = descriptors[key].value;
