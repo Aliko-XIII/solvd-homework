@@ -27,8 +27,9 @@ Object.keys(person).forEach(key =>
 // values for any of the properties (e.g., { firstName: "Jane", age: 32 }).
 // Ensure that this method adheres to the read-only property descriptor set earlier.
 person.updateInfo = function (newInfo) {
+    const descriptors = Object.getOwnPropertyDescriptors(this);
     Object.keys(newInfo).forEach(key => {
-        if (key in this) {
+        if (key in this && descriptors[key].writable) {
             Object.defineProperty(person, key,
                 { value: newInfo[key] })
         }
