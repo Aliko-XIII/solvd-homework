@@ -42,11 +42,13 @@ console.log(person);
 // of an empty object. Make this property non-enumerable and non-configurable.
 Object.defineProperty(person, 'address', {
     value: {},
+    writable: true,
     enumerable: false,
     configurable: false
 })
 console.log(person)
-
+person.updateInfo({ address: { street: 'Myru' } });
+console.log(person)
 // Task 2: Object Property Enumeration and Deletion
 // Create a new object called product with the following properties and values:
 
