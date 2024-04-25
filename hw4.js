@@ -35,8 +35,6 @@ person.updateInfo = function (newInfo) {
         }
     })
 }
-person.updateInfo({ firstName: 'bob' });
-console.log(person);
 
 // Create a new property called address on the person object with an initial value 
 // of an empty object. Make this property non-enumerable and non-configurable.
@@ -47,8 +45,8 @@ Object.defineProperty(person, 'address', {
     configurable: false
 })
 console.log(person)
-person.updateInfo({ address: { street: 'Myru' } });
-console.log(person)
+person.updateInfo({ firstName: 'bob', address: { street: 'Myru' } });
+console.log(Object.getOwnPropertyDescriptors(person));
 // Task 2: Object Property Enumeration and Deletion
 // Create a new object called product with the following properties and values:
 
