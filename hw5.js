@@ -8,7 +8,7 @@
 //  based on the callback's logic.
 
 // Use the customFilterUnique function to filter an array of objects based
-//  on a specific property and return only unique objects.
+//  on a specific property and return only unique objects. 
 /**
  * 
  * @param {Array} arr 
@@ -17,12 +17,10 @@
 function customFilterUnique(arr, cb) {
     const arrCopy = [...arr];
     arrCopy.forEach(el => {
-        
+
     });
 
 }
-
-
 
 // Task 2: Array Chunking
 // Create a function called chunkArray that takes an array and a chunk size
@@ -31,16 +29,35 @@ function customFilterUnique(arr, cb) {
 //  should return an array of arrays.
 
 // Optimize the chunkArray function to minimize memory usage while chunking the array.
+/**
+ * 
+ * @param {Array} arr 
+ * @param {number} size 
+ */
+function chunkArray(arr, size) {
+    let res = []
+    let count = 0
+    while (count < arr.length) {
+        res.push(arr.slice(count, count + size));
+        count += size;
+    }
+    return res;
+}
 
-
-
+console.log(chunkArray([1, 2, 3, 4, 5, 6, 7, 8, 9], 2));
+console.log(chunkArray([1, 2, 3, 4, 5, 6, 7, 8, 9], 3));
 
 // Task 3: Array Shuffling
 // Create a function called customShuffle that takes an array as an argument
 //  and returns a new array with its elements randomly shuffled.
 // Implement the customShuffle function using an efficient shuffling algorithm
 //  to achieve uniform randomness.
-
+function customShuffle(arr) {
+    const shuffleNum = 5;
+    for(let i =0; i<shuffleNuml;i++){
+        
+    }
+}
 
 
 
