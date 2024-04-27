@@ -78,6 +78,7 @@ function getArrayIntersection(arr1, arr2) {
             res.push(val) : null);
     return res;
 }
+
 console.log(getArrayIntersection(
     [1, 2, 3, 3, 3, 7],
     [5, 7, 4, 1, 3, 2, 2, 0]));
@@ -85,8 +86,28 @@ console.log(getArrayIntersection(
 // Create a function called getArrayUnion that takes two arrays as 
 // arguments and returns a new array containing all unique elements 
 // from both arrays, without any duplicates.
+/**
+ * @param {Array} arr1 
+ * @param {Array} arr2 
+ */
+function getArrayUnion(arr1, arr2) {
+    const res = []
+    const len = Math.max(arr1.length, arr2.length);
+    console.log(len);
+    for (let i = 0; i < len; i++) {
+        if (i < arr1.length && res.indexOf(arr1[i]) === -1) {
+            res.push(arr1[i]);
+        }
+        if (i < arr2.length && res.indexOf(arr2[i]) === -1) {
+            res.push(arr2[i]);
+        }
+    }
+    return res;
+}
 
-
+console.log(getArrayUnion(
+    [1, 2, 3, 3, 3, 7],
+    [5, 7, 4, 1, 3, 2, 2, 0]));
 
 // Task 5: Array Performance Analysis
 // Implement a function called measureArrayPerformance that takes a function 
