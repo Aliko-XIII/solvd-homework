@@ -114,7 +114,24 @@ console.log(getArrayUnion(
 // and an array as arguments. The measureArrayPerformance function should 
 // execute the provided function with the given array as input and measure 
 // the execution time.
+function measureArrayPerformance(fn, arr) {
+    let start = process.hrtime.bigint();
+    fn(arr);
+    let finish = process.hrtime.bigint();
+    return Number(finish - start) * 0.000001;
+}
 
 // Use the measureArrayPerformance function to compare the performance of
 // built-in array methods (map, filter, reduce, etc.) against your custom
 // array manipulation functions.
+
+{
+    {
+        console.log('Custom fun: ' +
+            measureArrayPerformance(customShuffle, [1, 2, 3, 4, 5]));
+
+        console.log('Custom fun: ' +
+            measureArrayPerformance(()=>{}, [1, 2, 3, 4, 5]));
+
+    }
+}
