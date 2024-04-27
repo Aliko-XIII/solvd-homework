@@ -10,7 +10,6 @@
 // Use the customFilterUnique function to filter an array of objects based
 //  on a specific property and return only unique objects. 
 /**
- * 
  * @param {Array} arr 
  * @param {Function} cb 
  */
@@ -30,7 +29,6 @@ function customFilterUnique(arr, cb) {
 
 // Optimize the chunkArray function to minimize memory usage while chunking the array.
 /**
- * 
  * @param {Array} arr 
  * @param {number} size 
  */
@@ -53,23 +51,40 @@ console.log(chunkArray([1, 2, 3, 4, 5, 6, 7, 8, 9], 3));
 // Implement the customShuffle function using an efficient shuffling algorithm
 //  to achieve uniform randomness.
 function customShuffle(arr) {
+    const copy = [...arr];
     const shuffleNum = 5;
-    for(let i =0; i<shuffleNuml;i++){
-        
+    for (let i = 0; i < shuffleNum; i++) {
+        let from = Math.floor(Math.random() * arr.length);
+        let to = Math.floor(Math.random() * arr.length);
+        [copy[from], copy[to]] = [copy[to], copy[from]]
     }
+    return copy;
 }
 
-
+console.log(customShuffle([1, 2, 3, 4, 5]));
 
 // Task 4: Array Intersection and Union
 // Create a function called getArrayIntersection that takes two arrays as
 // arguments and returns a new array containing the common elements
 // between the two arrays.
+/**
+ * @param {Array} arr1 
+ * @param {Array} arr2 
+ */
+function getArrayIntersection(arr1, arr2) {
+    const res = []
+    arr1.forEach(val =>
+        arr2.indexOf(val) !== -1 && res.indexOf(val) === -1 ?
+            res.push(val) : null);
+    return res;
+}
+console.log(getArrayIntersection(
+    [1, 2, 3, 3, 3, 7],
+    [5, 7, 4, 1, 3, 2, 2, 0]));
 
 // Create a function called getArrayUnion that takes two arrays as 
 // arguments and returns a new array containing all unique elements 
 // from both arrays, without any duplicates.
-
 
 
 
