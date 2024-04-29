@@ -15,11 +15,50 @@
  */
 function customFilterUnique(arr, cb) {
     const arrCopy = [...arr];
+    const res = []
     arrCopy.forEach(el => {
-
+        if (cb(el)) {
+            res.push(el);
+        }
     });
-
+    return res;
 }
+
+function checkUniqueProp(prop) {
+    const propVals = [];
+    return function (obj) {
+        const check = propVals.indexOf(obj[prop]) == -1
+        if (check) { propVals.push(obj[prop]) };
+        return check;
+    }
+}
+const checkUniqueTel = checkUniqueProp('tel');
+
+const testPersons = [
+    {
+        name: 'Jack',
+        tel: '+32452345123132'
+    },
+    {
+        name: 'Jill',
+        tel: '+123456789'
+    },
+    {
+        name: 'Mike',
+        tel: '+123456789'
+    },
+    {
+        name: 'Alice',
+        tel: '+112233445566'
+    },
+    {
+        name: 'Bob',
+        tel: '+32452345123132'
+    },
+];
+
+console.log(customFilterUnique(testPersons, checkUniqueTel));
+
 
 // Task 2: Array Chunking
 // Create a function called chunkArray that takes an array and a chunk size
@@ -125,13 +164,10 @@ function measureArrayPerformance(fn, arr) {
 // built-in array methods (map, filter, reduce, etc.) against your custom
 // array manipulation functions.
 
+const checkUniqueTel1 = checkUniqueProp('tel');
+const checkUniqueTel2 = checkUniqueProp('tel');
+
 {
     {
-        console.log('Custom fun: ' +
-            measureArrayPerformance(customShuffle, [1, 2, 3, 4, 5]));
-
-        console.log('Custom fun: ' +
-            measureArrayPerformance(()=>{}, [1, 2, 3, 4, 5]));
-
     }
 }
