@@ -167,7 +167,10 @@ function measureArrayPerformance(fn, arr) {
 const checkUniqueTel1 = checkUniqueProp('tel');
 const checkUniqueTel2 = checkUniqueProp('tel');
 
-{
-    {
-    }
-}
+console.log('Custom fun: ' +
+    measureArrayPerformance((arr) => { customFilterUnique(arr, checkUniqueTel1) },
+        testPersons));
+
+console.log('Built-in fun: ' +
+    measureArrayPerformance((arr) => { arr.filter(checkUniqueTel2) },
+        testPersons));
