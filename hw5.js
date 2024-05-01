@@ -13,26 +13,27 @@
  * @param {Array} arr 
  * @param {Function} cb 
  */
+
 function customFilterUnique(arr, cb) {
     const arrCopy = [...arr];
     const res = []
+    let unique = true;
     arrCopy.forEach(el => {
-        if (cb(el)) {
+        unique = true
+        res.forEach(resEl => {
+            if (JSON.stringify(resEl) === JSON.stringify(el)) {
+                unique = false;
+            }
+        })
+        if (!cb(el)) {
+            unique = false;
+        }
+        if (unique) {
             res.push(el);
         }
     });
     return res;
 }
-
-function checkUniqueProp(prop) {
-    const propVals = [];
-    return function (obj) {
-        const check = propVals.indexOf(obj[prop]) == -1
-        if (check) { propVals.push(obj[prop]) };
-        return check;
-    }
-}
-const checkUniqueTel = checkUniqueProp('tel');
 
 const testPersons = [
     {
@@ -49,15 +50,16 @@ const testPersons = [
     },
     {
         name: 'Alice',
-        tel: '+112233445566'
     },
     {
-        name: 'Bob',
+        name: 'Jack',
         tel: '+32452345123132'
     },
 ];
-
-console.log(customFilterUnique(testPersons, checkUniqueTel));
+console.log(customFilterUnique(testPersons, obj => {
+    if (!obj || typeof obj !== 'object') { throw new Error('callback param should be object') }
+    return Object.keys(obj).includes('tel') ? obj : undefined;
+}));
 
 
 // Task 2: Array Chunking
