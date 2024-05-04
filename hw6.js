@@ -74,13 +74,9 @@ const highlightKeywords = (template, keywords) => {
 }
 const keywords = ["JavaScript", "template", "tagged"];
 const template = "Learn \${0} tagged templates to create custom \${1} literals for \${2} manipulation.";
-{
-    {
-        const highlighted = highlightKeywords(template, keywords);
-        console.log(highlighted);
+const highlighted = highlightKeywords(template, keywords);
+console.log(highlighted);
 
-    }
-}
 
 // Expected: "Learn <span class='highlight'>JavaScript</span> 
 // tagged templates to create custom <span class='highlight'>template</span>
@@ -117,6 +113,8 @@ console.log(code);
 // "1 function add(a, b) {
 //  2 return a + b;
 //  3 }"
+
+
 
 // Task 4: Implementing Debounce Function
 
@@ -162,7 +160,67 @@ function debouncedSearch(query) {
 
 const debouncedSearchHandler = debounce(debouncedSearch, 2000);
 
-const inputElement = document.getElementById("search-input");
-inputElement.addEventListener("input", event => {
-    debouncedSearchHandler(event.target.value);
-});
+// const inputElement = document.getElementById("search-input");
+// inputElement.addEventListener("input", event => {
+//     debouncedSearchHandler(event.target.value);
+// });
+
+
+
+// Task 5: Implementing Throttle Function
+
+// Your task is to implement a throttle function that takes a function
+//  and a time interval as arguments. The throttle function should ensure
+//  that the provided function is executed at most once within the
+//  specified time interval.
+
+// Instructions
+
+// 1. Implement a function called `throttle` that takes two arguments:
+// `func`: The function to be throttled.
+// interval: The time interval (in milliseconds) within which the function
+//  can be executed.
+
+// The throttle function should return a new function that wraps the 
+// provided function.
+
+// When the new function is invoked, it should:
+// Check if the specified time interval has elapsed since the last 
+// execution of the provided function.
+// If the interval has not elapsed, ignore the invocation.
+// If the interval has elapsed, execute the provided function and 
+// update the last execution timestamp.
+
+
+function throttle(func, interval) {
+    let timeout = -1;
+    let elapsed = true;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(
+            () => { elapsed = true; },
+            interval);
+        if (elapsed) {
+            func(...args);
+            elapsed = false;
+        }
+        else {
+            console.log('not elapsed');
+        }
+    }
+}
+
+// Test your throttle function by using it to throttle a scroll event 
+// listener. Ensure that the provided function is executed at most once
+// within the specified time interval during rapid scrolling.
+
+function onScroll(event) {
+    // Handle scroll event
+    console.log("Scroll event:", event);
+}
+
+const throttledScrollHandler = throttle(onScroll, 1000);
+// window.addEventListener("scroll", throttledScrollHandler);
+
+
+
