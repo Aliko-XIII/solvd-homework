@@ -318,9 +318,9 @@ function partionalCurry(func, arity) {
 }
 
 const partionalCurriedMultiply = partionalCurry(multiply, 3);
-const partionalStep1 = partionalCurriedMultiply(2); // Returns a curried function
-const [partionalStep2, stepMissed2] = partionalStep1('_'); // Returns a curried function
-const [partionalStep3, stepMissed3] = partionalStep2('_'); // Returns the final result: 2 * 3 * 4 = 24
+const partionalStep1 = partionalCurriedMultiply(2); 
+const [partionalStep2, stepMissed2] = partionalStep1('_');
+const [partionalStep3, stepMissed3] = partionalStep2('_'); 
 stepMissed2(3);
 const partionalResult = stepMissed3(4);
 console.log(partionalResult);
