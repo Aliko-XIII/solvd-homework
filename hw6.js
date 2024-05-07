@@ -295,6 +295,9 @@ function partionalCurry(func, arity) {
             args.push(placeholderSymbol);
             let index = args.length - 1;
             return [curried, arg => {
+                if (arg === placeholder) {
+                    throw new Error('Cannot pass placeholder to replace placeholder')
+                }
                 args[index] = arg;
                 if (args.length === arity
                     && args.indexOf(placeholderSymbol) === -1) {
@@ -318,8 +321,8 @@ const partionalCurriedMultiply = partionalCurry(multiply, 3);
 const partionalStep1 = partionalCurriedMultiply(2); // Returns a curried function
 const [partionalStep2, stepMissed2] = partionalStep1('_'); // Returns a curried function
 const [partionalStep3, stepMissed3] = partionalStep2('_'); // Returns the final result: 2 * 3 * 4 = 24
-const step2Finished = stepMissed2(3);
+stepMissed2(3);
 const partionalResult = stepMissed3(4);
-console.log(result);
+console.log(partionalResult);
 
 
