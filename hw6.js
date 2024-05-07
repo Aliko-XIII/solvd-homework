@@ -277,3 +277,49 @@ const result = step2(4); // Returns the final result: 2 * 3 * 4 = 24
 
 console.log("Result:", result); // Expected: 24
 
+// Extend your currying function to allow partial application. Implement
+//  a special symbol (e.g., _) that represents a placeholder for missing
+//  arguments. The curried function should be able to accept arguments in
+//  any order, while placeholders are used for missing arguments.
+/**
+ * 
+ * @param {Function} func 
+ * @param {number} arity 
+ */
+function partionalCurry(func, arity) {
+    const args = [];
+    const placeholder = '_';
+    const placeholderSymbol = Symbol(placeholder);
+    return curried = (arg) => {
+        if (arg === placeholder) {
+            args.push(placeholderSymbol);
+            let index = args.length - 1;
+            return [curried, arg => {
+                args[index] = arg;
+                if (args.length === arity
+                    && args.indexOf(placeholderSymbol) === -1) {
+                    return func(...args);
+                }
+            }]
+        }
+        args.push(arg);
+        if (args.length === arity
+            && args.indexOf(placeholderSymbol) === -1
+        ) {
+            return func(...args);
+        }
+        else {
+            return curried;
+        }
+    };
+}
+
+const partionalCurriedMultiply = partionalCurry(multiply, 3);
+const partionalStep1 = partionalCurriedMultiply(2); // Returns a curried function
+const [partionalStep2, stepMissed2] = partionalStep1('_'); // Returns a curried function
+const [partionalStep3, stepMissed3] = partionalStep2('_'); // Returns the final result: 2 * 3 * 4 = 24
+const step2Finished = stepMissed2(3);
+const partionalResult = stepMissed3(4);
+console.log(result);
+
+
