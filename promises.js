@@ -130,21 +130,6 @@ promiseAllSettled(promises2)
  * @param {Array<Function>} functionsArray 
  */
 const chainPromises = (functionsArray) =>
-    //     {
-    //     let initialPromise = Promise.resolve();
-
-    //     for (let func of functionsArray) {
-    //         initialPromise = initialPromise
-    //             .then(func) 
-    //             .catch(reason => {
-    //                 return Promise.reject(reason);
-    //             });
-    //     }
-
-    //     // Return the final chained promise
-    //     return initialPromise;
-
-    // }
     new Promise((resolve, reject) => {
         let counter = 0;
         functionsArray.reduce((acc, func) => {
