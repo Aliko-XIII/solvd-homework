@@ -111,3 +111,81 @@ promiseAllSettled(promises2)
         // { status: 'rejected', reason: 'Error occurred' },
         // { status: 'fulfilled', value: 3 }]
     });
+
+// Task 3: Implement Chaining of Promises as a Separate Function
+// Your task is to implement a function called chainPromises that facilitates chaining of
+// promises.The function should accept an array of functions that return promises
+// and execute them sequentially.
+
+// Instructions
+//  Implement a function called chainPromises that takes an array of functions as an
+// argument.
+//  Each function in the array should return a promise.
+//  The chainPromises function should execute the functions sequentially, chaining
+// the promises together.
+//  The returned promise should resolve with the value of the last resolved
+// promise or reject with the reason of the first rejected promise.
+/**
+ * 
+ * @param {Array<Function>} functionsArray 
+ */
+const chainPromises = (functionsArray) =>
+    //     {
+    //     let initialPromise = Promise.resolve();
+
+    //     for (let func of functionsArray) {
+    //         initialPromise = initialPromise
+    //             .then(func) 
+    //             .catch(reason => {
+    //                 return Promise.reject(reason);
+    //             });
+    //     }
+
+    //     // Return the final chained promise
+    //     return initialPromise;
+
+    // }
+    new Promise((resolve, reject) => {
+        let counter = 0;
+        functionsArray.reduce((acc, func) => {
+            if (counter === functionsArray.length - 1) {
+                acc.then(val => {
+                    resolve(func(val))
+                })
+            }
+            counter++
+            return acc.then(func)
+                .catch(reason => { reject(reason) });
+        }, Promise.resolve());
+    })
+
+// function asyncFunction1() {
+//     return Promise.resolve("Result from asyncFunction1");
+// }
+// function asyncFunction2(data) {
+//     return Promise.resolve(data + " - Result from asyncFunction2");
+// }
+// function asyncFunction3(data) {
+//     return Promise.resolve(data + " - Result from asyncFunction3");
+// }
+
+function asyncFunction1() {
+    return Promise.resolve("Result from asyncFunction1");
+}
+function asyncFunction2(data) {
+    return Promise.reject("Some error of asyncFunction2");
+}
+function asyncFunction3(data) {
+    return Promise.resolve(data + " - Result from asyncFunction3");
+}
+
+const functionsArray = [asyncFunction1, asyncFunction2, asyncFunction3];
+
+chainPromises(functionsArray)
+    .then(result => {
+        console.log("Chained promise result:", result);
+        // Expected: "Result from asyncFunction1 - Result from asyncFunction2 - Result from asyncFunction3"
+    })
+    .catch(error => {
+        console.error("Chained promise error:", error);
+    });
