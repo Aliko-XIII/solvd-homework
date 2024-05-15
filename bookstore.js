@@ -29,10 +29,6 @@ class Book {
     toString() {
         return `Book "${this.title}" by ${this.author} sold for ${this.price * (1 - this.discount)}."`
     }
-
-    // static searchBook(){
-
-    // }
 }
 
 /**
