@@ -135,7 +135,17 @@ class StudentUser extends User {
         this.discount += 0.2;
     }
 }
+
+/**
+ * Represents a base class for book records.
+ * Provides properties for book records.
+ */
 class BookRecord {
+    /**
+     * Creates a new instance of the BookRecord class.
+     * @param {Book} book - The book in the record.
+     * @param {number} amount - The number of book copies.
+     */
     constructor(book, amount = 1) {
         this.book = book;
         this.amount = amount;
@@ -234,6 +244,10 @@ class Cart {
         return Object.values(this.#bookRecords).map(record => record.book);
     }
 
+    /**
+     * Get the cart's book records.
+     * @returns {BookRecord[]} The array of book records.
+     */
     get bookRecords() {
         return Object.values(this.#bookRecords);
     }
@@ -253,7 +267,7 @@ class Cart {
 /**
  * Calculates total price of books.
  * @param {User} user - user checking books.
- * @param {BookRecord[]} bookRecords - bookRecords to calculate price.
+ * @param {BookRecord[]} bookRecords - book records to calculate price.
  * @returns {number} - total price of books.
  */
 function getBooksPrice(user, ...bookRecords) {
