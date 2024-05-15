@@ -135,14 +135,22 @@ class StudentUser extends User {
         this.discount += 0.2;
     }
 }
-
+class BookRecord {
+    constructor(book, amount = 1) {
+        this.book = book;
+        this.amount = amount;
+    }
+}
 
 /**
  * Represents a base class for user's cart.
  * Provides properties and methods for carts.
  */
 class Cart {
-    #books;
+    // A private field with object of book records.
+    // Keys are books' ISBN
+    // Values are BookRecord objects
+    #bookRecords;
 
     /**
      * Creates a new instance of the Cart class.
@@ -150,7 +158,7 @@ class Cart {
      */
     constructor(user) {
         this.user = user;
-        this.#books = {};
+        this.#bookRecords = {};
     }
 
     /**
@@ -162,14 +170,11 @@ class Cart {
             console.log(addedBook.toString() + ' is not available');
             return;
         }
-        if (addedBook.isbn in this.#books) {
-            this.#books[addedBook.isbn].amount++;
+        if (addedBook.isbn in this.#bookRecords) {
+            this.#bookRecords[addedBook.isbn].amount++;
         }
         else {
-            this.#books[addedBook.isbn] = {
-                book: addedBook,
-                amount: 1,
-            }
+            this.#bookRecords[addedBook.isbn] = new BookRecord(addedBook);
         }
     }
 
@@ -192,15 +197,15 @@ class Cart {
      * @param {string} bookisbn - The ISBN of the book to remove.
      */
     removeBook(bookisbn) {
-        if (bookisbn in this.#books) {
-            this.#books[bookisbn].amount--;
-            console.log(`Book ${this.#books[bookisbn].book.title} amount in cart is reduced`);
+        if (bookisbn in this.#bookRecords) {
+            this.#bookRecords[bookisbn].amount--;
+            console.log(`Book ${this.#bookRecords[bookisbn].book.title} amount in cart is reduced`);
         } else {
             console.log('There is no such book in your cart');
             return;
         }
-        if (this.#books[bookisbn].amount <= 0) {
-            delete this.#books[bookisbn];
+        if (this.#bookRecords[bookisbn].amount <= 0) {
+            delete this.#bookRecords[bookisbn];
             console.log('Book is no longer in cart')
         }
     }
@@ -210,7 +215,7 @@ class Cart {
      * @returns {number} The total price.
      */
     get totalPrice() {
-        let total = Object.values(this.#books).reduce((acc, record) => {
+        let total = Object.values(this.#bookRecords).reduce((acc, record) => {
             let discount = 1 - (this.user.discount + record.book.discount);
             discount += this.user.constructor.name == "StudentUser"
                 && record.book.constructor.name == "TextBook" ? 0.05 : 0;
@@ -218,7 +223,7 @@ class Cart {
                 && this.user.grade == record.book.grade ? 0.05 : 0;
             return acc + record.book.price * record.amount * discount;
         }, 0);
-        return Math.round(total*100)/100;
+        return Math.round(total * 100) / 100;
     }
 
     /**
@@ -226,28 +231,38 @@ class Cart {
      * @returns {Book[]} The array of books.
      */
     get books() {
-        return Object.values(this.#books);
+        return Object.values(this.#bookRecords).map(record => record.book);
+    }
+
+    get bookRecords() {
+        return Object.values(this.#bookRecords);
     }
 
     //Logs the order details to the console
     showCart() {
         console.log(this.user.name + "'s Cart:");
-        this.books.forEach(book => {
-            console.log(book.toString());
+        Object.values(this.#bookRecords).forEach(record => {
+            console.log(record.book.toString() + "x" + record.amount);
         })
         console.log("Total Price:", this.totalPrice);
+        console.log()
     }
 }
 
 
 /**
  * Calculates total price of books.
- * @param {Book[]} books - books to calculate price.
+ * @param {User} user - user checking books.
+ * @param {BookRecord[]} bookRecords - bookRecords to calculate price.
  * @returns {number} - total price of books.
  */
-function getBooksPrice(...books) {
-    const tempCart = new Cart();
-    books.forEach(book => { tempCart.addBook(book) });
+function getBooksPrice(user, ...bookRecords) {
+    const tempCart = new Cart(user);
+    bookRecords.forEach(record => {
+        for (let i = 0; i < record.amount; i++) {
+            tempCart.addBook(record.book);
+        }
+    });
     return tempCart.totalPrice;
 }
 
@@ -259,12 +274,12 @@ class Order {
     /**
      * Creates a new instance of the Cart class.
      * @param {User} user - The user which makes order.
-     * @param {Book[]} books - The books in the order.
+     * @param {BookRecord[]} books - The book records in the order.
      */
     constructor(user, books) {
         this.user = user;
         this.books = books;
-        this.totalPrice = getBooksPrice(...books);
+        this.totalPrice = getBooksPrice(user, ...books);
     }
 
     //Logs the order details to the console
@@ -273,26 +288,27 @@ class Order {
         let userType = this.user.constructor.name == "StudentUser" ? "Student" : "User";
         console.log(userType + ": ", this.user.name);
         console.log("Books:");
-        this.books.forEach(book => {
-            console.log(book.toString());
+        this.books.forEach(record => {
+            console.log(record.book.toString() + "x" + record.amount);
         })
         console.log("Total Price:", this.totalPrice);
+        console.log();
     }
 }
 
 
 const users = [
     new User("Alice Smith", "alice@example.com", "U001"),
-    new User("Bob Johnson", "bob@example.com", "U002", 5),
-    new StudentUser("Charlie Brown", "charlie@example.com", "U003", 8),
+    new User("Bob Johnson", "bob@example.com", "U002", 0.05),
+    new StudentUser("Charlie Brown", "charlie@example.com", "U003", 0.08),
 ];
 
 const bookStore = [
     new Book("Science Encyclopedia", "John Smith", "1234567890", 10.99, true),
     new FictionBook("1984", "George Orwell", "1234567891", "Dystopia", 8.99, true, 0.05),
     new Book("Bible", "Catholic Church", "1234567892", 12.99, true, 0.07),
-    new FictionBook("Moby-Dick", "Herman Melville", "1234567893", 15.99),
-    new FictionBook("Pride and Prejudice", "Jane Austen", "1234567894", 9.99, true),
+    new FictionBook("Moby-Dick", "Herman Melville", "1234567893", "Novel", 15.99),
+    new FictionBook("Pride and Prejudice", "Jane Austen", "1234567894", "Novel", 9.99, true),
     new TextBook("Math", "Mark Black", "1234567895", 8, 14.99, true)
 ];
 
@@ -304,28 +320,30 @@ function testRun() {
     // Book removal
     aliceCart.showCart();
     aliceCart.removeBook("1234567891");
+    console.log();
     aliceCart.showCart();
-    return;
+
 
     // First user order
-    const aliceOrder = new Order(users[0], aliceCart.books);
+    const aliceOrder = new Order(users[0], aliceCart.bookRecords);
     aliceOrder.showOrder();
 
     // Second user
     const bobCart = new Cart(users[1]);
     bobCart.addBook(bookStore[3]);
+    bobCart.showCart();
 
     // Second user order
-    const bobOrder = new Order(users[1], bobCart.books);
+    const bobOrder = new Order(users[1], bobCart.bookRecords);
     bobOrder.showOrder();
 
     // Third user
     const charlieCart = new Cart(users[2]);
     charlieCart.addBook(bookStore[4], bookStore[5], bookStore[5],);
-    console.log("Charlie's Cart:", charlieCart.books);
+    charlieCart.showCart();
 
     // Third user order
-    const charlieOrder = new Order(users[2], charlieCart.books);
+    const charlieOrder = new Order(users[2], charlieCart.bookRecords);
     charlieOrder.showOrder();
 }
 
