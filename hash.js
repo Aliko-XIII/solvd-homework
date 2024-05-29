@@ -208,6 +208,9 @@ class HashTable {
         }
     }
 
+    /**
+     * @returns {string} stringified hash table
+     */
     toString() {
         let res = 'Hash table:\n';
         this.#table.forEach((val, index) => {
@@ -227,12 +230,21 @@ class HashTable {
         return res;
     }
 }
-
+/**
+ * Class representing info about hero.
+ * Used as value in hash table.
+ */
 class HeroInfo {
+    /**
+     * 
+     * @param {string} heroName - name of the hero
+     * @param {string} number - secret code number of hero
+     */
     constructor(heroName, number) {
         this.heroName = heroName;
         this.number = number;
     }
+
     toString() {
         return `HeroInfo[Name: ${this.heroName}; number: ${this.number}]`;
     }
