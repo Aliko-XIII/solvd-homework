@@ -765,7 +765,7 @@ class LinkedNode {
  * Implements methods for inserting nodes, deleting nodes, 
  * and searching for a node.
  */
-class LinkedList {
+export class LinkedList {
 
     /**
      * A link to the head of the list
