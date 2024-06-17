@@ -1,11 +1,11 @@
 {
   "name": "personalproj",
   "version": "1.0.0",
-  "description": "Personal project for Solvd Node.js course.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Aliko Tektov",
-  "license": "ISC"
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
