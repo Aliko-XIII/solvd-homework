@@ -1,10 +1,11 @@
-// import { Symptom } from "./Symptom";
-// import { Organ } from "./Organ";
+const { Symptom } =require("./Symptom");
+const { Organ } =require("./Organ");
+const { client } = require("../config/database");
 
 /**
  * Class representing doctors' specializations.
  */
-export class Specialization {
+class Specialization {
     /**
      * Constructor for Specialization class.
      * @param {string} name - name of doctor's specialization
@@ -38,4 +39,17 @@ export class Specialization {
         return `Specialization: "${this.name}".
         Description: ${this.description}.`;
     }
+
+    static async getSpecializations() {
+        try {
+            const res = await client.query(`SELECT * FROM specializations;`);
+            return res.rows;
+        } catch (err) {
+            console.error('Error executing query', err.stack);
+            throw err;
+        }
+    }
+
 }
+
+module.exports = { Specialization };

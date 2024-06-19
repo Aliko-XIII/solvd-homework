@@ -1,20 +1,23 @@
-// import { Specialization } from "./Specialization";
-import { User } from "./User";
-
+const { Specialization } = require("./Specialization");
+const { User } = require("./User");
+const { Role } = require("./Role");
+const { client } = require("../config/database");
 /**
  * Class representing hospital's doctor.
  */
-export class Doctor extends User {
+class Doctor extends Role {
     /**
      * Doctor's specialization
      * @type {Specialization}
      */
     #specialization;
+
     /**
      * Date when doctor becomes available
      * @type {Date|null}
      */
     availableFrom;
+
     /**
      * Date when doctor stops being avalibale
      * @type {Date|null}
@@ -22,20 +25,22 @@ export class Doctor extends User {
     availableTill;
 
     /**
-     * Constructor for Doctor class.
-     * @param {string} name - doctor's name
-     * @param {string} surname - doctor's surname
-     * @param {string} password - doctor's password
-     * @param {number} age - doctor's age
-     * @param {number} maxLoad - max amount of patients per day for doctor
-     * @param {Specialization} specialization - doctor's specialization 
-     * @param {string} sex - doctor's sex
+     * Max patients per day for doctor
+     * @type {number}
      */
-    constructor(name, surname, age, password, specialization = null, sex = "Empty", maxLoad = 1) {
-        if (age <= 18 || age > 70) {
+    maxLoad;
+
+    /**
+     * Constructor for Doctor class.
+     * @param {Specialization} specialization - doctor's specialization 
+     * @param {number} maxLoad - max amount of patients per day for doctor
+     * @param {User} user - doctor's user record
+     */
+    constructor(specialization = null, maxLoad = 1, user) {
+        if (user.age <= 18 || user.age > 70) {
             throw new Error('Doctor\'s age should be from 18 to 70.')
         }
-        super(name, surname, password, age, sex);
+        super(user);
 
         if (typeof specialization !== 'object') {
             throw new Error('Wrong specialization data type.');
@@ -53,4 +58,20 @@ export class Doctor extends User {
     get specialization() {
         return this.#specialization;
     }
+
+    static async getDoctors() {
+        try {
+            const res = await client.query(`SELECT * FROM doctors
+                INNER JOIN users 
+                ON users.id = doctors.user_id;`);
+            return res.rows;
+        } catch (err) {
+            console.error('Error executing query', err.stack);
+            throw err;
+        }
+    }
+
 }
+
+
+module.exports = { Doctor };
