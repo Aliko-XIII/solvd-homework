@@ -4,13 +4,14 @@ const { client } = require("../config/database");
  * Class representing patients' symptoms.
  */
 class Symptom {
-    constructor(name, locationOrgan = null, description = '') {
+    constructor(id, name, description = '', locationOrgan = null) {
+        this.id = id;
         if (typeof name !== 'string') {
             throw new Error('Name should be string');
         }
         this.name = name;
 
-        if (typeof this.locationOrgan !== 'object') {
+        if (typeof locationOrgan !== 'object') {
             throw new Error('Organ should be object');
         }
         this.locationOrgan = locationOrgan;
@@ -30,13 +31,34 @@ class Symptom {
     static async getSymptoms() {
         try {
             const res = await client.query(`SELECT * FROM symptoms;`);
-            return res.rows;
+            const symptoms = [];
+            res.rows.forEach(row => {
+                let symptom = new Symptom(row.id, row.name, row.description);
+                symptoms.push(symptom);
+            });
+            return symptoms;
         } catch (err) {
             console.error('Error executing query', err.stack);
             throw err;
         }
     }
 
+    static async getSymptomsById(...id) {
+        try {
+            const res = await client.query(`SELECT * FROM symptoms 
+                WHERE id IN (${id.toString()});`);
+            const symptoms = [];
+            res.rows.forEach(row => {
+                let symptom = new Symptom(row.id, row.name, row.description);
+                symptoms.push(symptom);
+            });
+            return symptoms;
+        } catch (err) {
+            console.error('Error executing query', err.stack);
+            throw err;
+        }
+    }
 }
+
 
 module.exports = { Symptom };

@@ -1,5 +1,5 @@
 const { client } = require("../config/database");
-const { Role } = require("./Role");
+// const { Role } = require("./Role");
 
 /**
  * Class representing hosptial system's user.
@@ -93,6 +93,26 @@ class User {
             throw err;
         }
     }
+
+    static async getUsersById(...id) {
+        try {
+            const res = await client.query(`SELECT * FROM users
+                WHERE id IN (${id.toString()});`);
+            const users = [];
+            res.rows.forEach(row => {
+                const user = new User(row.id, row.name, row.surname,
+                    row.password, row.age, row.sex
+                );
+                users.push(user);
+            })
+            return users;
+        } catch (err) {
+            console.error('Error executing query', err.stack);
+            throw err;
+        }
+    }
+
+
 
 }
 

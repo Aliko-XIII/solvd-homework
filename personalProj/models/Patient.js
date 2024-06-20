@@ -28,12 +28,15 @@ class Patient extends Role {
         this.insurance = insurance;
     }
 
+    /**
+     * 
+     * @returns {Patient[]}
+     */
     static async getPatients() {
         try {
             const res = await client.query(`SELECT * FROM patients;`);
-
             const patients = [];
-            const users = await User.getUsers();
+            const users = await User.getUsersById(...res.rows.map(row => row.user_id));
             users.forEach(user => {
                 let userRow = res.rows.find(row => row.user_id == user.id);
                 if (userRow) {
@@ -50,3 +53,5 @@ class Patient extends Role {
 
 
 module.exports = { Patient };
+
+Patient.getPatients().then(patients => console.log(patients.map(patient => patient.user)));
