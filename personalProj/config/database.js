@@ -12,4 +12,12 @@ client.connect()
     .then(() => console.log('Connected to the PostgreSQL'))
     .catch(err => console.error('Connection error', err.stack));
 
-module.exports = { client };
+function query(queryStr) {
+    try {
+        return client.query(queryStr);
+    } catch (err) {
+        console.error('Error executing query', err.stack);
+        throw err;
+    }
+}
+module.exports = { client, query };

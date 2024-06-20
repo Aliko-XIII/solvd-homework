@@ -1,4 +1,4 @@
-const { client } = require("../config/database");
+const { query } = require("../config/database");
 
 /**
  * Class representing patients' symptoms.
@@ -28,37 +28,26 @@ class Symptom {
         Location: ${this.locationOrgan == null ? 'Not mentioned' : `\n` + this.locationOrgan.toString()}`;
     }
 
+    static async getSymptomsFromData(rows) {
+        if (rows.length == 0) { return []; }
+        const symptoms = [];
+        rows.forEach(row => {
+            let symptom = new Symptom(row.id, row.name, row.description);
+            symptoms.push(symptom);
+        });
+        return symptoms;
+    }
+
     static async getSymptoms() {
-        try {
-            const res = await client.query(`SELECT * FROM symptoms;`);
-            const symptoms = [];
-            res.rows.forEach(row => {
-                let symptom = new Symptom(row.id, row.name, row.description);
-                symptoms.push(symptom);
-            });
-            return symptoms;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+        const res = await query(`SELECT * FROM symptoms;`);
+        return await this.getSymptomsFromData(res.rows);
     }
 
     static async getSymptomsById(...id) {
-        try {
-            const res = await client.query(`SELECT * FROM symptoms 
-                WHERE id IN (${id.toString()});`);
-            const symptoms = [];
-            res.rows.forEach(row => {
-                let symptom = new Symptom(row.id, row.name, row.description);
-                symptoms.push(symptom);
-            });
-            return symptoms;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+        const res = await query(`SELECT * FROM symptoms 
+            WHERE id IN (${id.toString()});`);
+        return await this.getSymptomsFromData(res.rows);
     }
 }
-
 
 module.exports = { Symptom };

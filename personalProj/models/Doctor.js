@@ -1,7 +1,7 @@
 const { Specialization } = require("./Specialization");
 const { User } = require("./User");
 const { Role } = require("./Role");
-const { client } = require("../config/database");
+const { query } = require("../config/database");
 /**
  * Class representing hospital's doctor.
  */
@@ -59,46 +59,44 @@ class Doctor extends Role {
         return this.specialization;
     }
 
-    static async getDoctors() {
-        try {
-            const res = await client.query(`SELECT * FROM doctors
-                INNER JOIN users 
-                ON users.id = doctors.user_id;`);
-            return res.rows;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
+
+    static async getDoctorsFromData(rows) {
+        if (rows.length == 0) { return []; }
+        const doctors = [];
+        const users = await User.getUsersById(...rows.map(row => row.user_id));
+        for (let user of users) {
+            let userRow = rows.find(row => row.user_id == user.id);
+            if (!userRow) { continue; }
+            let doctor = new Doctor(user, null, userRow.max_load);
+            doctor.availableFrom = userRow.available_from;
+            doctor.availableTill = userRow.available_till;
+            const specialization = (await Specialization.getSpecializationsById(
+                userRow.specialization))[0];
+            doctor.specialization = specialization;
+            console.log(specialization);
+            doctors.push(doctor);
         }
+        return doctors;
+    }
+    /**
+     * 
+     * @returns {Doctor[]}
+     */
+    static async getDoctors() {
+        const res = await query(`SELECT * FROM doctors;`);
+        return await Doctor.getDoctorsFromData(res.rows);
     }
 
     /**
      * 
      * @returns {Doctor[]}
      */
-    static async getDoctors() {
-        try {
-            const res = await client.query(`SELECT * FROM doctors;`);
-            const doctors = [];
-            const users = await User.getUsersById(...res.rows.map(row => row.user_id));
-            for (let user of users) {
-                let userRow = res.rows.find(row => row.user_id == user.id);
-                if (!userRow) { continue; }
-                let doctor = new Doctor(user, null, userRow.max_load);
-                doctor.availableFrom = userRow.available_from;
-                doctor.availableTill = userRow.available_till;
-                const specialization = (await Specialization.getSpecializationsById(userRow.specialization))[0];
-                doctor.specialization = specialization;
-                console.log(specialization);
-                doctors.push(doctor);
-            }
-            return doctors;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+    static async getDoctorsById(...id) {
+        const res = await query(`SELECT * FROM doctors
+            WHERE user_id IN (${id.toString()});`);
+        return getDoctorsFromData(res.rows);
     }
 
 }
 
-Doctor.getDoctors().then(console.log)
 module.exports = { Doctor };

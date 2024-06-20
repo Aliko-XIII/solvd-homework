@@ -1,4 +1,4 @@
-const { client } = require("../config/database");
+const { query } = require("../config/database");
 
 /**
  * Class representing treated organs.
@@ -11,7 +11,7 @@ class Organ {
         if (typeof name !== 'string') {
             throw new Error('Name should be string');
         }
-        this.name = name;`SELECT * FROM symptoms 
+        this.name = name; `SELECT * FROM symptoms 
                 WHERE id IN (${id.toString()});`
 
         if (typeof description !== 'string') {
@@ -25,35 +25,25 @@ class Organ {
         Description: ${this.description.length == 0 ? 'Empty.' : this.description}`;
     }
 
+    static async getOrgansFromData(rows) {
+        if (rows.length == 0) { return []; }
+        const organs = [];
+        rows.forEach(row => {
+            let organ = new Organ(row.id, row.name, row.description);
+            organs.push(organ);
+        });
+        return organs;
+    }
+
     static async getOrgans() {
-        try {
-            const res = await client.query(`SELECT * FROM organs;`);
-            const organs = [];
-            res.rows.forEach(row => {
-                let organ = new Organ(row.id, row.name, row.description);
-                organs.push(organ);
-            });
-            return organs;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+        const res = await query(`SELECT * FROM organs;`);
+        return await this.getOrgansFromData(res.rows);
     }
 
     static async getOrgansById(...id) {
-        try {
-            const res = await client.query(`SELECT * FROM organs 
-                WHERE id IN (${id.toString()});`);
-            const organs = [];
-            res.rows.forEach(row => {
-                let organ = new Organ(row.id, row.name, row.description);
-                organs.push(organ);
-            });
-            return organs;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+        const res = await query(`SELECT * FROM organs 
+            WHERE id IN (${id.toString()});`);
+        return await this.getOrgansFromData(res.rows);
     }
 
 }

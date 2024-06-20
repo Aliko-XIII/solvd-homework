@@ -1,6 +1,6 @@
 const { Symptom } = require("./Symptom");
 const { Organ } = require("./Organ");
-const { client } = require("../config/database");
+const { query } = require("../config/database");
 
 /**
  * Class representing doctors' specializations.
@@ -42,70 +42,43 @@ class Specialization {
         Description: ${this.description}.`;
     }
 
-    static async getSpecializations() {
-        try {
-            const symptoms = await Symptom.getSymptoms();
-            const organs = await Organ.getOrgans();
-            const toSymptomsQuery = await client.query(`SELECT * FROM specializations_to_symptoms;`);
-            const toOrgansQuery = await client.query(`SELECT * FROM specializations_to_organs;`);
-            const query = await client.query(`SELECT * FROM specializations;`);
+    static async getSpecializationsFromData(rows) {
+        if (rows.length == 0) { return []; }
+        const symptoms = await Symptom.getSymptoms();
+        const organs = await Organ.getOrgans();
+        const toSymptomsQuery = await query(`SELECT * FROM specializations_to_symptoms;`);
+        const toOrgansQuery = await query(`SELECT * FROM specializations_to_organs;`);
 
-            const specializations = [];
-            for (let row of query.rows) {
-                let specialization = new Specialization(row.id, row.name, row.description);
+        const specializations = [];
+        for (let row of rows) {
+            let specialization = new Specialization(row.id, row.name, row.description);
 
-                let specializationSymptoms = toSymptomsQuery.rows
-                    .filter(rec => rec.specialization == specialization.id)
-                    .map(rec => symptoms.find(symptom => symptom.id == rec.symptom));
-                specialization.symptoms.push(...specializationSymptoms);
+            let specializationSymptoms = toSymptomsQuery.rows
+                .filter(rec => rec.specialization == specialization.id)
+                .map(rec => symptoms.find(symptom => symptom.id == rec.symptom));
+            specialization.symptoms.push(...specializationSymptoms);
 
-                let specializationOrgans = toOrgansQuery.rows
-                    .filter(rec => rec.specialization == specialization.id)
-                    .map(rec => organs.find(organ => organ.id == rec.organ));
-                specialization.organs.push(...specializationOrgans);
+            let specializationOrgans = toOrgansQuery.rows
+                .filter(rec => rec.specialization == specialization.id)
+                .map(rec => organs.find(organ => organ.id == rec.organ));
+            specialization.organs.push(...specializationOrgans);
 
-                specializations.push(specialization);
-            }
-            return specializations;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
+            specializations.push(specialization);
         }
+        return specializations;
+    }
+
+    static async getSpecializations() {
+        const query = await query(`SELECT * FROM specializations;`);
+        return await Specialization.getSpecializationsFromData(query.rows);
     }
 
     static async getSpecializationsById(...id) {
-        try {
-            const symptoms = await Symptom.getSymptoms();
-            const organs = await Organ.getOrgans();
-            const toSymptomsQuery = await client.query(`SELECT * FROM specializations_to_symptoms;`);
-            const toOrgansQuery = await client.query(`SELECT * FROM specializations_to_organs;`);
-            const query = await client.query(`SELECT * FROM specializations WHERE id IN (${id.toString()});`);
-
-            const specializations = [];
-            for (let row of query.rows) {
-                let specialization = new Specialization(row.id, row.name, row.description);
-
-                let specializationSymptoms = toSymptomsQuery.rows
-                    .filter(rec => rec.specialization == specialization.id)
-                    .map(rec => symptoms.find(symptom => symptom.id == rec.symptom));
-                specialization.symptoms.push(...specializationSymptoms);
-
-                let specializationOrgans = toOrgansQuery.rows
-                    .filter(rec => rec.specialization == specialization.id)
-                    .map(rec => organs.find(organ => organ.id == rec.organ));
-                specialization.organs.push(...specializationOrgans);
-
-                specializations.push(specialization);
-            }
-            return specializations;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+        const query = await query(`SELECT * FROM specializations 
+            WHERE id IN (${id.toString()});`);
+        return await Specialization.getSpecializationsFromData(query.rows);
     }
 
 }
-
-// Specialization.getSpecializationsById(3).then(val=>console.log(val[0]));
 
 module.exports = { Specialization };

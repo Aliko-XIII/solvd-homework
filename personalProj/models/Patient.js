@@ -1,6 +1,6 @@
 const { User } = require("./User");
 const { Role } = require("./Role");
-const { client } = require("../config/database");
+const { query } = require("../config/database");
 
 /**
  * Class representing hospital's patient.
@@ -28,30 +28,37 @@ class Patient extends Role {
         this.insurance = insurance;
     }
 
+    static async getPatientsFromData(rows) {
+        if (rows.length == 0) { return []; }
+        const patients = [];
+        const users = await User.getUsersById(...rows.map(row => row.user_id));
+        users.forEach(user => {
+            let userRow = rows.find(row => row.user_id == user.id);
+            if (userRow) {
+                patients.push(new Patient(userRow.phone, userRow.insurance, user));
+            }
+        });
+        return patients;
+    }
+
     /**
      * 
      * @returns {Patient[]}
      */
     static async getPatients() {
-        try {
-            const res = await client.query(`SELECT * FROM patients;`);
-            const patients = [];
-            const users = await User.getUsersById(...res.rows.map(row => row.user_id));
-            users.forEach(user => {
-                let userRow = res.rows.find(row => row.user_id == user.id);
-                if (userRow) {
-                    patients.push(new Patient(userRow.phone, userRow.insurance, user));
-                }
-            });
-            return patients;
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+        const res = await query(`SELECT * FROM patients;`);
+        return await this.getPatientsFromData(res.rows);
+    }
+
+    /**
+     * 
+     * @returns {Patient[]}
+     */
+    static async getPatientsById(...id) {
+        const res = await query(`SELECT * FROM patients
+            WHERE user_id IN (${id.toString()});`);
+        return await this.getPatientsFromData(res.rows);
     }
 }
 
-
 module.exports = { Patient };
-
-Patient.getPatients().then(patients => console.log(patients.map(patient => patient.user)));
