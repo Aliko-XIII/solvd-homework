@@ -13,7 +13,7 @@ class Specialization {
      * @param {Symptom[]} symptoms - symptoms treated with doctor's specialization
      * @param {Organ[]} organs - organs treated with doctor's specialization
      */
-    constructor(id, name, description = '', symptoms = [], organs = []) {
+    constructor(name, description = '', symptoms = [], organs = [], id = -1) {
         this.id = id;
 
         if (typeof name !== 'string') {
@@ -79,22 +79,35 @@ class Specialization {
         return await Specialization.getSpecializationsFromData(query.rows);
     }
 
-    async insertSymptom() {
-        const res = await query(`INSERT INTO symptoms(
+    async insertSpecialization() {
+        const res = await query(`INSERT INTO specializations(
 	        name, description)
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
+        // for (let symptom of this.symptoms) {
+        //     const toSymptomRes = await query(`INSERT INTO public.specializations_to_symptoms(
+	    //     specialization, symptom)
+	    //     VALUES (${this.id}, ${symptom.id});`);
+        //     console.log('Inserted:', toSymptomRes.rows[0]);
+
+        // }
+        // for (let organ of this.organs) {
+        //     const toOrganRes = await query(`INSERT INTO public.specializations_to_organs(
+	    //     specialization, organ)
+	    //     VALUES (${this.id}, ${organ.id});`);
+        //     console.log('Inserted:', toOrganRes.rows[0]);
+        // }
     }
 
-    async deleteSymptom() {
-        const res = await query(`DELETE FROM symptoms WHERE id = ${this.id} RETURNING *;`);
+    async deleteSpecialization() {
+        const res = await query(`DELETE FROM specializations WHERE id = ${this.id} RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 
 }
 
-const test = new Symptom('test', 'descr');
-test.insertSymptom().then(() => test.deleteSymptom());
+const test = new Specialization('test', 'descr');
+test.insertSpecialization().then(() => test.deleteSpecialization());
 
 module.exports = { Specialization };

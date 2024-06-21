@@ -62,7 +62,5 @@ class Symptom {
         console.log('Deleted:', res.rows[0]);
     }
 }
-const test = new Symptom('test', 'descr');
-test.insertSymptom().then(() => test.deleteSymptom());
 
 module.exports = { Symptom };

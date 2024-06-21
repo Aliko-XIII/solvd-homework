@@ -60,7 +60,4 @@ class Organ {
     }
 }
 
-const test = new Organ('test', 'descr');
-test.insertOrgan().then(() => test.deleteOrgan());
-
 module.exports = { Organ };

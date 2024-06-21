@@ -98,9 +98,10 @@ class Doctor extends Role {
     }
 
     async insertDoctor() {
-        const res = await query(`INSERT INTO doctors(
-	        phone, insurance, user_id)
-            VALUES ('${this.phone}', '${this.insurance}', ${this.user.id}) RETURNING *;`);
+        const res = await query(`INSERT INTO public.doctors(
+            specialization, available_from, available_till, user_id, max_load)
+            VALUES (${this.specialization.id}, '${this.availableFrom}',
+            '${this.availableTill}', ${this.user.id}, ${this.maxLoad}) RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
     }
