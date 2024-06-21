@@ -97,6 +97,19 @@ class Doctor extends Role {
         return getDoctorsFromData(res.rows);
     }
 
+    async insertDoctor() {
+        const res = await query(`INSERT INTO doctors(
+	        phone, insurance, user_id)
+            VALUES ('${this.phone}', '${this.insurance}', ${this.user.id}) RETURNING *;`);
+        this.id = res.rows[0].id;
+        console.log('Inserted:', res.rows[0]);
+    }
+
+    async deleteDoctor() {
+        const res = await query(`DELETE FROM doctors WHERE user_id = ${this.user.id} RETURNING *;`);
+        console.log('Deleted:', res.rows[0]);
+    }
+
 }
 
 module.exports = { Doctor };

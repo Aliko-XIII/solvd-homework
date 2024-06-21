@@ -79,6 +79,22 @@ class Specialization {
         return await Specialization.getSpecializationsFromData(query.rows);
     }
 
+    async insertSymptom() {
+        const res = await query(`INSERT INTO symptoms(
+	        name, description)
+            VALUES ('${this.name}', '${this.description}') RETURNING *;`);
+        this.id = res.rows[0].id;
+        console.log('Inserted:', res.rows[0]);
+    }
+
+    async deleteSymptom() {
+        const res = await query(`DELETE FROM symptoms WHERE id = ${this.id} RETURNING *;`);
+        console.log('Deleted:', res.rows[0]);
+    }
+
 }
+
+const test = new Symptom('test', 'descr');
+test.insertSymptom().then(() => test.deleteSymptom());
 
 module.exports = { Specialization };

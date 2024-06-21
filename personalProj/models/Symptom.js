@@ -4,7 +4,7 @@ const { query } = require("../config/database");
  * Class representing patients' symptoms.
  */
 class Symptom {
-    constructor(id, name, description = '', locationOrgan = null) {
+    constructor(name, description = '', locationOrgan = null, id) {
         this.id = id;
         if (typeof name !== 'string') {
             throw new Error('Name should be string');
@@ -32,7 +32,7 @@ class Symptom {
         if (rows.length == 0) { return []; }
         const symptoms = [];
         rows.forEach(row => {
-            let symptom = new Symptom(row.id, row.name, row.description);
+            let symptom = new Symptom(row.name, row.description, row.id);
             symptoms.push(symptom);
         });
         return symptoms;
@@ -48,6 +48,21 @@ class Symptom {
             WHERE id IN (${id.toString()});`);
         return await this.getSymptomsFromData(res.rows);
     }
+
+    async insertSymptom() {
+        const res = await query(`INSERT INTO symptoms(
+	        name, description)
+            VALUES ('${this.name}', '${this.description}') RETURNING *;`);
+        this.id = res.rows[0].id;
+        console.log('Inserted:', res.rows[0]);
+    }
+
+    async deleteSymptom() {
+        const res = await query(`DELETE FROM symptoms WHERE id = ${this.id} RETURNING *;`);
+        console.log('Deleted:', res.rows[0]);
+    }
 }
+const test = new Symptom('test', 'descr');
+test.insertSymptom().then(() => test.deleteSymptom());
 
 module.exports = { Symptom };

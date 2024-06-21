@@ -20,7 +20,7 @@ class User {
      * @param {string} sex - user's sex
      * @param {string} password - user's password
      */
-    constructor(id, name, surname, password, age, sex = "Empty") {
+    constructor(name, surname, password, age, sex = "Empty", id = -1) {
         if (typeof id !== 'number') {
             throw new Error('ID is not valid.')
         }
@@ -81,8 +81,8 @@ class User {
         if (rows.length == 0) { return []; }
         const users = [];
         rows.forEach(row => {
-            const user = new User(row.id, row.name, row.surname,
-                row.password, row.age, row.sex
+            const user = new User(row.name, row.surname,
+                row.password, row.age, row.sex, row.id
             );
             users.push(user);
         })
@@ -98,6 +98,24 @@ class User {
         const res = await query(`SELECT * FROM users 
             WHERE id IN (${id.toString()});`);
         return await this.getUsersFromData(res.rows);
+    }
+
+    /**
+     * 
+     * @param {User} user 
+     */
+    async insertUser() {
+        const res = await query(`INSERT INTO users
+            (name, surname, age, sex, password)
+            VALUES ('${this.name}', '${this.surname}', ${this.age}, 
+            '${this.sex}', '${this.password}') RETURNING *;`);
+        this.id = res.rows[0].id;
+        console.log('Inserted:', res.rows[0]);
+    }
+
+    async deleteUser() {
+        const res = await query(`DELETE FROM users WHERE id = ${this.id} RETURNING *;`);
+        console.log('Deleted:', res.rows[0]);
     }
 }
 

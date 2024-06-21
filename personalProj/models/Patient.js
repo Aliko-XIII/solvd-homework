@@ -59,6 +59,22 @@ class Patient extends Role {
             WHERE user_id IN (${id.toString()});`);
         return await this.getPatientsFromData(res.rows);
     }
+
+    async insertPatient() {
+        const res = await query(`INSERT INTO patients(
+	        phone, insurance, user_id)
+            VALUES ('${this.phone}', '${this.insurance}', ${this.user.id}) RETURNING *;`);
+        this.id = res.rows[0].id;
+        console.log('Inserted:', res.rows[0]);
+    }
+
+    async deletePatient() {
+        const res = await query(`DELETE FROM patients WHERE user_id = ${this.user.id} RETURNING *;`);
+        console.log('Deleted:', res.rows[0]);
+    }
 }
+
+const test = new Patient('test', 'descr', new User('fsdaf', 'afsdf', 'dsafdasf', 24, 'M', 8));
+test.deletePatient();
 
 module.exports = { Patient };

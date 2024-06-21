@@ -4,7 +4,7 @@ const { query } = require("../config/database");
  * Class representing treated organs.
  */
 class Organ {
-    constructor(id, name, description = '') {
+    constructor(name, description = '', id = -1) {
 
         this.id = id;
 
@@ -29,7 +29,7 @@ class Organ {
         if (rows.length == 0) { return []; }
         const organs = [];
         rows.forEach(row => {
-            let organ = new Organ(row.id, row.name, row.description);
+            let organ = new Organ(row.name, row.description, row.id);
             organs.push(organ);
         });
         return organs;
@@ -46,6 +46,21 @@ class Organ {
         return await this.getOrgansFromData(res.rows);
     }
 
+    async insertOrgan() {
+        const res = await query(`INSERT INTO organs(
+	        name, description)
+            VALUES ('${this.name}', '${this.description}') RETURNING *;`);
+        this.id = res.rows[0].id;
+        console.log('Inserted:', res.rows[0]);
+    }
+
+    async deleteOrgan() {
+        const res = await query(`DELETE FROM organs WHERE id = ${this.id} RETURNING *;`);
+        console.log('Deleted:', res.rows[0]);
+    }
 }
+
+const test = new Organ('test', 'descr');
+test.insertOrgan().then(() => test.deleteOrgan());
 
 module.exports = { Organ };
