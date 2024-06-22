@@ -73,7 +73,6 @@ class Doctor extends Role {
             const specialization = (await Specialization.getSpecializationsById(
                 userRow.specialization))[0];
             doctor.specialization = specialization;
-            console.log(specialization);
             doctors.push(doctor);
         }
         return doctors;

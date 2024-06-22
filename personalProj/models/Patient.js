@@ -74,7 +74,7 @@ class Patient extends Role {
     }
 }
 
-const test = new Patient('test', 'descr', new User('fsdaf', 'afsdf', 'dsafdasf', 24, 'M', 8));
-test.deletePatient();
+// const test = new Patient('test', 'descr', new User('fsdaf', 'afsdf', 'dsafdasf', 24, 'M', 8));
+// test.deletePatient();
 
 module.exports = { Patient };

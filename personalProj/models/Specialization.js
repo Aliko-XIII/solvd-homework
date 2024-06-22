@@ -51,7 +51,7 @@ class Specialization {
 
         const specializations = [];
         for (let row of rows) {
-            let specialization = new Specialization(row.id, row.name, row.description);
+            let specialization = new Specialization(row.name, row.description, [], [], row.id);
 
             let specializationSymptoms = toSymptomsQuery.rows
                 .filter(rec => rec.specialization == specialization.id)
@@ -74,9 +74,9 @@ class Specialization {
     }
 
     static async getSpecializationsById(...id) {
-        const query = await query(`SELECT * FROM specializations 
+        const res = await query(`SELECT * FROM specializations 
             WHERE id IN (${id.toString()});`);
-        return await Specialization.getSpecializationsFromData(query.rows);
+        return await Specialization.getSpecializationsFromData(res.rows);
     }
 
     async insertSpecialization() {
@@ -87,15 +87,15 @@ class Specialization {
         console.log('Inserted:', res.rows[0]);
         // for (let symptom of this.symptoms) {
         //     const toSymptomRes = await query(`INSERT INTO public.specializations_to_symptoms(
-	    //     specialization, symptom)
-	    //     VALUES (${this.id}, ${symptom.id});`);
+        //     specialization, symptom)
+        //     VALUES (${this.id}, ${symptom.id});`);
         //     console.log('Inserted:', toSymptomRes.rows[0]);
 
         // }
         // for (let organ of this.organs) {
         //     const toOrganRes = await query(`INSERT INTO public.specializations_to_organs(
-	    //     specialization, organ)
-	    //     VALUES (${this.id}, ${organ.id});`);
+        //     specialization, organ)
+        //     VALUES (${this.id}, ${organ.id});`);
         //     console.log('Inserted:', toOrganRes.rows[0]);
         // }
     }
@@ -107,7 +107,7 @@ class Specialization {
 
 }
 
-const test = new Specialization('test', 'descr');
-test.insertSpecialization().then(() => test.deleteSpecialization());
+// const test = new Specialization('test', 'descr');
+// test.insertSpecialization().then(() => test.deleteSpecialization());
 
 module.exports = { Specialization };

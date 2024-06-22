@@ -11,9 +11,9 @@ class Symptom {
         }
         this.name = name;
 
-        if (typeof locationOrgan !== 'object') {
-            throw new Error('Organ should be object');
-        }
+        // if (typeof locationOrgan !== 'object') {
+        //     throw new Error('Organ should be object');
+        // }
         this.locationOrgan = locationOrgan;
 
         if (typeof description !== 'string') {
