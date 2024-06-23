@@ -1,4 +1,5 @@
 const { Patient } = require('../models/Patient');
+const { User } = require('../models/User');
 
 const getPatient = async (req, res) => {
     try {
@@ -11,8 +12,9 @@ const getPatient = async (req, res) => {
 
 const createPatient = async (req, res) => {
     try {
-        const {} = req.body;
-        const patient = new Patient(name, surname, password, age, sex);
+        const { phone, insurance, userId } = req.body;
+        const user = await User.getUsersById(userId)[0];
+        const patient = new Patient(phone, insurance, user);
         await patient.insertPatient();
         res.status(201).send(patient);
     } catch (err) {

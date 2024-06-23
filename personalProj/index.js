@@ -1,21 +1,22 @@
-
 const express = require('express');
+const userRoutes = require('./routes/userRoutes');
+
 const port = 3000;
 const app = express();
 
+app.use(userRoutes);
+app.use(express.json());
 
 
 app.get('/', (req, res) => {
-    res.send('Hello, world!');
+    res.send('Hello, it is hospital app');
 });
 
-app.get('/users/:userId', (req, res) => {
-    res.send('id:' + req.params.userId);
-});
+app.use('/users', userRoutes);
 
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Hospital app listening on port ${port}`)
 })
 
 
