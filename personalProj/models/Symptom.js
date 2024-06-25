@@ -4,17 +4,12 @@ const { query } = require("../config/database");
  * Class representing patients' symptoms.
  */
 class Symptom {
-    constructor(name, description = '', locationOrgan = null, id) {
+    constructor(name, description = '', id) {
         this.id = id;
         if (typeof name !== 'string') {
             throw new Error('Name should be string');
         }
         this.name = name;
-
-        // if (typeof locationOrgan !== 'object') {
-        //     throw new Error('Organ should be object');
-        // }
-        this.locationOrgan = locationOrgan;
 
         if (typeof description !== 'string') {
             throw new Error('Description should be string');

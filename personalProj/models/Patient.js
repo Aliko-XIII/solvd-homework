@@ -6,6 +6,7 @@ const { query } = require("../config/database");
  * Class representing hospital's patient.
  */
 class Patient extends Role {
+    // user;
     /**
      * Creates an instance of Patient.
      * @param {string} phone - patient's phone number

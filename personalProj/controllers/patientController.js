@@ -3,8 +3,17 @@ const { User } = require('../models/User');
 
 const getPatient = async (req, res) => {
     try {
-        const patient = await Patient.getPatientsById(req.params.id)[0];
-        res.status(200).send('patient', { patient: patient });
+        const patient = (await Patient.getPatientsById(req.params.id))[0];
+        res.status(200).send({ patient: patient });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
+const getAllPatients = async (req, res) => {
+    try {
+        const patients = await Patient.getPatients();
+        res.status(200).send({ patients: patients });
     } catch (err) {
         res.status(500).send(err);
     }
@@ -24,7 +33,7 @@ const createPatient = async (req, res) => {
 
 const deletePatient = async (req, res) => {
     try {
-        const patient = await Patient.getPatientsById(req.params.id)[0];
+        const patient = (await Patient.getPatientsById(req.params.id))[0];
         if (patient) {
             await patient.deletePatient();
             res.sendStatus(204);
@@ -40,4 +49,5 @@ module.exports = {
     getPatient,
     createPatient,
     deletePatient,
+    getAllPatients
 }

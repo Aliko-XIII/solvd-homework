@@ -93,7 +93,7 @@ class Doctor extends Role {
     static async getDoctorsById(...id) {
         const res = await query(`SELECT * FROM doctors
             WHERE user_id IN (${id.toString()});`);
-        return getDoctorsFromData(res.rows);
+        return Doctor.getDoctorsFromData(res.rows);
     }
 
     async insertDoctor() {
@@ -111,5 +111,6 @@ class Doctor extends Role {
     }
 
 }
+
 
 module.exports = { Doctor };

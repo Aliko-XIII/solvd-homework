@@ -48,7 +48,7 @@ class Appointment {
 
 }
 
-Appointment.getAppointments().then(console.log)
+// Appointment.getAppointments().then(console.log)
 
 module.exports = { Appointment };
 

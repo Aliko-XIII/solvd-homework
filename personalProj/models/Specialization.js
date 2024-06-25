@@ -69,8 +69,8 @@ class Specialization {
     }
 
     static async getSpecializations() {
-        const query = await query(`SELECT * FROM specializations;`);
-        return await Specialization.getSpecializationsFromData(query.rows);
+        const res = await query(`SELECT * FROM specializations;`);
+        return await Specialization.getSpecializationsFromData(res.rows);
     }
 
     static async getSpecializationsById(...id) {
@@ -108,6 +108,6 @@ class Specialization {
 }
 
 // const test = new Specialization('test', 'descr');
-// test.insertSpecialization().then(() => test.deleteSpecialization());
+// Specialization.getSpecializations().then(console.log);
 
 module.exports = { Specialization };
