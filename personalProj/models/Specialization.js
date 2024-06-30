@@ -85,19 +85,6 @@ class Specialization {
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
-        // for (let symptom of this.symptoms) {
-        //     const toSymptomRes = await query(`INSERT INTO public.specializations_to_symptoms(
-        //     specialization, symptom)
-        //     VALUES (${this.id}, ${symptom.id});`);
-        //     console.log('Inserted:', toSymptomRes.rows[0]);
-
-        // }
-        // for (let organ of this.organs) {
-        //     const toOrganRes = await query(`INSERT INTO public.specializations_to_organs(
-        //     specialization, organ)
-        //     VALUES (${this.id}, ${organ.id});`);
-        //     console.log('Inserted:', toOrganRes.rows[0]);
-        // }
     }
 
     async deleteSpecialization() {
@@ -107,7 +94,5 @@ class Specialization {
 
 }
 
-// const test = new Specialization('test', 'descr');
-// Specialization.getSpecializations().then(console.log);
 
 module.exports = { Specialization };

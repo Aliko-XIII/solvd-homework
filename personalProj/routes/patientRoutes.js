@@ -7,6 +7,8 @@ router.get('/all', patientController.getAllPatients);
 
 router.get('/:id', patientController.getPatient);
 
+router.get('/:id/appointments', patientController.getAppointments);
+
 router.post('/', patientController.createPatient);
 
 router.delete('/:id', patientController.deletePatient);

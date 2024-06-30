@@ -1,3 +1,4 @@
+const { Appointment } = require('../models/Appointment');
 const { Patient } = require('../models/Patient');
 const { User } = require('../models/User');
 
@@ -45,9 +46,19 @@ const deletePatient = async (req, res) => {
     }
 };
 
+const getAppointments = async (req, res) => {
+    try {
+        const appointments = await Appointment.getPatientAppointments(req.params.id);
+        res.status(200).send({ appointments: appointments });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 module.exports = {
     getPatient,
     createPatient,
     deletePatient,
-    getAllPatients
+    getAllPatients,
+    getAppointments
 }

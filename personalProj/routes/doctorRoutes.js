@@ -7,7 +7,9 @@ router.get('/all', doctorController.getAllDoctors);
 
 router.get('/:id', doctorController.getDoctor);
 
-// router.post('/', patientController.createPatient);
+router.get('/:id/appointments', doctorController.getAppointments);
+
+router.post('/', doctorController.createDoctor);
 
 router.delete('/:id', doctorController.deleteDoctor);
 

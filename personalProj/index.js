@@ -6,6 +6,7 @@ const doctorRoutes = require('./routes/doctorRoutes');
 const symptomRoutes = require('./routes/symptomRoutes');
 const organRoutes = require('./routes/organRoutes');
 const specializationRoutes = require('./routes/specializationRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
 const port = 3000;
 const app = express();
@@ -23,6 +24,7 @@ app.use('/doctors', doctorRoutes);
 app.use('/symptoms', symptomRoutes);
 app.use('/organs', organRoutes);
 app.use('/specializations', specializationRoutes);
+app.use('/appointments', appointmentRoutes);
 
 
 app.listen(port, () => {

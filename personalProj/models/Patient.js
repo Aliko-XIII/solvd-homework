@@ -1,6 +1,7 @@
 const { User } = require("./User");
 const { Role } = require("./Role");
 const { query } = require("../config/database");
+const { Appointment } = require("./Appointment");
 
 /**
  * Class representing hospital's patient.
@@ -73,6 +74,13 @@ class Patient extends Role {
         const res = await query(`DELETE FROM patients WHERE user_id = ${this.user.id} RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
+
+    async getAppointments() {
+        const res = await query(`SELECT * FROM appointments 
+            WHERE patient = ${this.id};`);
+        return await Appointment.getAppointmentsFromData(res.rows);
+    }
+
 }
 
 // const test = new Patient('test', 'descr', new User('fsdaf', 'afsdf', 'dsafdasf', 24, 'M', 8));
