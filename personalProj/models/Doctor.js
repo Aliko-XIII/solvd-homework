@@ -2,7 +2,7 @@ const { Specialization } = require("./Specialization");
 const { User } = require("./User");
 const { Role } = require("./Role");
 const { query } = require("../config/database");
-const { Appointment } = require("./Appointment");
+// const { Appointment } = require("./Appointment");
 /**
  * Class representing hospital's doctor.
  */
@@ -25,7 +25,7 @@ class Doctor extends Role {
      */
     availableTill;
 
-    /**
+    /** 
      * Max patients per day for doctor
      * @type {number}
      */
@@ -111,11 +111,11 @@ class Doctor extends Role {
         console.log('Deleted:', res.rows[0]);
     }
 
-    async getAppointments() {
-        const res = await query(`SELECT * FROM appointments 
-            WHERE doctor = ${this.id};`);
-        return await Appointment.getAppointmentsFromData(res.rows);
-    }
+    // async getAppointments() {
+    //     const res = await query(`SELECT * FROM appointments 
+    //         WHERE doctor = ${this.id};`);
+    //     return await Appointment.getAppointmentsFromData(res.rows);
+    // }
 
 }
 

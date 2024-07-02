@@ -13,25 +13,29 @@ const app = express();
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+});
 
 app.get('/', (req, res) => {
     res.send('Hello, it is hospital app');
 });
 
-app.use('/users', userRoutes);
-app.use('/patients', patientRoutes);
-app.use('/doctors', doctorRoutes);
-app.use('/symptoms', symptomRoutes);
-app.use('/organs', organRoutes);
-app.use('/specializations', specializationRoutes);
-app.use('/appointments', appointmentRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/symptoms', symptomRoutes);
+app.use('/api/organs', organRoutes);
+app.use('/api/specializations', specializationRoutes);
+app.use('/api/appointments', appointmentRoutes);
+
+app.use('/api/appointments', appointmentRoutes);
+
 
 
 app.listen(port, () => {
-    console.log(`Hospital app listening on port ${port        // if (typeof locationOrgan !== 'object') {
-        //     throw new Error('Organ should be object');
-        // }
-}`)
+    console.log(`Hospital app listening on port ${port}`);
 })
 
 
