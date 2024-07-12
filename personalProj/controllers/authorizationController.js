@@ -107,9 +107,7 @@ const isExpired = token => {
 
 const refreshToken = async (req, res) => {
     try {
-        console.log(req.body);
         const refreshToken = req.body.refresh_token;
-        console.log(refreshToken);
         !refreshToken ? res.send('No refresh token in request') : null;
         !validateToken(refreshToken) ? res.send('Refresh token is not valid') : null;
         // isExpired(refreshToken);
