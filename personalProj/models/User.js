@@ -20,7 +20,7 @@ class User {
      * @param {string} sex - user's sex
      * @param {string} password - user's password
      */
-    constructor(name, surname, password, age, sex = "Empty", id = -1) {
+    constructor(name, surname, phone, password, age, sex = "Empty", id = -1) {
         if (typeof id !== 'number') {
             throw new Error('ID is not valid.')
         }
@@ -58,6 +58,7 @@ class User {
             throw new Error('Age is not valid.')
         }
         this.age = age;
+        this.phone = phone;
     }
 
     /**
@@ -81,8 +82,8 @@ class User {
         if (rows.length == 0) { return []; }
         const users = [];
         rows.forEach(row => {
-            const user = new User(row.name, row.surname,
-                row.password, row.age, row.sex, row.id
+            const user = new User(row.first_name, row.last_name, row.phone,
+                row.pass, row.age, row.sex, row.user_id
             );
             users.push(user);
         })
@@ -100,15 +101,21 @@ class User {
         return await this.getUsersFromData(res.rows);
     }
 
+    static async getUserByPhone(phone) {
+        const res = await query(`SELECT * FROM users 
+            WHERE phone = '${phone}';`);
+        return (await this.getUsersFromData(res.rows))[0];
+    }
+
     /**
      * 
      * @param {User} user 
      */
     async insertUser() {
         const res = await query(`INSERT INTO users
-            (name, surname, age, sex, password)
+            (first_name, last_name, age, sex, pass, phone)
             VALUES ('${this.name}', '${this.surname}', ${this.age}, 
-            '${this.sex}', '${this.password}') RETURNING *;`);
+            '${this.sex}', '${this.password}', '${this.phone}') RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
     }

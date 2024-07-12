@@ -1,7 +1,5 @@
-class Test123{
-    constructor(){}
+const secret = 'AlikoServer';
+
+module.exports = {
+    secret: secret
 }
-
-const test = new Test123();
-
-console.log(test.constructor.name);
