@@ -20,10 +20,7 @@ class User {
      * @param {string} sex - user's sex
      * @param {string} password - user's password
      */
-    constructor(name, surname, phone, password, age, sex = "Empty", id = -1) {
-        if (typeof id !== 'number') {
-            throw new Error('ID is not valid.')
-        }
+    constructor(name, surname, phone, password, age, sex = "Empty", id = '') {
         this.id = id;
 
         if (typeof name !== 'string' ||
@@ -95,9 +92,9 @@ class User {
         return await this.getUsersFromData(res.rows);
     }
 
-    static async getUsersById(...id) {
+    static async getUserById(id) {
         const res = await query(`SELECT * FROM users 
-            WHERE id IN (${id.toString()});`);
+            WHERE user_id = '${id.toString()}';`);
         return await this.getUsersFromData(res.rows);
     }
 

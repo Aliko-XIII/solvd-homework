@@ -36,8 +36,7 @@ async function refreshToken() {
                 'Content-type': 'application/json; charset=UTF-8'
             }
 
-        })
-        .then(res => res.json());
+        }).then(res => res.json());
     return refreshedTokens;
 }
 
@@ -46,6 +45,5 @@ async function optionalRefresh() {
         const tokens = await refreshToken();
         localStorage.setItem('access_token', tokens.access_token);
         localStorage.setItem('refresh_token', tokens.refresh_token);
-    }
+    }   
 }
-

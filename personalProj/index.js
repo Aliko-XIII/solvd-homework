@@ -12,7 +12,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const authorizationRoutes = require('./routes/authorizationRoutes')
 
 //Additional functions
-const { validateToken, isExpired } = require('./controllers/authorizationController');
+const { validateSignature, isExpired } = require('./controllers/authorizationController');
 
 const port = 3000;
 const app = express();
@@ -36,7 +36,7 @@ app.use('/api/authorization', authorizationRoutes);
 //Access token validation middleware
 app.use((req, res, next) => {
   const isValid = req.headers.authorization
-    && validateToken(req.headers.authorization)
+    && validateSignature(req.headers.authorization)
     && !isExpired(req.headers.authorization);
 
   isValid ?

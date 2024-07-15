@@ -1,13 +1,14 @@
 const crypto = require('crypto');
 const { secret } = require('../config/config');
 const { User } = require('../models/User');
+const { query } = require("../config/database");
 
 
 /**
  * 
  * @param {string} token 
  */
-const validateToken = token => {
+const validateSignature = token => {
 
     const [headerEncoded, payloadEncoded, signature] = token.split('.');
 
@@ -17,7 +18,6 @@ const validateToken = token => {
     return signature === testSignature;
 
 }
-
 
 const getAccessToken = user => {
     const accessHeader = {
@@ -47,7 +47,7 @@ const getRefreshToken = user => {
     const refreshHeaderEncoded = Buffer.from(JSON.stringify(refreshHeader)).toString('base64url');
 
     const refreshPayloadEncoded = Buffer.from(
-        JSON.stringify({ "phone": user.phone })).toString('base64url');
+        JSON.stringify({ "id": user.id })).toString('base64url');
 
     const refreshSignature = crypto.createHmac('sha256', secret)
         .update(refreshHeaderEncoded + '.' + refreshPayloadEncoded).digest('base64url');
@@ -56,7 +56,23 @@ const getRefreshToken = user => {
     return refreshToken
 }
 
-const loginUser = async (req, res) => {
+async function updateRefresh(user_id, refresh_token) {
+    const expires_at = (new Date(getExpiration(refresh_token))).toISOString();
+    const res = await query(`INSERT INTO refresh_tokens (user_id, refresh_token, expires_at)
+    VALUES ('${user_id}', '${refresh_token}', '${expires_at}')
+    ON CONFLICT (user_id)
+    DO UPDATE SET refresh_token = EXCLUDED.refresh_token, expires_at = EXCLUDED.expires_at;`);
+}
+
+async function isRefreshValid(user_id, refresh_token) {
+    const res = await query(`SELECT * FROM refresh_tokens
+        WHERE user_id = '${user_id}'
+        AND expires_at > NOW();`);
+    return res.rows.length !== 0 && refresh_token === res.rows[0].refresh_token;
+
+}
+
+async function loginUser(req, res) {
     try {
 
         const user = await User.getUserByPhone(req.body['phone']);
@@ -67,16 +83,21 @@ const loginUser = async (req, res) => {
         }
 
         delete user['password'];
+        const access_token = getAccessToken(user);
+        const refresh_token = getRefreshToken(user);
+
+        await updateRefresh(user.id, refresh_token);
+
         res.send({
-            "access_token": getAccessToken(user),
-            "refresh_token": getRefreshToken(user)
+            "access_token": access_token,
+            "refresh_token": refresh_token
         });
     } catch (err) {
         res.status(500).send(err);
     }
 };
 
-const getTokenHeader = token => {
+function getTokenHeader(token) {
     const headerEncoded = token.split('.')[0];
     const headerDecoded = Buffer.from(headerEncoded, 'base64url').toString();
     const header = JSON.parse(headerDecoded);
@@ -90,7 +111,23 @@ const getTokenPayload = token => {
     return payload
 }
 
-const isExpired = token => {
+function getExpiration(token) {
+    const { iat, exp } = getTokenHeader(token);
+    const issuedAt = new Date(iat);
+    const expNumber = exp.replace(/[a-z]/g, '');
+    const expMeasure = exp.replace(/[0-9]/g, '');
+
+    let expiresAt;
+    if (expMeasure === 'm') {
+        expiresAt = issuedAt.getTime() + expNumber * 1000 * 60;
+    }
+    else if (expMeasure === 'd') {
+        expiresAt = issuedAt.getTime() + expNumber * 1000 * 60 * 60 * 24;
+    }
+    return expiresAt;
+}
+
+function isExpired(token) {
     const { iat, exp } = getTokenHeader(token);
     const issuedAt = new Date(iat);
     const expNumber = exp.replace(/[a-z]/g, '');
@@ -105,17 +142,19 @@ const isExpired = token => {
     return (expNumber < difference);
 }
 
-const refreshToken = async (req, res) => {
+async function refreshAccessToken(req, res) {
     try {
         const refreshToken = req.body.refresh_token;
         !refreshToken ? res.send('No refresh token in request') : null;
-        !validateToken(refreshToken) ? res.send('Refresh token is not valid') : null;
-        // isExpired(refreshToken);
-        const phone = getTokenPayload(refreshToken)['phone'];
-        const user = await User.getUserByPhone(phone);
+        
+        const id = getTokenPayload(refreshToken).id;
+        const isValid = await isRefreshValid(id, refreshToken);
+        !validateSignature(refreshToken) || !isValid ?
+            res.status(400).send('Refresh token is not valid') : null;
+
+        const user = await User.getUserById(id);
         res.send({
-            "access_token": getAccessToken(user),
-            "refresh_token": getRefreshToken(user)
+            "access_token": getAccessToken(user)
         });
     } catch (err) {
         res.status(500).send(err);
@@ -125,7 +164,7 @@ const refreshToken = async (req, res) => {
 
 module.exports = {
     loginUser,
-    validateToken,
-    refreshToken,
+    validateSignature,
+    refreshAccessToken,
     isExpired
 };
