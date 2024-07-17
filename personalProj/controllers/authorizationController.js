@@ -1,25 +1,26 @@
-const crypto = require('crypto');
-const { secret } = require('../config/config');
+// DB imports
 const { User } = require('../models/User');
 const { query } = require("../config/database");
 
+// Encryption imports
+const crypto = require('crypto');
+require('dotenv').config();
+const secret = process.env.SECRET;
 
 /**
  * 
  * @param {string} token 
  */
-const validateSignature = token => {
-
+function validateSignature(token) {
     const [headerEncoded, payloadEncoded, signature] = token.split('.');
 
     const testSignature = crypto.createHmac('sha256', secret)
         .update(headerEncoded + '.' + payloadEncoded).digest('base64url');
 
     return signature === testSignature;
-
 }
 
-const getAccessToken = user => {
+function createAccessToken(user) {
     const accessHeader = {
         "alg": "HS256",
         "typ": "JWT",
@@ -33,11 +34,12 @@ const getAccessToken = user => {
 
     const signature = crypto.createHmac('sha256', secret)
         .update(accessHeaderEncoded + '.' + accessPayloadEncoded).digest('base64url');
+
     const accessToken = `${accessHeaderEncoded}.${accessPayloadEncoded}.${signature}`;
     return accessToken;
 }
 
-const getRefreshToken = user => {
+function createRefreshToken(user) {
     const refreshHeader = {
         "alg": "HS256",
         "typ": "JWT",
@@ -51,8 +53,8 @@ const getRefreshToken = user => {
 
     const refreshSignature = crypto.createHmac('sha256', secret)
         .update(refreshHeaderEncoded + '.' + refreshPayloadEncoded).digest('base64url');
-    const refreshToken = `${refreshHeaderEncoded}.${refreshPayloadEncoded}.${refreshSignature}`;
 
+    const refreshToken = `${refreshHeaderEncoded}.${refreshPayloadEncoded}.${refreshSignature}`;
     return refreshToken
 }
 
@@ -62,6 +64,7 @@ async function updateRefresh(user_id, refresh_token) {
     VALUES ('${user_id}', '${refresh_token}', '${expires_at}')
     ON CONFLICT (user_id)
     DO UPDATE SET refresh_token = EXCLUDED.refresh_token, expires_at = EXCLUDED.expires_at;`);
+
 }
 
 async function isRefreshValid(user_id, refresh_token) {
@@ -69,12 +72,10 @@ async function isRefreshValid(user_id, refresh_token) {
         WHERE user_id = '${user_id}'
         AND expires_at > NOW();`);
     return res.rows.length !== 0 && refresh_token === res.rows[0].refresh_token;
-
 }
 
 async function loginUser(req, res) {
     try {
-
         const user = await User.getUserByPhone(req.body['phone']);
 
         if (!user || user.password != req.body['password']) {
@@ -83,8 +84,8 @@ async function loginUser(req, res) {
         }
 
         delete user['password'];
-        const access_token = getAccessToken(user);
-        const refresh_token = getRefreshToken(user);
+        const access_token = createAccessToken(user);
+        const refresh_token = createRefreshToken(user);
 
         await updateRefresh(user.id, refresh_token);
 
@@ -127,7 +128,7 @@ function getExpiration(token) {
     return expiresAt;
 }
 
-function isExpired(token) {
+function isTokenExpired(token) {
     const { iat, exp } = getTokenHeader(token);
     const issuedAt = new Date(iat);
     const expNumber = exp.replace(/[a-z]/g, '');
@@ -146,7 +147,7 @@ async function refreshAccessToken(req, res) {
     try {
         const refreshToken = req.body.refresh_token;
         !refreshToken ? res.send('No refresh token in request') : null;
-        
+
         const id = getTokenPayload(refreshToken).id;
         const isValid = await isRefreshValid(id, refreshToken);
         !validateSignature(refreshToken) || !isValid ?
@@ -154,17 +155,26 @@ async function refreshAccessToken(req, res) {
 
         const user = await User.getUserById(id);
         res.send({
-            "access_token": getAccessToken(user)
+            "access_token": createAccessToken(user)
         });
     } catch (err) {
         res.status(500).send(err);
     }
 };
 
+async function validateToken(req, res, next) {
+    const isValid = req.headers.authorization
+        && validateSignature(req.headers.authorization)
+        && !isTokenExpired(req.headers.authorization);
+
+    isValid ?
+        next() :
+        res.status(500).send('Authorization is not valid!');
+}
+
 
 module.exports = {
     loginUser,
-    validateSignature,
     refreshAccessToken,
-    isExpired
+    validateToken
 };

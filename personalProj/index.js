@@ -1,6 +1,6 @@
 //Module imports
 const express = require('express');
-
+require('dotenv').config();
 //Routes imports
 const userRoutes = require('./routes/userRoutes');
 const patientRoutes = require('./routes/patientRoutes');
@@ -12,9 +12,9 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const authorizationRoutes = require('./routes/authorizationRoutes')
 
 //Additional functions
-const { validateSignature, isExpired } = require('./controllers/authorizationController');
+const { validateSignature, isTokenExpired, validateToken } = require('./controllers/authorizationController');
 
-const port = 3000;
+//App setup 
 const app = express();
 app.use(express.json());
 
@@ -34,16 +34,7 @@ app.use((req, res, next) => {
 app.use('/api/authorization', authorizationRoutes);
 
 //Access token validation middleware
-app.use((req, res, next) => {
-  const isValid = req.headers.authorization
-    && validateSignature(req.headers.authorization)
-    && !isExpired(req.headers.authorization);
-
-  isValid ?
-    next() :
-    res.status(500).send('Authorization is not valid!');
-});
-
+app.use(validateToken);
 
 //Test route
 app.get('/', (req, res) => {
@@ -61,8 +52,8 @@ app.use('/api/appointments', appointmentRoutes);
 
 
 //Server listening port
-app.listen(port, () => {
-  console.log(`Hospital app listening on port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Hospital app listening on port ${process.env.PORT}`);
 })
 
 

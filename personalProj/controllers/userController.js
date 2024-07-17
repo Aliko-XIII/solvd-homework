@@ -1,7 +1,4 @@
-const crypto = require('crypto');
 const { User } = require('../models/User');
-const { secret } = require('../config/config');
-const { validate } = require('webpack');
 
 const getUserProfile = async (req, res) => {
     try {

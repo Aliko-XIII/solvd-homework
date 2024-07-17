@@ -6,36 +6,35 @@ const { query } = require("../config/database");
  */
 class User {
     /**
-     * Link to the user's role with specific info.
-     * @type {Role}
-     */
-    #role;
-
-    /**
      * Constructor for User class.
-     * @param {id} id - user's id
-     * @param {string} name - user's name
-     * @param {string} surname - user's surname
+     * @param {string} id - user's id
+     * @param {string} firstName - user's first name
+     * @param {string} lastName - user's last name
      * @param {number} age - user's age
      * @param {string} sex - user's sex
      * @param {string} password - user's password
      */
-    constructor(name, surname, phone, password, age, sex = "Empty", id = '') {
-        this.id = id;
-
-        if (typeof name !== 'string' ||
-            name.length == 0
+    constructor(firstName, lastName, phone, password, age, sex, id = '') {
+        if (typeof firstName !== 'string' ||
+            firstName.length == 0
         ) {
             throw new Error('Name is not valid.')
         }
-        this.name = name;
+        this.firstName = firstName;
 
-        if (typeof surname !== 'string' ||
-            surname.length == 0
+        if (typeof lastName !== 'string' ||
+            lastName.length == 0
         ) {
-            throw new Error('Surname is not valid.')
+            throw new Error('Last name is not valid.')
         }
-        this.surname = surname;
+        this.lastName = lastName;
+
+        if (typeof phone !== 'string' ||
+            phone.length == 0
+        ) {
+            throw new Error('Phone is not valid.')
+        }
+        this.phone = phone;
 
         if (typeof password !== 'string' ||
             password.length == 0
@@ -44,6 +43,11 @@ class User {
         }
         this.password = password;
 
+        if (typeof age !== 'number') {
+            throw new Error('Age is not valid.')
+        }
+        this.age = age;
+
         if (typeof sex !== 'string' ||
             sex.length == 0
         ) {
@@ -51,28 +55,10 @@ class User {
         }
         this.sex = sex;
 
-        if (typeof age !== 'number') {
-            throw new Error('Age is not valid.')
+        if (typeof id !== 'string') {
+            throw new Error('User id is not valid.')
         }
-        this.age = age;
-        this.phone = phone;
-    }
-
-    /**
-     * @param {Role} val
-     */
-    set role(val) {
-        if (typeof val != 'object') {
-            throw new Error('Role should be instance of Role class.');
-        }
-        this.#role = val;
-    }
-
-    /**
-     * @returns {Role} 
-     */
-    get role() {
-        return this.#role;
+        this.id = id;
     }
 
     static async getUsersFromData(rows) {
@@ -95,7 +81,7 @@ class User {
     static async getUserById(id) {
         const res = await query(`SELECT * FROM users 
             WHERE user_id = '${id.toString()}';`);
-        return await this.getUsersFromData(res.rows);
+        return (await this.getUsersFromData(res.rows))[0];
     }
 
     static async getUserByPhone(phone) {
@@ -111,7 +97,7 @@ class User {
     async insertUser() {
         const res = await query(`INSERT INTO users
             (first_name, last_name, age, sex, pass, phone)
-            VALUES ('${this.name}', '${this.surname}', ${this.age}, 
+            VALUES ('${this.firstName}', '${this.lastName}', ${this.age}, 
             '${this.sex}', '${this.password}', '${this.phone}') RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
