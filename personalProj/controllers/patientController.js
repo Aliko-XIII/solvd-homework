@@ -2,6 +2,9 @@ const { Appointment } = require('../models/Appointment');
 const { Patient } = require('../models/Patient');
 const { User } = require('../models/User');
 
+/**
+ * Retrieves a patient by ID and sends it in the response.
+ */
 const getPatient = async (req, res) => {
     try {
         const patient = (await Patient.getPatientsById(req.params.id))[0];
@@ -11,6 +14,9 @@ const getPatient = async (req, res) => {
     }
 };
 
+/**
+ * Retrieves all patients and sends them in the response.
+ */
 const getAllPatients = async (req, res) => {
     try {
         const patients = await Patient.getPatients();
@@ -20,6 +26,9 @@ const getAllPatients = async (req, res) => {
     }
 };
 
+/**
+ * Creates a new patient and inserts it into the database.
+ */
 const createPatient = async (req, res) => {
     try {
         const { phone, insurance, userId } = req.body;
@@ -32,6 +41,9 @@ const createPatient = async (req, res) => {
     }
 };
 
+/**
+ * Deletes a patient by ID from the database.
+ */
 const deletePatient = async (req, res) => {
     try {
         const patient = (await Patient.getPatientsById(req.params.id))[0];
@@ -46,6 +58,9 @@ const deletePatient = async (req, res) => {
     }
 };
 
+/**
+ * Retrieves appointments for a patient and sends them in the response.
+ */
 const getAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.getPatientAppointments(req.params.id);
@@ -53,7 +68,7 @@ const getAppointments = async (req, res) => {
     } catch (err) {
         res.status(500).send(err);
     }
-}
+};
 
 module.exports = {
     getPatient,
@@ -61,4 +76,4 @@ module.exports = {
     deletePatient,
     getAllPatients,
     getAppointments
-}
+};

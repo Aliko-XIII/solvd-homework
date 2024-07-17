@@ -1,5 +1,8 @@
 const { User } = require('../models/User');
 
+/**
+ * Handles the request to get a user by their ID.
+ */
 const getUser = async (req, res) => {
     try {
         const user = await User.getUserById(req.params.id);
@@ -9,6 +12,9 @@ const getUser = async (req, res) => {
     }
 };
 
+/**
+ * Handles the request to get all users.
+ */
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.getUsers();
@@ -18,6 +24,9 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+/**
+ * Handles the request to create a new user.
+ */
 const createUser = async (req, res) => {
     try {
         const { name, surname, password, age, sex, phone } = req.body;
@@ -29,7 +38,9 @@ const createUser = async (req, res) => {
     }
 };
 
-
+/**
+ * Handles the request to delete a user by their ID.
+ */
 const deleteUser = async (req, res) => {
     try {
         const user = await User.getUserById(req.params.id);
