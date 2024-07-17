@@ -90,10 +90,26 @@ class User {
         return (await this.getUsersFromData(res.rows))[0];
     }
 
-    /**
-     * 
-     * @param {User} user 
-     */
+    async updateUser(id, { firstName, lastName, age, sex, pass, phone }) {
+        if (!id) throw new Error('There is no id passed to update user record.');
+        const hasParams = Object.keys({ firstName, lastName, age, sex, pass, phone })
+            .some(key => key !== undefined);
+        if (!hasParams) throw new Error('There are no params to update.');
+        let queryStr = `UPDATE public.users SET\n`;
+        queryStr += `${firstName ? `first_name = '${firstName}', ` : ''}
+            ${firstName ? `first_name = '${firstName}', ` : ''}
+            ${lastName ? `last_name = '${lastName}', ` : ''}
+            ${age ? `age = ${age}, ` : ''}
+            ${sex ? `sex = '${sex}', ` : ''}
+            ${pass ? `pass = '${pass}', ` : ''}
+            ${phone ? `phone = '${phone}', ` : ''}`
+        queryStr = queryStr.slice(0, queryStr.length - 1) + '\n';
+        queryStr += `WHERE user_id='${id}';`;
+        const res = await query(queryStr);
+        this.id = res.rows[0].id;
+        console.log('Updated:', res.rows[0]);
+    }
+
     async insertUser() {
         const res = await query(`INSERT INTO users
             (first_name, last_name, age, sex, pass, phone)
@@ -107,6 +123,9 @@ class User {
         const res = await query(`DELETE FROM users WHERE id = ${this.id} RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
+
+
+
 }
 
 

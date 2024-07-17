@@ -1,15 +1,15 @@
 const { User } = require('../models/User');
 
-const getUserProfile = async (req, res) => {
+const getUser = async (req, res) => {
     try {
-        const user = (await User.getUsersById(req.params.id))[0];
+        const user = await User.getUserById(req.params.id);
         res.status(200).send(user);
     } catch (err) {
         res.status(500).send(err);
     }
 };
 
-const getAllUsersProfiles = async (req, res) => {
+const getAllUsers = async (req, res) => {
     try {
         const users = await User.getUsers();
         res.status(200).send(users);
@@ -32,7 +32,7 @@ const createUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const user = (await User.getUsersById(req.params.id))[0];
+        const user = await User.getUserById(req.params.id);
         if (user) {
             await user.deleteUser();
             res.sendStatus(204);
@@ -45,8 +45,8 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
-    getUserProfile,
+    getUser,
     createUser,
     deleteUser,
-    getAllUsersProfiles,
+    getAllUsers,
 }
