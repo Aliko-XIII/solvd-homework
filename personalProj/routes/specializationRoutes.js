@@ -3,7 +3,7 @@ const specializationController = require('../controllers/specializationControlle
 
 const router = express.Router();
 
-router.get('/all', specializationController.getAllSpecializations);
+router.get('/', specializationController.getAllSpecializations);
 
 router.get('/:id', specializationController.getSpecialization);
 

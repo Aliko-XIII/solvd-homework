@@ -31,7 +31,7 @@ class Patient extends Role {
         const patients = rows.map(async row => {
             const user = (await User.getUsersFromData(rows))[0];
             const patient = new Patient(row.insurance_number, row.insurance_provider, user);
-            return patient; 
+            return patient;
         });
         return Promise.all(patients);
     }
@@ -41,7 +41,9 @@ class Patient extends Role {
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
     static async getPatients() {
-        const res = await query(`SELECT * FROM patients;`);
+        const res = await query(`SELECT * FROM patients
+            INNER JOIN users ON
+	        users.user_id=patients.user_id;`);
         return await this.getPatientsFromData(res.rows);
     }
 
@@ -51,7 +53,8 @@ class Patient extends Role {
      * @returns {Promise<Patient>} A promise that resolves to a Patient instance.
      */
     static async getPatientById(id) {
-        const res = await query(`SELECT * FROM patients WHERE user_id = '${id.toString()}';`);
+        const res = await query(`SELECT * FROM patients
+            WHERE user_id = '${id.toString()}';`);
         return (await Patient.getPatientsFromData(res.rows))[0];
     }
 
@@ -62,7 +65,10 @@ class Patient extends Role {
      */
     static async getPatientsByIds(...ids) {
         const idArr = ids.map(id => `'${id.toString()}'`).join(',');
-        const res = await query(`SELECT * FROM patients WHERE user_id IN (${idArr});`);
+        const res = await query(`SELECT * FROM patients 
+            WHERE user_id IN (${idArr}) 
+            INNER JOIN users ON
+	        users.user_id=patients.user_id;`);
         return await Patient.getPatientsFromData(res.rows);
     }
 
@@ -89,7 +95,8 @@ class Patient extends Role {
      */
     async updatePatient(id, { insuranceNumber, insuranceProvider }) {
         if (!id) throw new Error('No ID provided to update patient record.');
-        const hasParams = Object.keys({ insuranceNumber, insuranceProvider }).some(key => key !== undefined);
+        const hasParams = Object.keys({ insuranceNumber, insuranceProvider })
+            .some(key => key !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE patients SET\n`;
@@ -107,7 +114,8 @@ class Patient extends Role {
      * @returns {Promise<void>} A promise that resolves when the patient is deleted.
      */
     async deletePatient() {
-        const res = await query(`DELETE FROM patients WHERE user_id = '${this.user.id}' RETURNING *;`);
+        const res = await query(`DELETE FROM patients 
+            WHERE user_id = '${this.user.id}' RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 }

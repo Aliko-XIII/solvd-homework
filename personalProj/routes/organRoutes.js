@@ -3,7 +3,7 @@ const organController = require('../controllers/organController');
 
 const router = express.Router();
 
-router.get('/all', organController.getAllOrgans);
+router.get('/', organController.getAllOrgans);
 
 router.get('/:id', organController.getOrgan);
 

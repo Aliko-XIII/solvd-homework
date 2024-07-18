@@ -3,7 +3,7 @@ const symptomController = require('../controllers/symptomController');
 
 const router = express.Router();
 
-router.get('/all', symptomController.getAllSymptoms);
+router.get('/', symptomController.getAllSymptoms);
 
 router.get('/:id', symptomController.getSymptom);
 
