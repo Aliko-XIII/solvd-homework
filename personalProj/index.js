@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.use('/api/authorization', authorizationRoutes);
 
 //Access token validation middleware
-app.use(validateToken);
+// app.use(validateToken);
 
 //Test route
 app.get('/', (req, res) => {

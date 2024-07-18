@@ -28,15 +28,12 @@ class Patient extends Role {
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
     static async getPatientsFromData(rows) {
-        const patients = [];
-        const users = await User.getUsersById(...rows.map(row => row.user_id));
-        users.forEach(user => {
-            let userRow = rows.find(row => row.user_id == user.id);
-            if (userRow) {
-                patients.push(new Patient(userRow.insurance_number, userRow.insurance_provider, user));
-            }
+        const patients = rows.map(async row => {
+            const user = (await User.getUsersFromData(rows))[0];
+            const patient = new Patient(row.insurance_number, row.insurance_provider, user);
+            return patient; 
         });
-        return patients;
+        return Promise.all(patients);
     }
 
     /**

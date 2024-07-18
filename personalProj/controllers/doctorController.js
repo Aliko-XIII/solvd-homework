@@ -2,7 +2,6 @@ const { Patient } = require('../models/Patient');
 const { Doctor } = require('../models/Doctor');
 const { User } = require('../models/User');
 const { Specialization } = require('../models/Specialization');
-const { Appointment } = require('../models/Appointment');
 
 const getDoctor = async (req, res) => {
     try {
@@ -17,7 +16,7 @@ const getDoctor = async (req, res) => {
 const getAllDoctors = async (req, res) => {
     try {
         const doctors = await Doctor.getDoctors();
-        res.status(200).send({ doctors: doctors });
+        res.status(200).send(doctors);
     } catch (err) {
         res.status(500).send(err);
     }
