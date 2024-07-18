@@ -119,12 +119,11 @@ class User {
         if (!hasParams) throw new Error('There are no params to update.');
         let queryStr = `UPDATE public.users SET\n`;
         queryStr += `${firstName ? `first_name = '${firstName}', ` : ''}
-        ${firstName ? `first_name = '${firstName}', ` : ''}
         ${lastName ? `last_name = '${lastName}', ` : ''}
         ${age ? `age = ${age}, ` : ''}
         ${sex ? `sex = '${sex}', ` : ''}
         ${pass ? `pass = '${pass}', ` : ''}
-        ${phone ? `phone = '${phone}', ` : ''}`
+        ${phone ? `phone = '${phone}', ` : ''}`;
         queryStr = queryStr.slice(0, queryStr.length - 1) + '\n';
         queryStr += `WHERE user_id='${id}';`;
         const res = await query(queryStr);
