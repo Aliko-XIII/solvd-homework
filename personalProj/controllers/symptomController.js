@@ -4,7 +4,7 @@ const getSymptom = async (req, res) => {
     try {
         const symptom = (await Symptom.getSymptomsById(req.params.id))[0];
         if (symptom) {
-            res.status(200).send({ symptom: symptom });
+            res.status(200).send(symptom);
         } else {
             res.sendStatus(404);
         }
@@ -16,7 +16,7 @@ const getSymptom = async (req, res) => {
 const getAllSymptoms = async (req, res) => {
     try {
         const symptoms = await Symptom.getSymptoms();
-        res.status(200).send({ symptoms: symptoms });
+        res.status(200).send(symptoms);
     } catch (err) {
         res.status(500).send(err);
     }

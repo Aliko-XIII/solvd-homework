@@ -8,7 +8,7 @@ const { User } = require('../models/User');
 const getPatient = async (req, res) => {
     try {
         const patient = (await Patient.getPatientsById(req.params.id))[0];
-        res.status(200).send({ patient: patient });
+        res.status(200).send(patient);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -20,7 +20,7 @@ const getPatient = async (req, res) => {
 const getAllPatients = async (req, res) => {
     try {
         const patients = await Patient.getPatients();
-        res.status(200).send({ patients: patients });
+        res.status(200).send(patients);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -32,7 +32,7 @@ const getAllPatients = async (req, res) => {
 const createPatient = async (req, res) => {
     try {
         const { phone, insurance, userId } = req.body;
-        const user = await User.getUsersById(userId)[0];
+        const user = await User.getUserById(userId);
         const patient = new Patient(phone, insurance, user);
         await patient.insertPatient();
         res.status(201).send(patient);

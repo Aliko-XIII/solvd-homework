@@ -6,7 +6,7 @@ const getAppointment = async (req, res) => {
     try {
         const appointment = (await Appointment.getAppointmentsById(req.params.id))[0];
         if (appointment) {
-            res.status(200).send({ appointment: appointment });
+            res.status(200).send(appointment);
         } else {
             res.sendStatus(404);
         }
@@ -18,7 +18,7 @@ const getAppointment = async (req, res) => {
 const getAllAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.getAppointments();
-        res.status(200).send({ appointments: appointments });
+        res.status(200).send(appointments);
     } catch (err) {
         res.status(500).send(err);
     }

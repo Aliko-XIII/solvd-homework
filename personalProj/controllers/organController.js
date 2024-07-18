@@ -4,7 +4,7 @@ const getOrgan = async (req, res) => {
     try {
         const organ = (await Organ.getOrgansById(req.params.id))[0];
         if (organ) {
-            res.status(200).send({ organ: organ });
+            res.status(200).send(organ);
         } else {
             res.sendStatus(404);
         }
@@ -16,7 +16,7 @@ const getOrgan = async (req, res) => {
 const getAllOrgans = async (req, res) => {
     try {
         const organs = await Organ.getOrgans();
-        res.status(200).send({ organs: organs });
+        res.status(200).send(organs);
     } catch (err) {
         res.status(500).send(err);
     }
