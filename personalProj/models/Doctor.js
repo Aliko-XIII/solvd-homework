@@ -96,11 +96,12 @@ class Doctor extends Role {
      * @param {...number} id - User IDs of doctors to fetch.
      * @returns {Doctor[]} - Array of Doctor objects.
      */
-    static async getDoctorsById(...id) {
+    static async getDoctorsById(...ids) {
+        const idArr = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM doctors
-            WHERE user_id IN (${id.join(',')})
             INNER JOIN users ON
-	        users.user_id=doctors.user_id;`);
+	        users.user_id=doctors.user_id
+            WHERE doctors.user_id IN (${idArr});`);
         return Doctor.getDoctorsFromData(res.rows);
     }
 

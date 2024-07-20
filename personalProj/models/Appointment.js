@@ -4,10 +4,6 @@ const { Patient } = require("./Patient");
 const { Doctor } = require("./Doctor");
 
 class Appointment {
-
-    static workStart = 8;
-    static workEnd = 16;
-
     /**
      * 
      * @param {Patient} patient 
@@ -18,52 +14,33 @@ class Appointment {
      * @param {number} id 
      */
     constructor(patient, doctor, time, duration, description, id = -1) {
+        if (typeof description !== 'string') throw new Error('Description is not valid');
 
         this.id = id;
-
         this.time = time;
-
-        if (typeof duration !== 'number') {
-            throw new Error('Duration should be integer number of minutes');
-        }
         this.duration = duration;
-
-        if (typeof description !== 'string') {
-            throw new Error('Description is not valid')
-        }
         this.description = description;
-
         this.patient = patient;
-
         this.doctor = doctor;
-
         this.symptoms = [];
     }
 
     static async getAppointmentsFromData(rows) {
         if (rows.length == 0) { return []; }
-        const symptoms = await Symptom.getSymptoms();
-        const toSymptomsQuery = await query(`SELECT * FROM appointments_to_symptoms;`);
-
-        const appointments = [];
-        for (let row of rows) {
-            const patient = (await Patient.getPatientsById(row.patient))[0];
-            const doctor = (await Doctor.getDoctorsById(row.doctor))[0];
-            let appointment = new Appointment(patient, doctor, row.time,
-                row.duration_minutes, row.description, row.id);
-            appointments.push(appointment);
-
-            let appointmentSymptoms = toSymptomsQuery.rows
-                .filter(rec => rec.appointment == appointment.id)
-                .map(rec => symptoms.find(symptom => symptom.id == rec.symptom));
-            appointment.symptoms.push(...appointmentSymptoms);
-        }
-        return appointments;
+        const appointments = rows.map(async row => {
+            const patient = (await Patient.getPatientsByIds(row.patient_id))[0];
+            const doctor = (await Doctor.getDoctorsById(row.doctor_id))[0];
+            console.log(doctor);
+            const appointment = new Appointment(patient, doctor, row.appointment_time,
+                row.appointment_duration, row.additional_info, row.appointment_id);
+            return appointment;
+        });
+        return Promise.all(appointments);
     }
 
     static async getAppointments() {
         const res = await query(`SELECT * FROM appointments;`);
-        return await this.getAppointmentsFromData(res.rows);
+        return await Appointment.getAppointmentsFromData(res.rows);
     }
 
     static async getAppointmentsById(...id) {

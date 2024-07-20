@@ -54,7 +54,7 @@ class Patient extends Role {
      */
     static async getPatientById(id) {
         const res = await query(`SELECT * FROM patients
-            WHERE user_id = '${id.toString()}';`);
+            WHERE user_id = '${id}';`);
         return (await Patient.getPatientsFromData(res.rows))[0];
     }
 
@@ -64,11 +64,11 @@ class Patient extends Role {
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
     static async getPatientsByIds(...ids) {
-        const idArr = ids.map(id => `'${id.toString()}'`).join(',');
+        const idArr = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM patients 
-            WHERE user_id IN (${idArr}) 
             INNER JOIN users ON
-	        users.user_id=patients.user_id;`);
+	        users.user_id=patients.user_id
+            WHERE patients.user_id IN (${idArr}) ;`);
         return await Patient.getPatientsFromData(res.rows);
     }
 
