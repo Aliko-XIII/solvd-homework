@@ -11,7 +11,7 @@ This project is a hospital appointments app. The application has the following f
 ## Base URL
 `http://localhost:3000`
 
-*ADD PARAMS LIKE ?name=test*
+*ADD MORE PARAMS LIKE ?name=test*
 
 
 ## API Endpoints
@@ -22,8 +22,8 @@ This project is a hospital appointments app. The application has the following f
 Get all appointments. The server responds with status code 200 and all appointment records.
 
 **Query Parameters**:
-- `patientId` (integer): ID of the patient who signed up for the appointment
-- `doctorId` (integer): ID of the doctor who signed up for the appointment 
+- `patientId` (uuid string): ID of the patient who signed up for the appointment
+- `doctorId` (uuid string): ID of the doctor who signed up for the appointment 
 - `startBefore` (string): Time before which appointments occur
 - `startAfter` (string): Time after which appointments occur
 - `endBefore` (string): Time before which appointments end
