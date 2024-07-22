@@ -432,12 +432,69 @@ Empty
 
 ***
 #### GET `api/patients`
-Get all patients. Server should answer with status code 200 and all patients records.
 
-- `id` (uuid): patient's user record id
-- `insuranceNumber` (string): part of patient's insurance number
-- `insuranceProvider` (string): part of patient's insurance provider name
+**Purpose:** Get all patients.
 
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns all user records, which include id, phone, first name, last name, age and sex.</td>
+  </tr>
+
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>insuranceNumber</b></td>
+    <td>string</td>
+    <td>part of patient's insurance number</td>
+  </tr>
+  <tr>
+    <td><b>insuranceProvider</b></td>
+    <td>string</td>
+    <td>part of patient's insurance provider name</td>
+  </tr>
+  <tr>
+    <td><b>nestUser</b></td>
+    <td>boolean</td>
+    <td>true if returned patient object should include nested user record, false if only id</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -463,8 +520,62 @@ Get all patients. Server should answer with status code 200 and all patients rec
 ```
 ***
 #### GET `api/patients/{patientId}` 
-Get a patient by ID. Server should answer with status code 200 and one patient record.
 
+**Purpose:** Get a patient by ID.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns one patient record, which includes user id or record, insurance number and insurance provider name.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>There is no such patient found.</td>
+  </tr>
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+    <td><b>nestUser</b></td>
+    <td>boolean</td>
+    <td>true if returned patient object should include nested user record, false if only id</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -484,8 +595,50 @@ Get a patient by ID. Server should answer with status code 200 and one patient r
 ```
 ***
 #### POST `api/patients` 
-Create record about new patient and put it to the DB. The request should contain information needed for a new patient, such as user's id, phone and insurance. Server should answer with status code 201 and id of patient in the DB.
 
+**Purpose:** Create new patient record for user and put it to the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Patient object with information needed for a new patient, such as user's id, insurance number, insurance provider name.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>201</th>
+  <td>New patient record created for user and their record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Patient object misses fields or their data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>409</th>
+  <td>There is already a patient record for this user.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -496,6 +649,7 @@ Create record about new patient and put it to the DB. The request should contain
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
+        "id": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
         "insuranceNumber": "INS234567890",
         "insuranceProvider": "SecureHealth"
     }'
@@ -504,12 +658,60 @@ Create record about new patient and put it to the DB. The request should contain
 ```sh
     {
         "id": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
+        "insuranceNumber": "INS234567890",
+        "insuranceProvider": "SecureHealth"
     }
 ```
 ***
 #### PUT `api/patients/{patientId}`
-Update record about a patient in the DB. The request should contain updated information needed for a patient. Server should answer with status code 200 and updated info of patient in the DB.
 
+**Purpose:** Update record about a patient in the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Object with patient's ID and updated information needed for a patient.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Patient is updated and their updated record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>ID is valid, but there is no data in request body to update.</td>
+
+  <tr>
+  <td>400</th>
+  <td>Some of updated data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>User or patient record for specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -534,8 +736,45 @@ Update record about a patient in the DB. The request should contain updated info
 ```
 ***
 #### DELETE `api/patients/{patientId}` 
-Delete record about a patient from the DB. Server should answer with status code 204.
 
+**Purpose:** Delete record about a patient from the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>Patient record is deleted, nothing is returned.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>User or their patient record for specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
