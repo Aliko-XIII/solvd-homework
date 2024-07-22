@@ -1,7 +1,7 @@
 # API Documentation
 
 ## Description
-This project is a hospital appointments app. The application has the following functionality: add, update, delete, and get information about appointments, patients, doctors, their specializations, symptoms, and organs they work with.
+This project is a hospital appointments app. The application has the following functionality: add, update, delete, and get information about appointments, patients, doctors, their specializations, symptoms, and organs they work with. App supports authorization using JWT.
 
 ## Technical Requirements
 - **Programming Language**: JavaScript
@@ -463,7 +463,7 @@ Empty
 
   <tr>
   <td>200</th>
-  <td>Returns all user records, which include id, phone, first name, last name, age and sex.</td>
+  <td>Returns all patient records, which include user or their id, insurance number and provider name.</td>
   </tr>
 
 </table>
@@ -709,7 +709,7 @@ Object with patient's ID and updated information needed for a patient.
 
   <tr>
   <td>404</th>
-  <td>User or patient record for specified ID was not found.</td>
+  <td>User or patient record for the specified ID was not found.</td>
   </tr>
 </table>
 
@@ -722,6 +722,7 @@ Object with patient's ID and updated information needed for a patient.
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
+        "id": "d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g",
         "insuranceNumber": "INS345678901",
         "insuranceProvider": "PrimeCare"
     }'
@@ -772,7 +773,7 @@ Empty
 
   <tr>
   <td>404</th>
-  <td>User or their patient record for specified ID was not found.</td>
+  <td>User or their patient record for the specified ID was not found.</td>
   </tr>
 </table>
 
@@ -794,11 +795,64 @@ Empty
 
 ***
 #### GET `api/symptoms` 
-Get all symptoms. Server should answer with status code 200 and all symptoms records.
 
-- `name` (string): part of symptoms's name
-- `description` (string): part of symptom's description
+**Purpose:** Get all symptoms.
 
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns all symptom records, which include id, name and description.</td>
+  </tr>
+
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>name</b></td>
+    <td>string</td>
+    <td>part of symptom's name</td>
+  </tr>
+  <tr>
+    <td><b>description</b></td>
+    <td>string</td>
+    <td>part of symptom's description</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -823,8 +877,45 @@ Get all symptoms. Server should answer with status code 200 and all symptoms rec
 ```
 ***
 #### GET `api/symptoms/{symptomId}`
-Get a symptom by ID. Server should answer with status code 200 and one symptom record.
 
+**Purpose:** Get a symptom by ID.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns one symptom record, which includes id, name and description.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>There is no such symptom found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -845,8 +936,45 @@ Get a symptom by ID. Server should answer with status code 200 and one symptom r
 ```
 ***
 #### POST `api/symptoms` 
-Create record about new symptom and put it to the DB. The request should contain information needed for a new symptom, such as symptom's name and description. Server should answer with status code 201 and id of symptom in the DB.
 
+**Purpose:** Create new symptom record and put it to the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Symptom object with information needed for a new symptom, such as name and description.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>201</th>
+  <td>New symptom record created and its record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Symptom object misses fields or its data is invalid.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -857,7 +985,6 @@ Create record about new symptom and put it to the DB. The request should contain
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
         "name": "string",
         "description": "string",
     }'
@@ -866,13 +993,61 @@ Create record about new symptom and put it to the DB. The request should contain
 ```sh
     {
         "id": 1,
+        "name": "string",
+        "description": "string",
     }
 ```
 
 ***
 #### PUT `api/symptoms/{symptomId}` 
-Update record about a symptom in the DB. The request should contain updated information needed for a symptom. Server should answer with status code 200 and updated info of symptom in the DB.
 
+**Purpose:** Update record about a symptom in the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Object with symptom's ID and updated information needed for a symptom.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Symptom is updated and its updated record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>ID is valid, but there is no data in request body to update.</td>
+
+  <tr>
+  <td>400</th>
+  <td>Some of updated data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Symptom record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -898,8 +1073,45 @@ Update record about a symptom in the DB. The request should contain updated info
 
 ***
 #### DELETE `api/symptoms/{symptomId}`
-Delete record about a symptom from the DB. Server should answer with status code 204.
 
+**Purpose:** Delete record about a symptom from the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>Symptom record is deleted, nothing is returned.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Symptom record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -919,10 +1131,64 @@ Delete record about a symptom from the DB. Server should answer with status code
 
 ***
 #### GET `api/organs` 
-Get all organs. Server should answer with status code 200 and all organs records.
 
-- `name` (string): part of organ's name
-- `description` (string): part of organ's description
+**Purpose:** Get all organs.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns all organ records, which include id, name and description.</td>
+  </tr>
+
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>name</b></td>
+    <td>string</td>
+    <td>part of organ's name</td>
+  </tr>
+  <tr>
+    <td><b>description</b></td>
+    <td>string</td>
+    <td>part of organ's description</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -949,7 +1215,45 @@ Get all organs. Server should answer with status code 200 and all organs records
 ```
 ***
 #### GET `api/organs/{organId}` 
-Get a organ by ID. Server should answer with status code 200 and one organ record.
+
+**Purpose:** Get a organ by ID.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns one organ record, which includes id, name and description.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>There is no such organ found.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -971,7 +1275,45 @@ Get a organ by ID. Server should answer with status code 200 and one organ recor
 ```
 ***
 #### POST `api/organs`
-Create record about new organ and put it to the DB. The request should contain information needed for a new organ, such as organ's name and description. Server should answer with status code 201 and id of organ in the DB.
+
+**Purpose:** Create new organ record and put it to the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Organ object with information needed for a new organ, such as name and description.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>201</th>
+  <td>New organ record created and its record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Organ object misses fields or its data is invalid.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -983,7 +1325,6 @@ Create record about new organ and put it to the DB. The request should contain i
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
         "name": "string",
         "description": "string",
     }'
@@ -992,12 +1333,60 @@ Create record about new organ and put it to the DB. The request should contain i
 ```sh
     {
         "id": 1,
+        "name": "string",
+        "description": "string",
     }
 ```
 ***
 #### PUT `api/organs/{organId}` 
-Update record about a organ in the DB. The request should contain updated information needed for a organ. Server should answer with status code 200 and updated info of organ in the DB.
 
+**Purpose:** Update record about an organ in the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Object with organ's ID and updated information needed for an organ.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Organ is updated and its updated record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>ID is valid, but there is no data in request body to update.</td>
+
+  <tr>
+  <td>400</th>
+  <td>Some of updated data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Organ record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1008,6 +1397,7 @@ Update record about a organ in the DB. The request should contain updated inform
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
+        "id": 1,
         "name": "string",
         "description": "string",
     }'
@@ -1022,8 +1412,45 @@ Update record about a organ in the DB. The request should contain updated inform
 ```
 ***
 #### DELETE `api/organs/{organId}` 
-Delete record about a organ from the DB. Server should answer with status code 204.
 
+**Purpose:** Delete record about an organ from the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>Organ record is deleted, nothing is returned.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Organ record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1043,11 +1470,64 @@ Delete record about a organ from the DB. Server should answer with status code 2
 
 ***
 #### GET `api/specializations` 
-Get all specializations. Server should answer with status code 200 and all specializations records.
 
-- `name` (string): part of specialization's name
-- `description` (string): part of specialization's description
+**Purpose:** Get all specializations.
 
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns all specialization records, which include id, name and description.</td>
+  </tr>
+
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>name</b></td>
+    <td>string</td>
+    <td>part of specialization's name</td>
+  </tr>
+  <tr>
+    <td><b>description</b></td>
+    <td>string</td>
+    <td>part of specialization's description</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1073,8 +1553,45 @@ Get all specializations. Server should answer with status code 200 and all speci
 ```
 ***
 #### GET `api/specializations/{specializationId}` 
-Get a specialization by ID. Server should answer with status code 200 and one specialization record.
 
+**Purpose:** Get a specialization by ID.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns one specialization record, which includes id, name and description.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>There is no such specialization found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1095,8 +1612,45 @@ Get a specialization by ID. Server should answer with status code 200 and one sp
 ```
 ***
 #### POST `api/specializations`
-Create record about new specialization and put it to the DB. The request should contain information needed for a new specialization, such as specialization's name and description. Server should answer with status code 201 and id of specialization in the DB.
 
+**Purpose:** Create new specialization record and put it to the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Specialization object with information needed for a new specialization, such as name and description.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>201</th>
+  <td>New specialization record created and its record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Specialization object misses fields or its data is invalid.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1107,7 +1661,6 @@ Create record about new specialization and put it to the DB. The request should 
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
         "name": "string",
         "description": "string",
     }'
@@ -1116,12 +1669,60 @@ Create record about new specialization and put it to the DB. The request should 
 ```sh
     {
         "id": 1,
+        "name": "string",
+        "description": "string",
     }
 ```
 ***
 #### PUT `api/specializations/{specializationId}` 
-Update record about a specialization in the DB. The request should contain updated information needed for a specialization. Server should answer with status code 200 and updated info of specialization in the DB.
 
+**Purpose:** Update record about a specialization in the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Object with specialization's ID and updated information needed for a specialization.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Specialization is updated and its updated record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>ID is valid, but there is no data in request body to update.</td>
+
+  <tr>
+  <td>400</th>
+  <td>Some of updated data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Specialization record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1132,6 +1733,7 @@ Update record about a specialization in the DB. The request should contain updat
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
+        "id": 1,
         "name": "string",
         "description": "string",
     }'
@@ -1146,8 +1748,45 @@ Update record about a specialization in the DB. The request should contain updat
 ```
 ***
 #### DELETE `api/specializations/{specializationId}` 
-Delete record about a specialization from the DB. Server should answer with status code 204.
 
+**Purpose:** Delete record about a specialization from the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>Specialization record is deleted, nothing is returned.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Specialization record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 ***Example***
 
