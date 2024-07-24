@@ -15,7 +15,116 @@ This project is a hospital appointments app. The application has the following f
 
 ## API Endpoints
 
-### 1. Endpoint `api/users/`:
+### 1. Endpoint `api/authorization/`:
+
+***
+#### POST `api/authorization/login`
+**Purpose:** Log in user.
+
+**Request headers:**
+
+Empty
+
+**Request body:**
+
+Object which contains user's phone and password.
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>User successfully logged in. 
+  
+  Returns:
+
+  1) object with short term access token used for requests authorization.
+  2) object with long term refresh token used for getting new access token.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Phone number or password are not correct.</td>
+  </tr>
+</table>
+
+***Example***
+
+**Request**
+```sh
+    curl -X 'POST' \
+    'api/authorization/login' \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "phone": "6667778882",
+        "password": "greenpass789",
+    }'
+```
+
+**Response body**
+```sh
+    {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImlhdCI6IkZyaSBKdWwgMTIgMjAyNCAxMjoyNzo1MiBHTVQrMDMwMCAoRWFzdGVybiBFdXJvcGVhbiBTdW1tZXIgVGltZSkiLCJleHAiOiIxbSJ9.eyJpZCI6MjAsIm5hbWUiOiJDaHJpc3RvcGhlciIsInN1cm5hbWUiOiJHcmVlbiIsInNleCI6Ik0iLCJhZ2UiOjM3LCJwaG9uZSI6IjY2Njc3Nzg4ODIifQ.6__HjLeclq5Vf1Oue5R4-cnaqWcBCQuIeM8tusBFjck",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImlhdCI6IkZyaSBKdWwgMTIgMjAyNCAxMjoyNzo1MiBHTVQrMDMwMCAoRWFzdGVybiBFdXJvcGVhbiBTdW1tZXIgVGltZSkiLCJleHAiOiIzZCJ9.eyJwaG9uZSI6IjY2Njc3Nzg4ODIifQ.BN1IPBCfcbaeoollARNd4VJp0WJssVU5lDJ0sQ5If5s"
+    }
+```
+
+***
+#### POST `api/authorization/refresh`
+**Purpose:** Get new access token.
+
+**Request headers:**
+
+Empty
+
+**Request body:**
+
+Object which contains user's refresh token.
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td> New access token is generated and returned.
+  </td>
+  </tr>
+  <tr>
+  <td>400</th>
+  <td>Refresh token is not valid.</td>
+  </tr>
+</table>
+
+***Example***
+
+**Request**
+```sh
+    curl -X 'POST' \
+    'api/authorization/login' \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImlhdCI6IldlZCBKdWwgMjQgMjAyNCAxOTo1OTo0NiBHTVQrMDMwMCAoRWFzdGVybiBFdXJvcGVhbiBTdW1tZXIgVGltZSkiLCJleHAiOiIzZCJ9.eyJpZCI6ImYxY2M0NTliLTQxNTItNDU2MC05NmQ3LTQ4NWNkYzNmY2IyMCJ9.lBSMqquCRP5YQ5JiyWkm5JXUM33utIQcL2qa27R1-rs"
+    }'
+```
+
+**Response body**
+```sh
+      {
+      "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImlhdCI6IldlZCBKdWwgMjQgMjAyNCAxOTo1OTo1OSBHTVQrMDMwMCAoRWFzdGVybiBFdXJvcGVhbiBTdW1tZXIgVGltZSkiLCJleHAiOiIxbSJ9.eyJmaXJzdE5hbWUiOiJDaHJpc3RvcGhlciIsImxhc3ROYW1lIjoiR3JlZW4iLCJwaG9uZSI6IjY2Njc3Nzg4ODIiLCJwYXNzd29yZCI6ImdyZWVucGFzczc4OSIsImFnZSI6MzcsInNleCI6Ik0iLCJpZCI6ImYxY2M0NTliLTQxNTItNDU2MC05NmQ3LTQ4NWNkYzNmY2IyMCJ9.EN8OFvjGycT9KiHWydSY09_Keq5gAqrOEkS7RHiWYf8"
+      }
+```
+
+### 2. Endpoint `api/users/`:
 
 ***
 #### GET `api/users`
@@ -96,7 +205,7 @@ Empty
   </tr>
 </table>
 
-***Example 1***
+***Example***
 
 **Request**
 ```sh
@@ -126,36 +235,6 @@ Empty
     ]
 ```
 
-***Example 2***
-
-**Request**
-```sh
-    curl -X 'GET' \
-    'api/users/?firstName=Br' \
-    -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
-```
-   ​
-**Response body**
-```sh
-    [
-    {
-        "id": "e7e5a26d-b46b-4a1b-8f83-c2a09a7f2c58",
-        "firstName": "Bruce",
-        "lastName": "Wayne",
-        "age": 26,
-        "sex": "M",
-        "phone": "+1-555-123-4567"
-    },
-    {
-        "id": "4d94f28e-3ef4-4d22-a234-0f8c7c13b749",
-        "firstName": "Brian",
-        "lastName": "Banner",
-        "age": 19,
-        "sex": "M",
-        "phone": "+1-555-234-5678"
-    }
-    ]
-```
 ***
 #### GET `api/users/{userId}`
 **Purpose:** Get a user by ID. 
@@ -355,7 +434,6 @@ Object with user's ID and updated information needed for a user.
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": "a1c2e3d4-5f67-8a9b-0cde-1f23456789ab",
         "firstName": "Jackson",
     }'
 ```
@@ -508,12 +586,12 @@ Empty
 **Response body**
 ```sh
     [{
-        "id": "a3b9c5d7-8e2f-4a6b-9c3d-8e2f7a9b0c1d",
+        "user": "a3b9c5d7-8e2f-4a6b-9c3d-8e2f7a9b0c1d",
         "insuranceNumber": "INS123456789",
         "insuranceProvider": "HealthPlus"
     },
     {
-        "id": "b4c8d6e1-9f2a-4b7c-8d9e-0a1b2c3d4e5f",
+        "user": "b4c8d6e1-9f2a-4b7c-8d9e-0a1b2c3d4e5f",
         "insuranceNumber": "INS987654321",
         "insuranceProvider": "CareCo"
     }]
@@ -588,7 +666,7 @@ Empty
 **Response body**
 ```sh
     {
-    "id": "f9d4a1b2-3c56-4d78-a9b0-1e2f3c4d5e6f",
+    "user": "f9d4a1b2-3c56-4d78-a9b0-1e2f3c4d5e6f",
     "insuranceNumber": "INS456789012",
     "insuranceProvider": "MedCare"
     }
@@ -649,7 +727,7 @@ Patient object with information needed for a new patient, such as user's id, ins
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
+        "user": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
         "insuranceNumber": "INS234567890",
         "insuranceProvider": "SecureHealth"
     }'
@@ -657,7 +735,7 @@ Patient object with information needed for a new patient, such as user's id, ins
 **Response body**
 ```sh
     {
-        "id": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
+        "user": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
         "insuranceNumber": "INS234567890",
         "insuranceProvider": "SecureHealth"
     }
@@ -718,11 +796,10 @@ Object with patient's ID and updated information needed for a patient.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/patients/1' \
+    'api/patients/d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": "d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g",
         "insuranceNumber": "INS345678901",
         "insuranceProvider": "PrimeCare"
     }'
@@ -730,7 +807,7 @@ Object with patient's ID and updated information needed for a patient.
 **Response body**
 ```sh
     {
-        "id": "d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g",
+        "user": "d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g",
         "insuranceNumber": "INS345678901",
         "insuranceProvider": "PrimeCare"
     }
@@ -791,7 +868,7 @@ Empty
     Empty
 ```
 
-### 5. Endpoint `api/symptoms/`:
+### 4. Endpoint `api/symptoms/`:
 
 ***
 #### GET `api/symptoms` 
@@ -864,16 +941,18 @@ Empty
 ```
 **Response body**
 ```sh
-    [{
-        "id": 1,
-        "name": "string",
-        "description": "string",
-    },
+    [
     {
         "id": 1,
-        "name": "string",
-        "description": "string",
-    }]
+        "name": "Headache",
+        "description": "A continuous pain in the head."
+    },
+    {
+        "id": 2,
+        "name": "Fever",
+        "description": "An abnormally high body temperature."
+    }
+    ]
 ```
 ***
 #### GET `api/symptoms/{symptomId}`
@@ -930,8 +1009,8 @@ Empty
 ```sh
     {
         "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Headache",
+        "description": "A continuous pain in the head."
     }
 ```
 ***
@@ -985,16 +1064,16 @@ Symptom object with information needed for a new symptom, such as name and descr
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "name": "string",
-        "description": "string",
+        "name": "Cough",
+        "description": "A sudden, forceful hacking sound to release air and clear an irritation in the throat or airway.",
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
-        "name": "string",
-        "description": "string",
+        "id": 3,
+        "name": "Cough",
+        "description": "A sudden, forceful hacking sound to release air and clear an irritation in the throat or airway.",
     }
 ```
 
@@ -1054,20 +1133,20 @@ Object with symptom's ID and updated information needed for a symptom.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/symptoms/1' \
+    'api/symptoms/4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "name": "string",
-        "description": "string",
+        "name": "Fatigue",
+        "description": "A feeling of extreme tiredness and lack of energy.",
     }'
 ```
 **Response body**
 ```sh
     {
         "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Fatigue",
+        "description": "A feeling of extreme tiredness and lack of energy.",
     }
 ```
 
@@ -1127,7 +1206,7 @@ Empty
     Empty
 ```
 
-### 6. Endpoint `api/organs/`:
+### 5. Endpoint `api/organs/`:
 
 ***
 #### GET `api/organs` 
@@ -1204,14 +1283,14 @@ Empty
 ```sh
     [{
         "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Heart",
+        "description": "A muscular organ that pumps blood through the circulatory system."
     },
     {
-        "id": 1,
-        "name": "string",
-        "description": "string",
-    }]
+        "id": 2,
+        "name": "Lungs",
+        "description": "A pair of respiratory organs responsible for inhaling oxygen and exhaling carbon dioxide."
+    },]
 ```
 ***
 #### GET `api/organs/{organId}` 
@@ -1269,8 +1348,8 @@ Empty
 ```sh
     {
         "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Heart",
+        "description": "A muscular organ that pumps blood through the circulatory system.",
     }
 ```
 ***
@@ -1325,17 +1404,17 @@ Organ object with information needed for a new organ, such as name and descripti
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "name": "string",
-        "description": "string",
+        "name": "Liver",
+        "description": "A large organ that processes nutrients, detoxifies harmful substances, and produces bile.",
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
-        "name": "string",
-        "description": "string",
-    }
+        "id": 3,
+        "name": "Liver",
+        "description": "A large organ that processes nutrients, detoxifies harmful substances, and produces bile."
+    },
 ```
 ***
 #### PUT `api/organs/{organId}` 
@@ -1393,21 +1472,20 @@ Object with organ's ID and updated information needed for an organ.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/organs/1' \
+    'api/organs/4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Kidneys",
+        "description": "A pair of organs that filter blood to remove waste and excess fluid, forming urine.",
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
-        "name": "string",
-        "description": "string",
+        "id": 4,
+        "name": "Kidneys",
+        "description": "A pair of organs that filter blood to remove waste and excess fluid, forming urine.",
     }
 ```
 ***
@@ -1466,7 +1544,7 @@ Empty
     Empty
 ```
 
-### 7. Endpoint `api/specializations/`:
+### 6. Endpoint `api/specializations/`:
 
 ***
 #### GET `api/specializations` 
@@ -1527,6 +1605,16 @@ Empty
     <td>string</td>
     <td>part of specialization's description</td>
   </tr>
+  <tr>
+    <td><b>nestOrgans</b></td>
+    <td>boolean</td>
+    <td>true if returned specialization object should include organs' whole objects, false if only ids</td>
+  </tr>
+   <tr>
+    <td><b>nestSymptoms</b></td>
+    <td>boolean</td>
+    <td>true if returned specialization object should include symptoms' whole objects, false if only ids</td>
+  </tr>
 </table>
 
 ***Example***
@@ -1542,13 +1630,17 @@ Empty
 ```sh
     [{
         "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Cardiologist",
+        "description": "A doctor who specializes in diagnosing and treating heart conditions.",
+        "organs": [1],
+        "symptoms": [1, 4]
     },
     {
-        "id": 1,
-        "name": "string",
-        "description": "string",
+        "id": 2,
+        "name": "Pulmonologist",
+        "description": "A doctor who specializes in diagnosing and treating lung conditions.",
+        "organs": [2],
+        "symptoms": [2, 3]
     }]
 ```
 ***
@@ -1593,6 +1685,29 @@ Empty
   </tr>
 </table>
 
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>nestOrgans</b></td>
+    <td>boolean</td>
+    <td>true if returned specialization object should include organs' whole objects, false if only ids</td>
+  </tr>
+   <tr>
+    <td><b>nestSymptoms</b></td>
+    <td>boolean</td>
+    <td>true if returned specialization object should include symptoms' whole objects, false if only ids</td>
+  </tr>
+</table>
+
 ***Example***
 
 **Request**
@@ -1606,8 +1721,10 @@ Empty
 ```sh
     {
         "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Cardiologist",
+        "description": "A doctor who specializes in diagnosing and treating heart conditions.",
+        "organs": [1],
+        "symptoms": [1, 4]
     }
 ```
 ***
@@ -1661,14 +1778,16 @@ Specialization object with information needed for a new specialization, such as 
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "name": "string",
-        "description": "string",
+        "name": "Nephrologist",
+        "description": "A doctor who specializes in diagnosing and treating kidney conditions.",
+        "organs": [4],
+        "symptoms": [4, 5],
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
+        "id": 3,
         "name": "string",
         "description": "string",
     }
@@ -1729,21 +1848,24 @@ Object with specialization's ID and updated information needed for a specializat
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/specializations/1' \
+    'api/specializations/4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
-        "name": "string",
-        "description": "string",
+        "name": "Gastroenterologist",
+        "description": "A doctor who specializes in diagnosing and treating stomach and digestive system conditions.",
+        "organs": [5],
+        "symptoms": [4, 5]
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
-        "name": "string",
-        "description": "string",
+        "id": 4,
+        "name": "Gastroenterologist",
+        "description": "A doctor who specializes in diagnosing and treating stomach and digestive system conditions.",
+        "organs": [5],
+        "symptoms": [4, 5]
     }
 ```
 ***
@@ -1802,14 +1924,74 @@ Empty
     Empty
 ```
 
-### 4. Endpoint `api/doctors/`:
+### 7. Endpoint `api/doctors/`:
 
 ***
 #### GET `api/doctors`
-Get all doctors. Server should answer with status code 200 and all doctors records.
 
-- `id` (uuid): doctor's user record id
+**Purpose:** Get all doctors.
 
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns all doctor records, which include user or their id, specialization or its id, patient load, start time of workday, end time of workday.</td>
+  </tr>
+
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>specializationId</b></td>
+    <td>integer</td>
+    <td>doctor's specialization id</td>
+  </tr>
+  <tr>
+    <td><b>nestUser</b></td>
+    <td>boolean</td>
+    <td>true if returned doctor object should include nested user record, false if only id</td>
+  </tr>
+
+  <tr>
+    <td><b>nestSpecialization</b></td>
+    <td>boolean</td>
+    <td>true if returned doctor object should include nested specialization record, false if only id</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -1823,40 +2005,148 @@ Get all doctors. Server should answer with status code 200 and all doctors recor
 **Response body**
 ```sh
     [{
-        "id": 1,
-        "phone": "string",
-        "insurance": "string",
+        "user": "123e4567-e89b-12d3-a456-426614174000",
+        "specialization": 3,
+        "patientLoad": 1,
+        "workdayStart": "08:00:00",
+        "workdayEnd": "18:00:00"
     },
     {
-        "id": 2,
-        "phone": "string",
-        "insurance": "string",
+        "user": "123e4567-e89b-12d3-a456-426614174001",
+        "specialization": 1,
+        "patientLoad": 5,
+        "workdayStart": "08:00:00",
+        "workdayEnd": "17:00:00"
     }]
 ```
 ***
 #### GET `api/doctors/{doctorId}` 
-Get a doctor by ID. Server should answer with status code 200 and one doctor record.
 
+**Purpose:** Get a doctor by ID.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns one doctor record, which includes user id or record, specialization or its id, patient load, start time of workday, end time of workday.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>There is no such doctor found.</td>
+  </tr>
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+    <td><b>nestUser</b></td>
+    <td>boolean</td>
+    <td>true if returned doctor object should include nested user record, false if only id</td>
+  </tr>
+  <tr>
+    <td><b>nestSpecialization</b></td>
+    <td>boolean</td>
+    <td>true if returned doctor object should include nested specialization record, false if only id</td>
+  </tr>
+</table>
 
 ***Example***
 
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/doctors/1' \
+    'api/doctors/123e4567-e89b-12d3-a456-426614174002' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
-        "phone": "string",
-        "insurance": "string",
+        "user": "123e4567-e89b-12d3-a456-426614174002",
+        "specialization": 2,
+        "patientLoad": 3,
+        "workdayStart": "09:00:00",
+        "workdayEnd": "18:00:00"
     }
 ```
 ***
 #### POST `api/doctors` 
-Create record about new doctor and put it to the DB. The request should contain information needed for a new doctor, such as user's id, phone and insurance. Server should answer with status code 201 and id of doctor in the DB.
+
+**Purpose:** Create new doctor record for user and put it to the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Doctor object which includes user or their id, specialization or its id, patient load, start time of workday, end time of workday.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>201</th>
+  <td>New doctor record created for user and their record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Doctor object misses fields or their data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>409</th>
+  <td>There is already a doctor record for this user.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -1868,20 +2158,72 @@ Create record about new doctor and put it to the DB. The request should contain 
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
-        "phone": "string",
-        "insurance": "string",
+        "specialization": 4,
+        "patientLoad": 4,
+        "workdayStart": "08:30:00",
+        "workdayEnd": "17:30:00"
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
+        "user": "123e4567-e89b-12d3-a456-426614174003",
+        "specialization": 4,
+        "patientLoad": 4,
+        "workdayStart": "08:30:00",
+        "workdayEnd": "17:30:00"
     }
 ```
 ***
 #### PUT `api/doctors/{doctorId}`
-Update record about a doctor in the DB. The request should contain updated information needed for a doctor. Server should answer with status code 200 and updated info of doctor in the DB.
+
+**Purpose:** Update record about a doctor in the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Object with doctor's ID and updated information needed for a doctor.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Doctor is updated and their updated record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>ID is valid, but there is no data in request body to update.</td>
+
+  <tr>
+  <td>400</th>
+  <td>Some of updated data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>User or doctor record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -1889,25 +2231,69 @@ Update record about a doctor in the DB. The request should contain updated infor
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/doctors/1' \
+    'api/doctors/123e4567-e89b-12d3-a456-426614174004' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "phone": "string",
-        "insurance": "string",
+        "user": "123e4567-e89b-12d3-a456-426614174004",
+        "specialization": 5,
+        "patientLoad": 2,
+        "workdayStart": "07:00:00",
+        "workdayEnd": "15:00:00"
     }'
 ```
 **Response body**
 ```sh
-    {
-        "id": 1,
-        "phone": "string",
-        "insurance": "string",
+     {
+        "user": "123e4567-e89b-12d3-a456-426614174004",
+        "specialization": 5,
+        "patientLoad": 2,
+        "workdayStart": "07:00:00",
+        "workdayEnd": "15:00:00"
     }
 ```
 ***
 #### DELETE `api/doctors/{doctorId}` 
-Delete record about a doctor from the DB. Server should answer with status code 204.
+
+
+**Purpose:** Delete record about a doctor from the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>Doctor record is deleted, nothing is returned.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>User or their doctor record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -1915,7 +2301,7 @@ Delete record about a doctor from the DB. Server should answer with status code 
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/doctors/1' \
+    'api/doctors/123e4567-e89b-12d3-a456-426614174004' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1924,20 +2310,99 @@ Delete record about a doctor from the DB. Server should answer with status code 
     Empty
 ```
 
-### 1. Endpoint `/api/appointments`
+### 8. Endpoint `/api/appointments`
 
 ***
 #### GET `/api/appointments`
-Get all appointments. The server responds with status code 200 and all appointment records.
+
+**Purpose:** Get all appointments.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns all appointment records, which include id, patient record or their id, doctor record or their id, appointment time, duration and additional info.</td>
+  </tr>
+
+</table>
 
 **Query Parameters**:
-- `patientId` (uuid string): ID of the patient who signed up for the appointment
-- `doctorId` (uuid string): ID of the doctor who signed up for the appointment 
-- `startBefore` (string): Time before which appointments occur
-- `startAfter` (string): Time after which appointments occur
-- `endBefore` (string): Time before which appointments end
-- `endAfter` (string): Time after which appointments end
 
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>patientId</b></td>
+    <td>uuid</td>
+    <td>ID of the patient who signed up for the appointment</td>
+  </tr>
+  <tr>
+    <td><b>doctorId</b></td>
+    <td>uuid</td>
+    <td>ID of the doctor who signed up for the appointment</td>
+  </tr>
+  <tr>
+    <td><b>nestDoctor</b></td>
+    <td>boolean</td>
+    <td>true if returned appointment object should include nested doctor record, false if only id</td>
+  </tr>
+  <tr>
+    <td><b>nestPatient</b></td>
+    <td>boolean</td>
+    <td>true if returned appointment object should include nested patient record, false if only id</td>
+  </tr>
+  <tr>
+    <td><b>startBefore</b></td>
+    <td>string</td>
+    <td>time before which appointments occur</td>
+  </tr>
+  <tr>
+    <td><b>startAfter</b></td>
+    <td>string</td>
+    <td>time after which appointments occur</td>
+  </tr>
+  <tr>
+    <td><b>endBefore</b></td>
+    <td>string</td>
+    <td>time before which appointments end</td>
+  </tr>
+  <tr>
+    <td><b>endAfter</b></td>
+    <td>string</td>
+    <td>time after which appointments end</td>
+  </tr>
+
+</table>
 
 ***Example***
 
@@ -1951,88 +2416,86 @@ Get all appointments. The server responds with status code 200 and all appointme
 ```sh
     [{
         "id": 1,
-        "patientId": 1,
-        "doctorId": 1,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
+        "patientId": "123e4567-e89b-12d3-a456-426614174011",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174012",
+        "time": "2024-07-24T09:00:00",
+        "duration": "01:00:00",
+        "additionalInfo": "Regular check-up"
     },
     {
         "id": 2,
-        "patientId": 2,
-        "doctorId": 2,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
+        "patientId": "123e4567-e89b-12d3-a456-426614174013",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174014",
+        "time": "2024-07-24T10:00:00",
+        "duration": "00:30:00",
+        "additionalInfo": "Follow-up visit"
     }] 
-```
-
-
-***Example***
-
-**Request**
-```sh
-    curl -X 'GET' \
-    'api/appointments/?patientId=3' \
-    -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
-```
-
-**Response body**
-```sh
-    [{
-        "id": 1,
-        "patientId": 3,
-        "doctorId": 1,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
-    },
-    {
-        "id": 2,
-        "patientId": 3,
-        "doctorId": 2,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
-    }]
-```
-
-
-***Example***
-
-**Request**
-
-```sh
-    curl -X 'GET' \
-    'api/appointments/?doctorId=4' \
-    -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
-```
-
-**Response body**
-```sh
-    [{
-        "id": 1,
-        "patientId": 1,
-        "doctorId": 4,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
-    },
-    {
-        "id": 2,
-        "patientId": 2,
-        "doctorId": 4,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
-    }]
 ```
 
 ***
 #### GET `api/appointments/{appointmetId}`
-Get an appointment by ID.
-Server should answer with status code 200 and one appointment record.
 
+**Purpose:** Get an appointment by ID.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Returns one appointment record, which includes id, patient record or their id, doctor record or their id, appointment time, duration and additional info.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>There is no such appointment found.</td>
+  </tr>
+</table>
+
+**Query Parameters**:
+
+<table border=3>
+  <tr>
+    <th style="width: 10%;">
+    Parameter name</th>
+    <th style="width: 10%;">
+    Patameter type</th>
+    <th style="width: 60%;">
+    Parameter description</th>
+  </tr>
+  <tr>
+    <td><b>nestDoctor</b></td>
+    <td>boolean</td>
+    <td>true if returned appointment object should include nested doctor record, false if only id</td>
+  </tr>
+  <tr>
+    <td><b>nestPatient</b></td>
+    <td>boolean</td>
+    <td>true if returned appointment object should include nested patient record, false if only id</td>
+  </tr>
+</table>
 
 ***Example***
 
@@ -2047,18 +2510,60 @@ Server should answer with status code 200 and one appointment record.
 ```sh
     {
         "id": 1,
-        "patientId": 1,
-        "doctorId": 1,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
+        "patientId": "123e4567-e89b-12d3-a456-426614174011",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174012",
+        "time": "2024-07-24T09:00:00",
+        "duration": "01:00:00",
+        "additionalInfo": "Regular check-up"
     }
 ```
 
 ***
 #### POST `api/appointments`
-Create a record about new appointment and put it to the DB. The request should contain information needed for a new appointment, such as patient, doctor, time of its start, time of its end, additional text information.*SYMPTOMS???* 
-Server should answer with status code 201 and id of record in the DB.
+
+**Purpose:** Create new appointment record and put it to the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Appointment record, which includes id, patient record or their id, doctor record or their id, appointment time, duration and additional info.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>201</th>
+  <td>New appointment record is created and returned.</td>
+  </tr>
+
+  <tr>
+  <td>400</th>
+  <td>Appointment object misses fields or their data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>409</th>
+  <td>There is already an appointment record at this time for these doctor and patient.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -2070,24 +2575,76 @@ Server should answer with status code 201 and id of record in the DB.
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "patientId": 1,
-        "doctorId": 1,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
+        "patientId": "123e4567-e89b-12d3-a456-426614174015",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174016",
+        "time": "2024-07-24T11:00:00",
+        "duration": "01:00:00",
+        "additionalInfo": "Consultation for respiratory issues"
     }'
 ```
 
 **Response body**
 ```sh
     {
-        "id": 1,
+        "id": 3,
+        "patientId": "123e4567-e89b-12d3-a456-426614174015",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174016",
+        "time": "2024-07-24T11:00:00",
+        "duration": "01:00:00",
+        "additionalInfo": "Consultation for respiratory issues"
     }
 ```
 
 ***
 #### PUT `api/appointments/{appointmetId}`
-Update record about an appointment in the DB. The request should contain updated information needed for an appointment. *SYMPTOMS???* Server should answer with status code 200 and updated info of record in the DB.
+
+**Purpose:** Update record about an appointment in the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Object with appointment's ID and updated information needed for an appointment.
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>200</th>
+  <td>Appointment is updated and its updated record is returned.</td>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>ID is valid, but there is no data in request body to update.</td>
+
+  <tr>
+  <td>400</th>
+  <td>Some of updated data is invalid.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Appointment record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 
 ***Example***
@@ -2099,29 +2656,68 @@ Update record about an appointment in the DB. The request should contain updated
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "id": 1,
-        "patientId": 1,
-        "doctorId": 1,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
+        "id": 4,
+        "patientId": "123e4567-e89b-12d3-a456-426614174017",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174018",
+        "time": "2024-07-24T12:00:00",
+        "duration": "00:45:00",
+        "additionalInfo": "Kidney function tests"
     }'
 ```
 **Response body**
 ```sh
     {
-        "id": 1,
-        "patientId": 1,
-        "doctorId": 1,
-        "start_time": *time*,
-        "end_time": *time*,
-        "info": "string",
+        "id": 4,
+        "patientId": "123e4567-e89b-12d3-a456-426614174017",
+        "doctorId": "123e4567-e89b-12d3-a456-426614174018",
+        "time": "2024-07-24T12:00:00",
+        "duration": "00:45:00",
+        "additionalInfo": "Kidney function tests"
     }
 ```
 
 ***
 #### DELETE `api/appointments/{appointmetId}`
-Delete record about an appointment from the DB. Server should answer with status code 204.
+
+
+**Purpose:** Delete record about an appointment from the DB.
+
+**Request headers:**
+
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Authorization</th>
+  <td>Access token generated for user.</td>
+  </tr>
+</table>
+
+**Request body:**
+
+Empty
+
+**Responses:**
+
+<table border=3>
+    <tr>
+  <th style="width:20%;">Status code</th>
+  <th>Response</th>
+  </tr>
+
+  <tr>
+  <td>204</th>
+  <td>Apointment record is deleted, nothing is returned.</td>
+  </tr>
+
+  <tr>
+  <td>404</th>
+  <td>Apointment record for the specified ID was not found.</td>
+  </tr>
+</table>
 
 
 ***Example***
