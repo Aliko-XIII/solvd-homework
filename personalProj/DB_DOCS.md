@@ -54,6 +54,33 @@ This table stores user information including personal details, contact informati
   - `first_name_length`: char_length(first_name) > 0
   - `last_name_length`: char_length(last_name) > 0
 
+## Table: refresh_tokens
+
+### Description
+This table stores refresh tokens for users, which are used to generate new access tokens for authentication purposes.
+
+### Columns
+
+- **user_id** (`uuid`): 
+  - Description: A unique identifier for each user, linked to a user in the users table.
+  - Constraints: Primary Key, Foreign Key referencing users(user_id)
+
+- **refresh_token** (`character varying`): 
+  - Description: The refresh token associated with the user.
+  - Constraints: None
+
+- **expires_at** (`timestamp with time zone`): 
+  - Description: The expiration date and time of the refresh token.
+  - Constraints: None
+
+### Constraints
+
+- **Primary Key**: `user_id`
+- **Foreign Key**: 
+  - `user_id` references users(user_id)
+    - **On Update**: Cascade
+    - **On Delete**: Cascade
+
  
 ## Table: patients
 
