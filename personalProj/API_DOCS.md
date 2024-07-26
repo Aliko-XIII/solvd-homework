@@ -15,10 +15,10 @@ This project is a hospital appointments app. The application has the functionali
 
 ## API Endpoints
 
-### 1. Endpoint `api/authorization/`:
+### 1. Endpoint `api/v1/authorization/`:
 
 ***
-#### POST `api/authorization/login`
+#### POST `api/v1/authorization/login`
 **Purpose:** Authenticate and log in a user..
 
 **Request headers:**
@@ -68,7 +68,7 @@ Object which contains user's phone and password.
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/authorization/login' \
+    'api/v1/authorization/login' \
     -H 'Content-Type: application/json' \
     -d '{
         "phone": "6667778882",
@@ -85,7 +85,7 @@ Object which contains user's phone and password.
 ```
 
 ***
-#### POST `api/authorization/refresh`
+#### POST `api/v1/authorization/refresh`
 **Purpose:** Get new access token.
 
 **Request headers:**
@@ -129,7 +129,7 @@ Object which contains user's refresh token.
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/authorization/login' \
+    'api/v1/authorization/login' \
     -H 'Content-Type: application/json' \
     -d '{
         "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImlhdCI6IldlZCBKdWwgMjQgMjAyNCAxOTo1OTo0NiBHTVQrMDMwMCAoRWFzdGVybiBFdXJvcGVhbiBTdW1tZXIgVGltZSkiLCJleHAiOiIzZCJ9.eyJpZCI6ImYxY2M0NTliLTQxNTItNDU2MC05NmQ3LTQ4NWNkYzNmY2IyMCJ9.lBSMqquCRP5YQ5JiyWkm5JXUM33utIQcL2qa27R1-rs"
@@ -143,10 +143,10 @@ Object which contains user's refresh token.
       }
 ```
 
-### 2. Endpoint `api/users/`:
+### 2. Endpoint `api/v1/users/`:
 
 ***
-#### GET `api/users`
+#### GET `api/v1/users`
 **Purpose:** Get all users.
 
 **Request headers:**
@@ -229,7 +229,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/users' \
+    'api/v1/users' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -255,7 +255,7 @@ Empty
 ```
 
 ***
-#### GET `api/users/{userId}`
+#### GET `api/v1/users/{userId}`
 **Purpose:** Get a user by ID. 
 
 **Request headers:**
@@ -300,7 +300,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/users/8a9e4d28-fb9b-4f80-b25c-7b93e8c1c1e4' \
+    'api/v1/users/8a9e4d28-fb9b-4f80-b25c-7b93e8c1c1e4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -317,7 +317,7 @@ Empty
 ```
 
 ***
-#### POST `api/users` 
+#### POST `api/v1/users` 
 
 **Purpose:** Create new user record and put it to the DB.
 
@@ -372,7 +372,7 @@ User object with first name, last name, age, sex, password.
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/users' \
+    'api/v1/users' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -393,7 +393,7 @@ User object with first name, last name, age, sex, password.
 ```
 
 ***
-#### PUT `api/users/{userId}` 
+#### PUT `api/v1/users/{userId}` 
 
 **Purpose:** Update record about a user in the DB.
 
@@ -453,7 +453,7 @@ Object with user's ID and updated information needed for a user.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/users/a1c2e3d4-5f67-8a9b-0cde-1f23456789ab' \
+    'api/v1/users/a1c2e3d4-5f67-8a9b-0cde-1f23456789ab' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -474,7 +474,7 @@ Object with user's ID and updated information needed for a user.
 ```
 
 ***
-#### DELETE `api/users/{userId}` 
+#### DELETE `api/v1/users/{userId}` 
 
 **Purpose:** Delete record about a user from the DB.
 
@@ -520,7 +520,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/users/b3d4e5f6-7a8b-9c0d-1e2f-3g456h789i0j' \
+    'api/v1/users/b3d4e5f6-7a8b-9c0d-1e2f-3g456h789i0j' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -529,10 +529,10 @@ Empty
     Empty
 ```
 
-### 3. Endpoint `api/patients/`:
+### 3. Endpoint `api/v1/patients/`:
 
 ***
-#### GET `api/patients`
+#### GET `api/v1/patients`
 
 **Purpose:** Get all patients.
 
@@ -602,7 +602,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/patients' \
+    'api/v1/patients' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -620,7 +620,7 @@ Empty
     }]
 ```
 ***
-#### GET `api/patients/{patientId}` 
+#### GET `api/v1/patients/{patientId}` 
 
 **Purpose:** Get a patient by ID.
 
@@ -683,7 +683,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/patients/f9d4a1b2-3c56-4d78-a9b0-1e2f3c4d5e6f' \
+    'api/v1/patients/f9d4a1b2-3c56-4d78-a9b0-1e2f3c4d5e6f' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 **Response body**
@@ -695,7 +695,7 @@ Empty
     }
 ```
 ***
-#### POST `api/patients` 
+#### POST `api/v1/patients` 
 
 **Purpose:** Create new patient record for user and put it to the DB.
 
@@ -750,7 +750,7 @@ Patient object with information needed for a new patient, such as user's id, ins
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/patients' \
+    'api/v1/patients' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -768,7 +768,7 @@ Patient object with information needed for a new patient, such as user's id, ins
     }
 ```
 ***
-#### PUT `api/patients/{patientId}`
+#### PUT `api/v1/patients/{patientId}`
 
 **Purpose:** Update record about a patient in the DB.
 
@@ -827,7 +827,7 @@ Object with patient's ID and updated information needed for a patient.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/patients/d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g' \
+    'api/v1/patients/d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -844,7 +844,7 @@ Object with patient's ID and updated information needed for a patient.
     }
 ```
 ***
-#### DELETE `api/patients/{patientId}` 
+#### DELETE `api/v1/patients/{patientId}` 
 
 **Purpose:** Delete record about a patient from the DB.
 
@@ -890,7 +890,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/patients/e8f7d6b2-4c9a-1d0e-8f3b-5a6c7d8e9f0g' \
+    'api/v1/patients/e8f7d6b2-4c9a-1d0e-8f3b-5a6c7d8e9f0g' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -899,10 +899,10 @@ Empty
     Empty
 ```
 
-### 4. Endpoint `api/symptoms/`:
+### 4. Endpoint `api/v1/symptoms/`:
 
 ***
-#### GET `api/symptoms` 
+#### GET `api/v1/symptoms` 
 
 **Purpose:** Get all symptoms.
 
@@ -967,7 +967,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/symptoms' \
+    'api/v1/symptoms' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 **Response body**
@@ -986,7 +986,7 @@ Empty
     ]
 ```
 ***
-#### GET `api/symptoms/{symptomId}`
+#### GET `api/v1/symptoms/{symptomId}`
 
 **Purpose:** Get a symptom by ID.
 
@@ -1032,7 +1032,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/symptoms/1' \
+    'api/v1/symptoms/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1045,7 +1045,7 @@ Empty
     }
 ```
 ***
-#### POST `api/symptoms` 
+#### POST `api/v1/symptoms` 
 
 **Purpose:** Create new symptom record and put it to the DB.
 
@@ -1095,7 +1095,7 @@ Symptom object with information needed for a new symptom, such as name and descr
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/symptoms' \
+    'api/v1/symptoms' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -1113,7 +1113,7 @@ Symptom object with information needed for a new symptom, such as name and descr
 ```
 
 ***
-#### PUT `api/symptoms/{symptomId}` 
+#### PUT `api/v1/symptoms/{symptomId}` 
 
 **Purpose:** Update record about a symptom in the DB.
 
@@ -1172,7 +1172,7 @@ Object with symptom's ID and updated information needed for a symptom.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/symptoms/4' \
+    'api/v1/symptoms/4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -1190,7 +1190,7 @@ Object with symptom's ID and updated information needed for a symptom.
 ```
 
 ***
-#### DELETE `api/symptoms/{symptomId}`
+#### DELETE `api/v1/symptoms/{symptomId}`
 
 **Purpose:** Delete record about a symptom from the DB.
 
@@ -1236,7 +1236,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/symptoms/1' \
+    'api/v1/symptoms/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1245,10 +1245,10 @@ Empty
     Empty
 ```
 
-### 5. Endpoint `api/organs/`:
+### 5. Endpoint `api/v1/organs/`:
 
 ***
-#### GET `api/organs` 
+#### GET `api/v1/organs` 
 
 **Purpose:** Get all organs.
 
@@ -1314,7 +1314,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/organs' \
+    'api/v1/organs' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
  ​
@@ -1332,7 +1332,7 @@ Empty
     },]
 ```
 ***
-#### GET `api/organs/{organId}` 
+#### GET `api/v1/organs/{organId}` 
 
 **Purpose:** Get a organ by ID.
 
@@ -1379,7 +1379,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/organs/1' \
+    'api/v1/organs/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1392,7 +1392,7 @@ Empty
     }
 ```
 ***
-#### POST `api/organs`
+#### POST `api/v1/organs`
 
 **Purpose:** Create new organ record and put it to the DB.
 
@@ -1443,7 +1443,7 @@ Organ object with information needed for a new organ, such as name and descripti
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/organs' \
+    'api/v1/organs' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -1460,7 +1460,7 @@ Organ object with information needed for a new organ, such as name and descripti
     },
 ```
 ***
-#### PUT `api/organs/{organId}` 
+#### PUT `api/v1/organs/{organId}` 
 
 **Purpose:** Update record about an organ in the DB.
 
@@ -1519,7 +1519,7 @@ Object with organ's ID and updated information needed for an organ.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/organs/4' \
+    'api/v1/organs/4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -1536,7 +1536,7 @@ Object with organ's ID and updated information needed for an organ.
     }
 ```
 ***
-#### DELETE `api/organs/{organId}` 
+#### DELETE `api/v1/organs/{organId}` 
 
 **Purpose:** Delete record about an organ from the DB.
 
@@ -1582,7 +1582,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/organs/1' \
+    'api/v1/organs/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1591,10 +1591,10 @@ Empty
     Empty
 ```
 
-### 6. Endpoint `api/specializations/`:
+### 6. Endpoint `api/v1/specializations/`:
 
 ***
-#### GET `api/specializations` 
+#### GET `api/v1/specializations` 
 
 **Purpose:** Get all specializations.
 
@@ -1669,7 +1669,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/specializations' \
+    'api/v1/specializations' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
  ​
@@ -1691,7 +1691,7 @@ Empty
     }]
 ```
 ***
-#### GET `api/specializations/{specializationId}` 
+#### GET `api/v1/specializations/{specializationId}` 
 
 **Purpose:** Get a specialization by ID.
 
@@ -1760,7 +1760,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/specializations/1' \
+    'api/v1/specializations/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1775,7 +1775,7 @@ Empty
     }
 ```
 ***
-#### POST `api/specializations`
+#### POST `api/v1/specializations`
 
 **Purpose:** Create new specialization record and put it to the DB.
 
@@ -1825,7 +1825,7 @@ Specialization object with information needed for a new specialization, such as 
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/specializations' \
+    'api/v1/specializations' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -1844,7 +1844,7 @@ Specialization object with information needed for a new specialization, such as 
     }
 ```
 ***
-#### PUT `api/specializations/{specializationId}` 
+#### PUT `api/v1/specializations/{specializationId}` 
 
 **Purpose:** Update record about a specialization in the DB.
 
@@ -1903,7 +1903,7 @@ Object with specialization's ID and updated information needed for a specializat
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/specializations/4' \
+    'api/v1/specializations/4' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -1924,7 +1924,7 @@ Object with specialization's ID and updated information needed for a specializat
     }
 ```
 ***
-#### DELETE `api/specializations/{specializationId}` 
+#### DELETE `api/v1/specializations/{specializationId}` 
 
 **Purpose:** Delete record about a specialization from the DB.
 
@@ -1970,7 +1970,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/specializations/1' \
+    'api/v1/specializations/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -1979,10 +1979,10 @@ Empty
     Empty
 ```
 
-### 7. Endpoint `api/doctors/`:
+### 7. Endpoint `api/v1/doctors/`:
 
 ***
-#### GET `api/doctors`
+#### GET `api/v1/doctors`
 
 **Purpose:** Get all doctors.
 
@@ -2053,7 +2053,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/doctors' \
+    'api/v1/doctors' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -2075,7 +2075,7 @@ Empty
     }]
 ```
 ***
-#### GET `api/doctors/{doctorId}` 
+#### GET `api/v1/doctors/{doctorId}` 
 
 **Purpose:** Get a doctor by ID.
 
@@ -2143,7 +2143,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/doctors/123e4567-e89b-12d3-a456-426614174002' \
+    'api/v1/doctors/123e4567-e89b-12d3-a456-426614174002' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 **Response body**
@@ -2157,7 +2157,7 @@ Empty
     }
 ```
 ***
-#### POST `api/doctors` 
+#### POST `api/v1/doctors` 
 
 **Purpose:** Create new doctor record for user and put it to the DB.
 
@@ -2213,7 +2213,7 @@ Doctor object which includes user or their id, specialization or its id, patient
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/doctors' \
+    'api/v1/doctors' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -2234,7 +2234,7 @@ Doctor object which includes user or their id, specialization or its id, patient
     }
 ```
 ***
-#### PUT `api/doctors/{doctorId}`
+#### PUT `api/v1/doctors/{doctorId}`
 
 **Purpose:** Update record about a doctor in the DB.
 
@@ -2294,7 +2294,7 @@ Object with doctor's ID and updated information needed for a doctor.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/doctors/123e4567-e89b-12d3-a456-426614174004' \
+    'api/v1/doctors/123e4567-e89b-12d3-a456-426614174004' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -2316,7 +2316,7 @@ Object with doctor's ID and updated information needed for a doctor.
     }
 ```
 ***
-#### DELETE `api/doctors/{doctorId}` 
+#### DELETE `api/v1/doctors/{doctorId}` 
 
 
 **Purpose:** Delete record about a doctor from the DB.
@@ -2364,7 +2364,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/doctors/123e4567-e89b-12d3-a456-426614174004' \
+    'api/v1/doctors/123e4567-e89b-12d3-a456-426614174004' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -2373,10 +2373,10 @@ Empty
     Empty
 ```
 
-### 8. Endpoint `/api/appointments`
+### 8. Endpoint `/api/v1/appointments`
 
 ***
-#### GET `/api/appointments`
+#### GET `/api/v1/appointments`
 
 **Purpose:** Get all appointments.
 
@@ -2472,7 +2472,7 @@ Empty
 **Request**:
 ```sh
     curl -X 'GET' \
-    '/api/appointments'\
+    '/api/v1/appointments'\
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 **Response body**
@@ -2496,7 +2496,7 @@ Empty
 ```
 
 ***
-#### GET `api/appointments/{appointmetId}`
+#### GET `api/v1/appointments/{appointmetId}`
 
 **Purpose:** Get an appointment by ID.
 
@@ -2565,7 +2565,7 @@ Empty
 **Request**
 ```sh
     curl -X 'GET' \
-    'api/appointments/1' \
+    'api/v1/appointments/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
@@ -2582,7 +2582,7 @@ Empty
 ```
 
 ***
-#### POST `api/appointments`
+#### POST `api/v1/appointments`
 
 **Purpose:** Create new appointment record and put it to the DB.
 
@@ -2638,7 +2638,7 @@ Appointment record, which includes id, patient record or their id, doctor record
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/appointments' \
+    'api/v1/appointments' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -2663,7 +2663,7 @@ Appointment record, which includes id, patient record or their id, doctor record
 ```
 
 ***
-#### PUT `api/appointments/{appointmetId}`
+#### PUT `api/v1/appointments/{appointmetId}`
 
 **Purpose:** Update record about an appointment in the DB.
 
@@ -2723,7 +2723,7 @@ Object with appointment's ID and updated information needed for an appointment.
 **Request**
 ```sh
     curl -X 'PUT' \
-    'api/appointments/1' \
+    'api/v1/appointments/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -2748,7 +2748,7 @@ Object with appointment's ID and updated information needed for an appointment.
 ```
 
 ***
-#### DELETE `api/appointments/{appointmetId}`
+#### DELETE `api/v1/appointments/{appointmetId}`
 
 
 **Purpose:** Delete record about an appointment from the DB.
@@ -2796,7 +2796,7 @@ Empty
 **Request**
 ```sh
     curl -X 'DELETE' \
-    'api/appointments/1' \
+    'api/v1/appointments/1' \
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
 ```
 
