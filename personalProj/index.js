@@ -1,6 +1,7 @@
 //Module imports
 const express = require('express');
 require('dotenv').config();
+
 //Routes imports
 const userRoutes = require('./routes/userRoutes');
 const patientRoutes = require('./routes/patientRoutes');
@@ -12,7 +13,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const authorizationRoutes = require('./routes/authorizationRoutes')
 
 //Additional functions
-const { validateSignature, isTokenExpired, validateToken } = require('./controllers/authorizationController');
+const {validateToken } = require('./controllers/authorizationController');
 
 //App setup 
 const app = express();
@@ -34,7 +35,7 @@ app.use((req, res, next) => {
 app.use('/api/authorization', authorizationRoutes);
 
 //Access token validation middleware
-// app.use(validateToken);
+app.use(validateToken);
 
 //Test route
 app.get('/', (req, res) => {
