@@ -1,6 +1,13 @@
-# Database Table Documentation
+# Database Tables Documentation
 
-## Table: public.users
+## Enum Type: sex
+
+The sex enum type is used to represent the sex of users. It consists of two possible values:
+```
+M: Represents male.
+F: Represents female.
+```
+## Table: users
 
 ### Description
 This table stores user information including personal details, contact information, and unique identifiers.
@@ -8,21 +15,21 @@ This table stores user information including personal details, contact informati
 ### Columns
 
 - **user_id** (`uuid`): 
-  - Description: A unique identifier for each user. 
+  - Description: A unique identifier for each user, generated automatically.
   - Default: `gen_random_uuid()`
   - Constraints: Primary Key
 
 - **first_name** (`character varying`): 
   - Description: The first name of the user.
-  - Constraints: None
+  - Constraints: Not Null, Check (char_length(first_name) > 0)
 
 - **last_name** (`character varying`): 
   - Description: The last name of the user.
-  - Constraints: None
+  - Constraints: Not Null, Check (char_length(last_name) > 0)
 
 - **age** (`integer`): 
   - Description: The age of the user.
-  - Constraints: None
+  - Constraints: Check (age >= 0 AND age <= 120)
 
 - **sex** (`sex_type`): 
   - Description: The sex of the user.
@@ -30,60 +37,69 @@ This table stores user information including personal details, contact informati
 
 - **pass** (`character varying`): 
   - Description: The password for the user account.
-  - Constraints: Not Null
+  - Constraints: Not Null, Check (char_length(pass) > 6 AND char_length(pass) < 32)
 
 - **phone** (`character varying`): 
   - Description: The phone number of the user.
-  - Constraints: Not Null, Unique
+  - Constraints: Not Null, Unique, Check (char_length(phone) >= 10)
 
 ### Constraints
 
 - **Primary Key**: `user_id`
 - **Unique**: `phone`
+- **Check**: 
+  - `age_valid`: age >= 0 AND age <= 120
+  - `pass_length`: char_length(pass) > 6 AND char_length(pass) < 32
+  - `phone_length`: char_length(phone) >= 10
+  - `first_name_length`: char_length(first_name) > 0
+  - `last_name_length`: char_length(last_name) > 0
 
  
-## Table: public.patients
+## Table: patients
 
 ### Description
-This table stores patient information, linking each patient to a user and storing insurance details.
+This table stores information about patients, including their insurance details.
 
 ### Columns
 
 - **user_id** (`uuid`): 
-  - Description: A unique identifier linking the patient to a user in the `public.users` table.
-  - Constraints: Primary Key, Foreign Key referencing `public.users(user_id)`
+  - Description: A unique identifier for each patient, linked to a user in the users table.
+  - Constraints: Primary Key, Foreign Key referencing users(user_id)
 
 - **insurance_number** (`character varying`): 
   - Description: The insurance number of the patient.
-  - Constraints: None
+  - Constraints: Check (char_length(insurance_number) > 0)
 
 - **insurance_provider** (`character varying`): 
-  - Description: The insurance provider of the patient.
-  - Constraints: None
+  - Description: The name of the patient's insurance provider.
+  - Constraints: Check (char_length(insurance_provider) > 0)
 
 ### Constraints
 
 - **Primary Key**: `user_id`
-- **Foreign Key**: `user_id` references `public.users(user_id)`
+- **Foreign Key**: `user_id` references users(user_id)
   - **On Update**: Cascade
   - **On Delete**: Set Null
+- **Check**: 
+  - `insurance_number_length`: char_length(insurance_number) > 0
+    - `insurance_provider_length`: char_length(insurance_provider) > 0
 
 
-## Table: public.symptoms
+## Table: symptoms
 
 ### Description
-This table stores information about various symptoms, including their names and descriptions.
+This table stores information about symptoms that can be associated with various medical conditions.
 
 ### Columns
 
 - **symptom_id** (`integer`): 
-  - Description: A unique identifier for each symptom.
-  - Default: `nextval('symptoms_symptom_id_seq'::regclass)`
-  - Constraints: Primary Key
+  - Description: A unique identifier for each symptom, generated automatically in a sequential order.
+  - Default: `nextval('symptoms_symptom_id_seq')`
+  - Constraints: Primary Key, Serial
 
 - **symptom_name** (`character varying`): 
   - Description: The name of the symptom.
-  - Constraints: Not Null
+  - Constraints: Not Null, Check (char_length(symptom_name) > 0)
 
 - **symptom_description** (`text`): 
   - Description: A description of the symptom.
@@ -92,22 +108,25 @@ This table stores information about various symptoms, including their names and 
 ### Constraints
 
 - **Primary Key**: `symptom_id`
+- **Check**: 
+  - `symptom_name_length`: char_length(symptom_name) > 0
 
-## Table: public.organs
+
+## Table: organs
 
 ### Description
-This table stores information about various organs, including their names and descriptions.
+This table stores information about various organs in the human body.
 
 ### Columns
 
 - **organ_id** (`integer`): 
   - Description: A unique identifier for each organ, generated automatically in a sequential order.
-  - Default: `nextval('organs_organ_id_seq'::regclass)`
-  - Constraints: Primary Key, Serial
+  - Default: `nextval('organs_organ_id_seq')`
+  - Constraints: Primary Key
 
 - **organ_name** (`character varying`): 
   - Description: The name of the organ.
-  - Constraints: Not Null
+  - Constraints: Not Null, Check (char_length(organ_name) > 0)
 
 - **organ_description** (`text`): 
   - Description: A description of the organ.
@@ -116,22 +135,24 @@ This table stores information about various organs, including their names and de
 ### Constraints
 
 - **Primary Key**: `organ_id`
+- **Check**: 
+  - `organ_name_length`: char_length(organ_name) > 0
 
-## Table: public.specializations
+## Table: specializations
 
 ### Description
-This table stores information about various medical specializations, including their names and descriptions.
+This table stores information about different medical specializations.
 
 ### Columns
 
 - **specialization_id** (`integer`): 
   - Description: A unique identifier for each specialization, generated automatically in a sequential order.
-  - Default: `nextval('specializations_specialization_id_seq'::regclass)`
-  - Constraints: Primary Key, Serial
+  - Default: `nextval('specializations_specialization_id_seq')`
+  - Constraints: Primary Key
 
 - **specialization_name** (`character varying`): 
   - Description: The name of the specialization.
-  - Constraints: Not Null
+  - Constraints: Not Null, Check (char_length(specialization_name) > 0)
 
 - **specialization_description** (`text`): 
   - Description: A description of the specialization.
@@ -140,8 +161,10 @@ This table stores information about various medical specializations, including t
 ### Constraints
 
 - **Primary Key**: `specialization_id`
+- **Check**: 
+  - `specialization_name_length`: char_length(specialization_name) > 0
 
-## Table: public.specializations_to_symptoms
+## Table: specializations_to_symptoms
 
 ### Description
 This table links medical specializations to symptoms, indicating which symptoms are associated with each specialization.
@@ -150,28 +173,28 @@ This table links medical specializations to symptoms, indicating which symptoms 
 
 - **record_id** (`integer`): 
   - Description: A unique identifier for each record, generated automatically in a sequential order.
-  - Default: `nextval('specializations_to_symptoms_record_id_seq'::regclass)`
+  - Default: `nextval('specializations_to_symptoms_record_id_seq')`
   - Constraints: Primary Key, Serial
 
 - **specialization_id** (`integer`): 
   - Description: The identifier for the specialization.
-  - Constraints: Not Null, Foreign Key referencing `public.specializations(specialization_id)`
+  - Constraints: Not Null, Foreign Key referencing `specializations(specialization_id)`
 
 - **symptom_id** (`integer`): 
   - Description: The identifier for the symptom.
-  - Constraints: Not Null, Foreign Key referencing `public.symptoms(symptom_id)`
+  - Constraints: Not Null, Foreign Key referencing `symptoms(symptom_id)`
 
 ### Constraints
 
 - **Primary Key**: `record_id`
-- **Foreign Key**: `specialization_id` references `public.specializations(specialization_id)`
+- **Foreign Key**: `specialization_id` references `specializations(specialization_id)`
   - **On Update**: Cascade
   - **On Delete**: Cascade
-- **Foreign Key**: `symptom_id` references `public.symptoms(symptom_id)`
+- **Foreign Key**: `symptom_id` references `symptoms(symptom_id)`
   - **On Update**: Cascade
   - **On Delete**: Cascade
 
-## Table: public.specializations_to_organs
+## Table: specializations_to_organs
 
 ### Description
 This table links medical specializations to organs, indicating which organs are associated with each specialization.
@@ -180,46 +203,45 @@ This table links medical specializations to organs, indicating which organs are 
 
 - **record_id** (`integer`): 
   - Description: A unique identifier for each record, generated automatically in a sequential order.
-  - Default: `nextval('specializations_to_organs_record_id_seq'::regclass)`
+  - Default: `nextval('specializations_to_organs_record_id_seq')`
   - Constraints: Primary Key, Serial
 
 - **specialization_id** (`integer`): 
   - Description: The identifier for the specialization.
-  - Constraints: Not Null, Foreign Key referencing `public.specializations(specialization_id)`
+  - Constraints: Not Null, Foreign Key referencing `specializations(specialization_id)`
 
 - **organ_id** (`integer`): 
   - Description: The identifier for the organ.
-  - Constraints: Not Null, Foreign Key referencing `public.organs(organ_id)`
+  - Constraints: Not Null, Foreign Key referencing `organs(organ_id)`
 
 ### Constraints
 
 - **Primary Key**: `record_id`
-- **Foreign Key**: `specialization_id` references `public.specializations(specialization_id)`
+- **Foreign Key**: `specialization_id` references `specializations(specialization_id)`
   - **On Update**: Cascade
   - **On Delete**: Cascade
-- **Foreign Key**: `organ_id` references `public.organs(organ_id)`
+- **Foreign Key**: `organ_id` references `organs(organ_id)`
   - **On Update**: Cascade
   - **On Delete**: Cascade
 
-## Table: public.doctors
+## Table: doctors
 
 ### Description
-This table stores information about doctors, including their specialization, patient load, and work schedule.
+This table stores information about doctors, including their specialization, work hours, and patient load.
 
 ### Columns
 
 - **user_id** (`uuid`): 
-  - Description: A unique identifier for each doctor, linked to a user in the `public.users` table.
-  - Constraints: Primary Key, Foreign Key referencing `public.users(user_id)`
+  - Description: A unique identifier for each doctor, linked to a user in the users table.
+  - Constraints: Primary Key, Foreign Key referencing users(user_id)
 
 - **specialization_id** (`integer`): 
-  - Description: The identifier for the doctor's specialization.
-  - Constraints: Not Null, Foreign Key referencing `public.specializations(specialization_id)`
+  - Description: The specialization of the doctor.
+  - Constraints: Not Null, Foreign Key referencing specializations(specialization_id)
 
 - **patient_load** (`smallint`): 
-  - Description: The current load of patients assigned to the doctor.
-  - Default: `1`
-  - Constraints: Not Null
+  - Description: The number of patients assigned to the doctor.
+  - Constraints: Not Null, Check (patient_load > 0)
 
 - **workday_start** (`time without time zone`): 
   - Description: The start time of the doctor's workday.
@@ -232,11 +254,19 @@ This table stores information about doctors, including their specialization, pat
 ### Constraints
 
 - **Primary Key**: `user_id`
-- **Foreign Key**: `specialization_id` references `public.specializations(specialization_id)`
-  - **On Update**: Cascade
-  - **On Delete**: Set Null
+- **Foreign Key**: 
+  - `specialization_id` references specializations(specialization_id)
+    - **On Update**: Cascade
+    - **On Delete**: Set Null
+  - `user_id` references users(user_id)
+    - **On Update**: Cascade
+    - **On Delete**: Cascade
+- **Check**: 
+  - `patient_load_valid`: patient_load > 0
+  - `workday_valid`: workday_start < workday_end
 
-## Table: public.appointments
+
+## Table: appointments
 
 ### Description
 This table stores information about appointments between patients and doctors, including scheduling details and additional information.
@@ -245,16 +275,16 @@ This table stores information about appointments between patients and doctors, i
 
 - **appointment_id** (`integer`): 
   - Description: A unique identifier for each appointment, generated automatically in a sequential order.
-  - Default: `nextval('appointments_appointment_id_seq'::regclass)`
+  - Default: `nextval('appointments_appointment_id_seq')`
   - Constraints: Primary Key, Serial
 
 - **patient_id** (`uuid`): 
   - Description: The unique identifier for the patient associated with the appointment.
-  - Constraints: Foreign Key referencing `public.patients(user_id)`
+  - Constraints: Foreign Key referencing `patients(user_id)`
 
 - **doctor_id** (`uuid`): 
   - Description: The unique identifier for the doctor associated with the appointment.
-  - Constraints: Foreign Key referencing `public.doctors(user_id)`
+  - Constraints: Foreign Key referencing `doctors(user_id)`
 
 - **appointment_time** (`timestamp without time zone`): 
   - Description: The date and time of the appointment.
@@ -271,39 +301,9 @@ This table stores information about appointments between patients and doctors, i
 ### Constraints
 
 - **Primary Key**: `appointment_id`
-- **Foreign Key**: `doctor_id` references `public.doctors(user_id)`
+- **Foreign Key**: `doctor_id` references `doctors(user_id)`
   - **On Update**: Cascade
   - **On Delete**: Set Null
-- **Foreign Key**: `patient_id` references `public.patients(user_id)`
+- **Foreign Key**: `patient_id` references `patients(user_id)`
   - **On Update**: Cascade
   - **On Delete**: Set Null
-
-## Table: public.appointments_to_symptoms
-
-### Description
-This table links appointments to symptoms, indicating which symptoms are associated with each appointment.
-
-### Columns
-
-- **record_id** (`integer`): 
-  - Description: A unique identifier for each record, generated automatically in a sequential order.
-  - Default: `nextval('appointments_to_symptoms_record_id_seq'::regclass)`
-  - Constraints: Primary Key, Serial
-
-- **appointment_id** (`integer`): 
-  - Description: The identifier for the appointment.
-  - Constraints: Not Null, Foreign Key referencing `public.appointments(appointment_id)`
-
-- **symptom_id** (`integer`): 
-  - Description: The identifier for the symptom.
-  - Constraints: Not Null, Foreign Key referencing `public.symptoms(symptom_id)`
-
-### Constraints
-
-- **Primary Key**: `record_id`
-- **Foreign Key**: `appointment_id` references `public.appointments(appointment_id)`
-  - **On Update**: Cascade
-  - **On Delete**: Cascade
-- **Foreign Key**: `symptom_id` references `public.symptoms(symptom_id)`
-  - **On Update**: Cascade
-  - **On Delete**: Cascade
