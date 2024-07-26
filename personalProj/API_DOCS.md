@@ -1,7 +1,7 @@
 # API Documentation
 
 ## Description
-This project is a hospital appointments app. The application has the following functionality: add, update, delete, and get information about appointments, patients, doctors, their specializations, symptoms, and organs they work with. App supports authorization using JWT.
+This project is a hospital appointments app. The application has the functionality to add, update, delete, and get information about appointments, patients, doctors, their specializations, symptoms, and organs they work with. App supports authorization using JWT (JSON Web Token).
 
 ## Technical Requirements
 - **Programming Language**: JavaScript
@@ -19,11 +19,21 @@ This project is a hospital appointments app. The application has the following f
 
 ***
 #### POST `api/authorization/login`
-**Purpose:** Log in user.
+**Purpose:** Authenticate and log in a user..
 
 **Request headers:**
 
-Empty
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
+</table>
 
 **Request body:**
 
@@ -80,7 +90,16 @@ Object which contains user's phone and password.
 
 **Request headers:**
 
-Empty
+<table border=3>
+<tr>
+  <th style="width:20%;">Header name</th>
+  <th>Header value</th>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
+</table>
 
 **Request body:**
 
@@ -313,6 +332,10 @@ Empty
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
@@ -688,6 +711,10 @@ Empty
   <td>Authorization</th>
   <td>Access token generated for user.</td>
   </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
 </table>
 
 **Request body:**
@@ -756,6 +783,10 @@ Patient object with information needed for a new patient, such as user's id, ins
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
@@ -1030,6 +1061,10 @@ Empty
   <td>Authorization</th>
   <td>Access token generated for user.</td>
   </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
 </table>
 
 **Request body:**
@@ -1093,6 +1128,10 @@ Symptom object with information needed for a new symptom, such as name and descr
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
@@ -1369,6 +1408,10 @@ Empty
   <td>Authorization</th>
   <td>Access token generated for user.</td>
   </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
 </table>
 
 **Request body:**
@@ -1432,6 +1475,10 @@ Organ object with information needed for a new organ, such as name and descripti
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
@@ -1744,6 +1791,10 @@ Empty
   <td>Authorization</th>
   <td>Access token generated for user.</td>
   </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
 </table>
 
 **Request body:**
@@ -1808,6 +1859,10 @@ Specialization object with information needed for a new specialization, such as 
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
@@ -2118,6 +2173,10 @@ Empty
   <td>Authorization</th>
   <td>Access token generated for user.</td>
   </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
 </table>
 
 **Request body:**
@@ -2190,6 +2249,10 @@ Doctor object which includes user or their id, specialization or its id, patient
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
@@ -2535,6 +2598,10 @@ Empty
   <td>Authorization</th>
   <td>Access token generated for user.</td>
   </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
+  </tr>
 </table>
 
 **Request body:**
@@ -2611,6 +2678,10 @@ Appointment record, which includes id, patient record or their id, doctor record
   <tr>
   <td>Authorization</th>
   <td>Access token generated for user.</td>
+  </tr>
+  <tr>
+  <td>Content-Type</th>
+  <td>application/json</td>
   </tr>
 </table>
 
