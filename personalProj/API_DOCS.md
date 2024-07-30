@@ -129,7 +129,7 @@ Object which contains user's refresh token.
 **Request**
 ```sh
     curl -X 'POST' \
-    'api/v1/authorization/login' \
+    'api/v1/authorization/refresh' \
     -H 'Content-Type: application/json' \
     -d '{
         "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImlhdCI6IldlZCBKdWwgMjQgMjAyNCAxOTo1OTo0NiBHTVQrMDMwMCAoRWFzdGVybiBFdXJvcGVhbiBTdW1tZXIgVGltZSkiLCJleHAiOiIzZCJ9.eyJpZCI6ImYxY2M0NTliLTQxNTItNDU2MC05NmQ3LTQ4NWNkYzNmY2IyMCJ9.lBSMqquCRP5YQ5JiyWkm5JXUM33utIQcL2qa27R1-rs"

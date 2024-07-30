@@ -1,7 +1,7 @@
 import { optionalRefresh } from './refresh';
 
 async function getUsers() {
-    optionalRefresh();
+    await optionalRefresh();
     const users = fetch('http://localhost:3000/api/users',
         {
             headers: {
@@ -13,7 +13,7 @@ async function getUsers() {
 }
 
 async function updateUser(id, user) {
-    optionalRefresh();
+    await optionalRefresh();
     const users = fetch(`http://localhost:3000/api/users/${id}`,
 
         {
@@ -29,7 +29,22 @@ async function updateUser(id, user) {
     return users;
 }
 
+async function deleteUser(id) {
+    await optionalRefresh();
+    const deletion = fetch(`http://localhost:3000/api/users/${id}`,
+
+        {
+            method: 'DELETE',
+            headers: {
+                'Authorization': localStorage.getItem('access_token'),
+            },
+        })
+        .then(res => res.json());
+    return deletion;
+}
+
 export default {
     getUsers,
-    updateUser
+    updateUser,
+    deleteUser
 };

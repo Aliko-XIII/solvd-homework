@@ -10,6 +10,13 @@ function getTokenHeader(token) {
     return header;
 }
 
+function getTokenPayload(token) {
+    const payloadEncoded = token.split('.')[1];
+    const payloadDecoded = atob(payloadEncoded);
+    const payload = JSON.parse(payloadDecoded);
+    return payload;
+}
+
 /**
  * Checks if a JWT token is expired
  * @param {string} token - JWT token
@@ -54,7 +61,6 @@ async function optionalRefresh() {
     if (isExpired(localStorage.getItem('access_token'))) {
         const tokens = await refreshToken();
         localStorage.setItem('access_token', tokens.access_token);
-        localStorage.setItem('refresh_token', tokens.refresh_token);
     }
 }
 
