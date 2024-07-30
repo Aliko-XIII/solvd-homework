@@ -44,55 +44,6 @@ function createAccessToken(user) {
 }
 
 /**
- * Creates a refresh token for the given user
- * @param {User} user - User object
- * @returns {string} - Generated refresh token
- */
-function createRefreshToken(user) {
-    const refreshHeader = {
-        "alg": "HS256",
-        "typ": "JWT",
-        "iat": (new Date()).toString(),
-        "exp": "3d"
-    };
-
-    const refreshHeaderEncoded = Buffer.from(JSON.stringify(refreshHeader)).toString('base64url');
-    const refreshPayloadEncoded = Buffer.from(JSON.stringify({ "id": user.id })).toString('base64url');
-    const refreshSignature = crypto.createHmac('sha256', secret)
-        .update(refreshHeaderEncoded + '.' + refreshPayloadEncoded).digest('base64url');
-
-    const refreshToken = `${refreshHeaderEncoded}.${refreshPayloadEncoded}.${refreshSignature}`;
-    return refreshToken;
-}
-
-/**
- * Updates the refresh token in the database for the given user
- * @param {string} user_id - User ID
- * @param {string} refresh_token - Refresh token
- * @returns {Promise<void>}
- */
-async function updateRefresh(user_id, refresh_token) {
-    const expires_at = (new Date(getExpiration(refresh_token))).toISOString();
-    const res = await query(`INSERT INTO refresh_tokens (user_id, refresh_token, expires_at)
-    VALUES ('${user_id}', '${refresh_token}', '${expires_at}')
-    ON CONFLICT (user_id)
-    DO UPDATE SET refresh_token = EXCLUDED.refresh_token, expires_at = EXCLUDED.expires_at;`);
-}
-
-/**
- * Checks if the refresh token is valid for the given user
- * @param {string} user_id - User ID
- * @param {string} refresh_token - Refresh token
- * @returns {Promise<boolean>} - true if the refresh token is valid, false otherwise
- */
-async function isRefreshValid(user_id, refresh_token) {
-    const res = await query(`SELECT * FROM refresh_tokens
-        WHERE user_id = '${user_id}'
-        AND expires_at > NOW();`);
-    return res.rows.length !== 0 && refresh_token === res.rows[0].refresh_token;
-}
-
-/**
  * Handles user login, generates access and refresh tokens
  */
 async function loginUser(req, res) {
@@ -180,6 +131,55 @@ function isTokenExpired(token) {
         difference = ((new Date()).getTime() - issuedAt.getTime()) / 1000 / 60 / 60 / 24;
     }
     return (expNumber < difference);
+}
+
+/**
+ * Creates a refresh token for the given user
+ * @param {User} user - User object
+ * @returns {string} - Generated refresh token
+ */
+function createRefreshToken(user) {
+    const refreshHeader = {
+        "alg": "HS256",
+        "typ": "JWT",
+        "iat": (new Date()).toString(),
+        "exp": "3d"
+    };
+
+    const refreshHeaderEncoded = Buffer.from(JSON.stringify(refreshHeader)).toString('base64url');
+    const refreshPayloadEncoded = Buffer.from(JSON.stringify({ "id": user.id })).toString('base64url');
+    const refreshSignature = crypto.createHmac('sha256', secret)
+        .update(refreshHeaderEncoded + '.' + refreshPayloadEncoded).digest('base64url');
+
+    const refreshToken = `${refreshHeaderEncoded}.${refreshPayloadEncoded}.${refreshSignature}`;
+    return refreshToken;
+}
+
+/**
+ * Updates the refresh token in the database for the given user
+ * @param {string} user_id - User ID
+ * @param {string} refresh_token - Refresh token
+ * @returns {Promise<void>}
+ */
+async function updateRefresh(user_id, refresh_token) {
+    const expires_at = (new Date(getExpiration(refresh_token))).toISOString();
+    const res = await query(`INSERT INTO refresh_tokens (user_id, refresh_token, expires_at)
+    VALUES ('${user_id}', '${refresh_token}', '${expires_at}')
+    ON CONFLICT (user_id)
+    DO UPDATE SET refresh_token = EXCLUDED.refresh_token, expires_at = EXCLUDED.expires_at;`);
+}
+
+/**
+ * Checks if the refresh token is valid for the given user
+ * @param {string} user_id - User ID
+ * @param {string} refresh_token - Refresh token
+ * @returns {Promise<boolean>} - true if the refresh token is valid, false otherwise
+ */
+async function isRefreshValid(user_id, refresh_token) {
+    const res = await query(`SELECT * FROM refresh_tokens
+        WHERE user_id = '${user_id}'
+        AND expires_at > NOW();`);
+    return res.rows.length !== 0 && refresh_token === res.rows[0].refresh_token;
 }
 
 /**

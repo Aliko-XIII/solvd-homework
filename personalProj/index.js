@@ -1,6 +1,7 @@
 //Module imports
 const express = require('express');
 require('dotenv').config();
+const path = require('path');
 
 //Routes imports
 const userRoutes = require('./routes/userRoutes');
@@ -13,11 +14,10 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const authorizationRoutes = require('./routes/authorizationRoutes')
 
 //Additional functions
-const {validateToken } = require('./controllers/authorizationController');
+const { validateToken } = require('./controllers/authorizationController');
 
 //App setup 
 const app = express();
-app.use(express.json());
 
 //CORS handler
 app.use((req, res, next) => {
@@ -31,17 +31,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.json());
+
 //Authorization routes
 app.use('/api/authorization', authorizationRoutes);
 
 //Access token validation middleware
-app.use(validateToken);
+app.use('/api', validateToken);
 
-//Test route
-app.get('/', (req, res) => {
-  res.send('Hello, it is hospital app');
-});
-
+app.use(express.json());
 // API routes
 app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
@@ -50,6 +48,12 @@ app.use('/api/symptoms', symptomRoutes);
 app.use('/api/organs', organRoutes);
 app.use('/api/specializations', specializationRoutes);
 app.use('/api/appointments', appointmentRoutes);
+
+// Handle React routing, return all requests to React app
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
 
 
 //Server listening port

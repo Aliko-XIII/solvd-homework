@@ -6,13 +6,16 @@ const Login = () => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
 
-    const { user, login } = useContext(HospitalContext);
+    const { user, login, setRole } = useContext(HospitalContext);
 
     const handleSubmit = async e => {
         e.preventDefault();
         login(phone, password);
         console.log('Phone:', phone);
         console.log('Password:', password);
+        setRole({
+            name: 'user'
+        });
     };
 
     return (

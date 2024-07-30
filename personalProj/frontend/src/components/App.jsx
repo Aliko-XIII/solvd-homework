@@ -1,11 +1,19 @@
 import React from 'react';
 import { SetStateAction, createContext, useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import Login from "./Login/Login";
+import Header from "./Header/Header";
+import Navigation from "./Navigation/Navigation";
+import NoPage from "./NoPage/NoPage";
+import Register from './Register/Register';
+import Config from './Config/Config';
 
 export const HospitalContext = createContext({
     user: {
-        name: '',
-        surname: '',
+        id: '',
+        firstName: '',
+        lastName: '',
         phone: '',
         age: -1,
         sex: '',
@@ -13,12 +21,15 @@ export const HospitalContext = createContext({
         refresh_token: ''
     },
     login: (phone, password) => { },
-    role: {}
+    register: (firstName, lastName, phone, password, age, sex) => { },
+    role: { name },
+    setRole: ({ name }) => { },
+    setUser: () => { }
 });
 
-const App = ({ dataFetchers, auth }) => {
+const App = ({ dataFetchers, loginUser, registerUser }) => {
     const [user, setUser] = useState({});
-    const [role, setRole] = useState({});
+    const [role, setRole] = useState({ name: 'guest' });
 
     /**
      * @param {string} phone 
@@ -26,7 +37,12 @@ const App = ({ dataFetchers, auth }) => {
      * @returns {object}
      */
     async function login(phone, password) {
-        const user = await auth.loginUser(phone, password);
+        const user = await loginUser(phone, password);
+        setUser(user);
+    }
+
+    async function register(firstName, lastName, phone, password, age, sex) {
+        const user = await registerUser(firstName, lastName, phone, password, age, sex);
         setUser(user);
     }
 
@@ -34,16 +50,32 @@ const App = ({ dataFetchers, auth }) => {
         console.log(await dataFetchers.getUsers());
     }
 
-
-
     return (
-        <HospitalContext.Provider value={{ user: user, role: role, login: login }}>
-            <h1>Hospital App</h1>
-            {user.access_token ?
-                <div>
-                    <button onClick={logUsers}>GET USERS</button>
-                </div> :
-                <Login />}
+        <HospitalContext.Provider value={{
+            user: user,
+            role: role,
+            login: login,
+            register: register,
+            setRole: setRole,
+            setUser: setUser
+        }}>
+
+            <BrowserRouter>
+                <Header />
+                <Navigation />
+
+                <div className="contentWrapper">
+                    <Routes>
+                        <Route exact path="/" element={<Login />} />
+                        <Route exact path="/login" element={<Login />} />
+                        <Route exact path="/register" element={<Register />} />
+                        <Route exact path="/config"
+                            element={<Config updateUser={dataFetchers.updateUser} />} />
+                        <Route path="*" element={<NoPage />} />
+                    </Routes>
+                </div>
+
+            </BrowserRouter>
 
         </HospitalContext.Provider>
     );

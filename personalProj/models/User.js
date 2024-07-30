@@ -39,7 +39,8 @@ class User {
      * @returns {boolean} - Returns true if the value is a non-empty string, otherwise false.
      */
     validateString(value) {
-        return typeof value === 'string' && value.trim().length > 0;
+        console.log(value);
+        return typeof value === 'string' && value.length > 0;
     }
 
     /**
@@ -112,7 +113,7 @@ class User {
      * @param {string} [updates.phone] - The new phone number.
      * @throws {Error} If no ID is provided or no parameters to update.
      */
-    async updateUser(id, { firstName, lastName, age, sex, pass, phone }) {
+    static async updateUser(id, { firstName, lastName, age, sex, pass, phone }) {
         if (!id) throw new Error('There is no id passed to update user record.');
         const hasParams = Object.keys({ firstName, lastName, age, sex, pass, phone })
             .some(key => key !== undefined);
@@ -124,11 +125,10 @@ class User {
         ${sex ? `sex = '${sex}', ` : ''}
         ${pass ? `pass = '${pass}', ` : ''}
         ${phone ? `phone = '${phone}', ` : ''}`;
-        queryStr = queryStr.slice(0, queryStr.length - 1) + '\n';
+        queryStr = queryStr.slice(0, queryStr.length-2) + '\n';
         queryStr += `WHERE user_id='${id}';`;
+        console.log(queryStr);
         const res = await query(queryStr);
-        this.id = res.rows[0].id;
-        console.log('Updated:', res.rows[0]);
     }
 
     /**
