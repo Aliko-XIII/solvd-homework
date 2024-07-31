@@ -6,7 +6,6 @@ const { Specialization } = require('../models/Specialization');
 const getDoctor = async (req, res) => {
     try {
         const doctor = (await Doctor.getDoctorsById(req.params.id))[0];
-        console.log(doctor);
         res.status(200).send(doctor);
     } catch (err) {
         res.status(500).send(err);

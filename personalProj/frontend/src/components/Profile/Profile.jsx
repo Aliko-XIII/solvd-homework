@@ -1,12 +1,15 @@
 import React, { useContext } from 'react';
 import { HospitalContext } from '../App';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = ({ deleteUser }) => {
     const { user, setUser } = useContext(HospitalContext);
-
+    const navigate = useNavigate();
+    
     const handleDelete = async () => {
         try {
-            await deleteUser(user.userId);
+            await deleteUser(user.id);
+            navigate('/login');
             setUser({});
         } catch (error) {
             console.error('Failed to delete user:', error);

@@ -39,7 +39,6 @@ class User {
      * @returns {boolean} - Returns true if the value is a non-empty string, otherwise false.
      */
     validateString(value) {
-        console.log(value);
         return typeof value === 'string' && value.length > 0;
     }
 
@@ -127,7 +126,6 @@ class User {
         ${phone ? `phone = '${phone}', ` : ''}`;
         queryStr = queryStr.slice(0, queryStr.length-2) + '\n';
         queryStr += `WHERE user_id='${id}';`;
-        console.log(queryStr);
         const res = await query(queryStr);
     }
 
@@ -151,7 +149,7 @@ class User {
      * @returns {Promise<void>}
      */
     async deleteUser() {
-        const res = await query(`DELETE FROM users WHERE id = ${this.id} RETURNING *;`);
+        const res = await query(`DELETE FROM users WHERE user_id = '${this.id}' RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 }

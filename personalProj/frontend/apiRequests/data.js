@@ -31,7 +31,7 @@ async function updateUser(id, user) {
 
 async function deleteUser(id) {
     await optionalRefresh();
-    const deletion = fetch(`http://localhost:3000/api/users/${id}`,
+    const deletionStatus = fetch(`http://localhost:3000/api/users/${id}`,
 
         {
             method: 'DELETE',
@@ -39,8 +39,8 @@ async function deleteUser(id) {
                 'Authorization': localStorage.getItem('access_token'),
             },
         })
-        .then(res => res.json());
-    return deletion;
+        .then(res => res.status);
+    return deletionStatus;
 }
 
 export default {

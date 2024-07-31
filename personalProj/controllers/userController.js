@@ -29,7 +29,7 @@ const getAllUsers = async (req, res) => {
  */
 const createUser = async (req, res) => {
     try {
-        const { firstName, lastName, phone, password, age, sex} = req.body;
+        const { firstName, lastName, phone, password, age, sex } = req.body;
         const user = new User(firstName, lastName, phone, password, age, sex);
         await user.insertUser();
         res.status(201).send(user);
@@ -51,6 +51,7 @@ const deleteUser = async (req, res) => {
             res.sendStatus(404);
         }
     } catch (err) {
+        console.error(err);
         res.status(500).send(err);
     }
 };
@@ -59,7 +60,6 @@ const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { firstName, lastName, phone, password, age, sex } = req.body;
-        console.log(req.body);
 
         if (!id) {
             return res.status(400).json({ error: 'User ID is required' });

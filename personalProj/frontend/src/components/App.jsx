@@ -9,6 +9,7 @@ import NoPage from "./NoPage/NoPage";
 import Register from './Register/Register';
 import Config from './Config/Config';
 import Profile from './Profile/Profile';
+import Role from './Role/Role';
 
 export const HospitalContext = createContext({
     user: {
@@ -74,6 +75,7 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
                             element={<Config updateUser={dataFetchers.updateUser} />} />
                         <Route exact path="/profile"
                             element={<Profile deleteUser={dataFetchers.deleteUser} />} />
+                        <Route exact path="/role" element={<Role />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </div>

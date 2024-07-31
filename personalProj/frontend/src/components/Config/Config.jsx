@@ -15,6 +15,7 @@ const Config = ({ updateUser }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        formData.age = parseInt(formData.age);
         updateUser(user.id, formData);
         setUser(formData);
     };
