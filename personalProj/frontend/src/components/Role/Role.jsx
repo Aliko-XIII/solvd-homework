@@ -68,6 +68,11 @@ const Role = ({ setPatient, setDoctor }) => {
         setPatient(null); // Reset patient data after deletion
     };
 
+    const handleDeleteDoctor = async () => {
+        await data.deleteDoctor(user.id);
+        setDoctor(null); // Reset doctor data after deletion
+    };
+
     return (
         <div>
             <h1>Select Role</h1>
@@ -95,6 +100,9 @@ const Role = ({ setPatient, setDoctor }) => {
             <button onClick={handleCreateRole}>Create role</button>
             {selectedRole === 'patient' && (
                 <button onClick={handleDeletePatient}>Delete Patient</button>
+            )}
+            {selectedRole === 'doctor' && (
+                <button onClick={handleDeleteDoctor}>Delete Doctor</button>
             )}
             {showForm && (
                 <form onSubmit={handleSubmit}>

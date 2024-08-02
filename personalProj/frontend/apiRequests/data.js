@@ -142,6 +142,26 @@ async function createDoctor(specializationId, patientLoad, userId, workdayStart,
     return createdDoctor;
 }
 
+async function deleteDoctor(doctorId) {
+    await optionalRefresh();
+    const response = await fetch(`http://localhost:3000/api/doctors/${doctorId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+
+    if (response.status === 204) {
+        return 'Doctor deleted successfully';
+    } else if (response.status === 404) {
+        return 'Doctor not found';
+    } else {
+        const error = await response.json();
+        return 'Error deleting doctor';
+    }
+}
+
+
 
 export default {
     getUsers,
@@ -152,5 +172,6 @@ export default {
     deletePatient,
     getDoctor, 
     getSpecializations,
-    createDoctor
+    createDoctor, 
+    deleteDoctor
 };
