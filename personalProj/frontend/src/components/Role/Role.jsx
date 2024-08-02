@@ -1,12 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { HospitalContext } from '../App';
 import { useNavigate } from 'react-router-dom';
+import SpecializationInput from './SpecializationInput/SpecializationInput';
 
-const Role = ({ setPatient, getPatient, setDoctor, getDoctor, createPatient, createDoctor, deletePatient }) => {
+const Role = ({setPatient, setDoctor}) => {
     const [selectedRole, setSelectedRole] = useState('patient');
     const [showForm, setShowForm] = useState(false);
     const [roleData, setRoleData] = useState({});
-    const { role, user } = useContext(HospitalContext);
+    const { role, user, data } = useContext(HospitalContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,12 +30,19 @@ const Role = ({ setPatient, getPatient, setDoctor, getDoctor, createPatient, cre
         });
     };
 
+    const handleSpecializationChange = (value) => {
+        setRoleData({
+            ...roleData,
+            specializationId: value
+        });
+    };
+
     const handleUseRole = async () => {
         if (selectedRole === 'patient') {
-            const patientData = await getPatient(user.id);
+            const patientData = await data.getPatient(user.id);
             setPatient(patientData);
         } else if (selectedRole === 'doctor') {
-            const doctorData = await getDoctor(user.id);
+            const doctorData = await data.getDoctor(user.id);
             setDoctor(doctorData);
         }
     };
@@ -46,16 +54,16 @@ const Role = ({ setPatient, getPatient, setDoctor, getDoctor, createPatient, cre
     const handleSubmit = (event) => {
         event.preventDefault();
         if (selectedRole === 'patient') {
-            createPatient(roleData.insuranceNumber, roleData.insuranceProvider, user.id);
+            data.createPatient(roleData.insuranceNumber, roleData.insuranceProvider, user.id);
             setPatient(roleData);
         } else if (selectedRole === 'doctor') {
-            createDoctor();
+            data.createDoctor();
             setDoctor(roleData);
         }
     };
 
     const handleDeletePatient = async () => {
-        await deletePatient(user.id);
+        await data.deletePatient(user.id);
         setPatient(null); // Reset patient data after deletion
     };
 
@@ -127,6 +135,11 @@ const Role = ({ setPatient, getPatient, setDoctor, getDoctor, createPatient, cre
                                     required
                                 />
                             </div>
+                            <SpecializationInput
+                                getSpecializations={data.getSpecializations}
+                                value={roleData.specializationId || ''}
+                                onChange={handleSpecializationChange}
+                            />
                             <div>
                                 <label htmlFor="workdayStart">Workday Start:</label>
                                 <input

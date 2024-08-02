@@ -107,6 +107,18 @@ async function deletePatient(patientId) {
     }
 }
 
+async function getSpecializations() {
+    await optionalRefresh();
+    const specializations = fetch('http://localhost:3000/api/specializations',
+        {
+            headers: {
+                'Authorization': localStorage.getItem('access_token')
+            },
+        })
+        .then(res => res.json());
+    return specializations;
+}
+
 export default {
     getUsers,
     updateUser,
@@ -114,5 +126,6 @@ export default {
     getPatient,
     createPatient,
     deletePatient,
-    getDoctor
+    getDoctor, 
+    getSpecializations
 };

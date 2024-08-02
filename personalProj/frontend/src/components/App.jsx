@@ -25,7 +25,8 @@ export const HospitalContext = createContext({
     register: (firstName, lastName, phone, password, age, sex) => { },
     role: { name },
     setRole: ({ name }) => { },
-    setUser: () => { }
+    setUser: () => { },
+    data: {}
 });
 
 const App = ({ dataFetchers, loginUser, registerUser }) => {
@@ -66,7 +67,8 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
             login: login,
             register: register,
             setRole: setRole,
-            setUser: setUser
+            setUser: setUser,
+            data: dataFetchers
         }}>
 
             <BrowserRouter>
@@ -83,12 +85,7 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
                         <Route exact path="/profile"
                             element={<Profile deleteUser={dataFetchers.deleteUser} />} />
                         <Route exact path="/role"
-                            element={<Role setPatient={setPatient} setDoctor={setDoctor}
-                                getPatient={dataFetchers.getPatient}
-                                getDoctor={dataFetchers.getDoctor}
-                                createPatient={dataFetchers.createPatient}
-                                createDoctor={dataFetchers.createDoctor}
-                                deletePatient={dataFetchers.deletePatient} />} />
+                            element={<Role setPatient={setPatient} setDoctor={setDoctor} />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </div>
