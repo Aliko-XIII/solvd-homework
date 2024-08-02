@@ -1,12 +1,21 @@
 import React, { useContext } from 'react';
-import { SetStateAction, createContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import {useNavigate } from "react-router-dom";
 import { HospitalContext } from "../App";
 
 const Login = () => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
 
-    const { user, login, setRole } = useContext(HospitalContext);
+    const { login, role, setRole } = useContext(HospitalContext);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (role.name != 'guest') {
+            navigate('/profile');
+        }
+    }, [role]);
 
     const handleSubmit = async e => {
         e.preventDefault();

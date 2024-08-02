@@ -28,7 +28,8 @@ class Patient extends Role {
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
     static async getPatientsFromData(rows) {
-        const patients = rows.map(async row => {
+            console.log(rows);
+            const patients = rows.map(async row => {
             const user = (await User.getUsersFromData(rows))[0];
             const patient = new Patient(row.insurance_number, row.insurance_provider, user);
             return patient;
@@ -54,7 +55,10 @@ class Patient extends Role {
      */
     static async getPatientById(id) {
         const res = await query(`SELECT * FROM patients
-            WHERE user_id = '${id}';`);
+            INNER JOIN users ON
+	        users.user_id=patients.user_id
+            WHERE patients.user_id = '${id}';`);
+        console.log(res.rows);
         return (await Patient.getPatientsFromData(res.rows))[0];
     }
 
@@ -113,9 +117,9 @@ class Patient extends Role {
      * Deletes the current Patient instance from the database.
      * @returns {Promise<void>} A promise that resolves when the patient is deleted.
      */
-    async deletePatient() {
+    static async deletePatient(id) {
         const res = await query(`DELETE FROM patients 
-            WHERE user_id = '${this.user.id}' RETURNING *;`);
+            WHERE user_id = '${id}' RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 }

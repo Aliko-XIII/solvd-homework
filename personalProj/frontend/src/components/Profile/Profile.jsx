@@ -1,16 +1,24 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { HospitalContext } from '../App';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Profile = ({ deleteUser }) => {
-    const { user, setUser } = useContext(HospitalContext);
+    const { user, setUser, role, setRole } = useContext(HospitalContext);
     const navigate = useNavigate();
-    
+    const location = useLocation();
+
+    useEffect(() => {
+        if (role.name == 'guest') {
+            navigate('/login');
+        }
+    });
+
     const handleDelete = async () => {
         try {
             await deleteUser(user.id);
             navigate('/login');
             setUser({});
+            setRole({ name: 'guest' });
         } catch (error) {
             console.error('Failed to delete user:', error);
         }

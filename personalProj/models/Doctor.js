@@ -16,13 +16,13 @@ class Doctor extends Role {
 
     /**
      * Time when doctor starts work.
-     * @type {Date}
+     * @type {Date|null}
      */
     workdayStart;
 
     /**
      * Time when doctor ends work.
-     * @type {Date}
+     * @type {Date|null}
      */
     workdayEnd;
 
@@ -30,27 +30,28 @@ class Doctor extends Role {
      * Maximum number of patients the doctor can handle per day.
      * @type {number}
      */
-    maxLoad;
+    patientLoad;
 
     /**
      * Constructor for Doctor class.
      * @param {User} user - The user associated with the doctor.
      * @param {Specialization} specialization - Doctor's specialization object.
-     * @param {number} maxLoad - Maximum number of patients per day for the doctor.
+     * @param {number} patientLoad - Maximum number of patients per day for the doctor.
+     * @param {Date|null} workdayStart - Start time of the workday.
+     * @param {Date|null} workdayEnd - End time of the workday.
      */
-    constructor(user, specialization, maxLoad = 1) {
+    constructor(user, specialization, patientLoad = 1, workdayStart = null, workdayEnd = null) {
         if (user.age <= 18 || user.age > 70)
             throw new Error('Doctor\'s age should be from 18 to 70.');
-        // if (!(specialization instanceof Specialization))
-        //     throw new Error('Wrong specialization data type.');
-        if (typeof maxLoad !== 'number' || maxLoad < 0)
-            throw new Error('Max patient load is not valid.');
+
+        if (typeof patientLoad !== 'number' || patientLoad < 0)
+            throw new Error('Patient load is not valid.');
 
         super(user);
         this.specialization = specialization;
-        this.maxLoad = maxLoad;
-        this.workdayStart = null;
-        this.workdayEnd = null;
+        this.patientLoad = patientLoad;
+        this.workdayStart = workdayStart;
+        this.workdayEnd = workdayEnd;
     }
 
     /**
@@ -70,11 +71,8 @@ class Doctor extends Role {
         if (rows.length === 0) { return []; }
         const doctors = rows.map(async row => {
             const user = (await User.getUsersFromData(rows))[0];
-            const doctor = new Doctor(user, null, row.max_load);
-            doctor.workdayStart = row.workday_start;
-            doctor.workdayEnd = row.workday_end;
-            doctor.specialization = (await Specialization.
-                getSpecializationsById(row.specialization_id))[0];
+            const doctor = new Doctor(user, null, row.patient_load, row.workday_start, row.workday_end);
+            doctor.specialization = (await Specialization.getSpecializationsById(row.specialization_id))[0];
             return doctor;
         });
         return Promise.all(doctors);
@@ -109,11 +107,11 @@ class Doctor extends Role {
      * Method to insert the doctor into the database.
      */
     async insertDoctor() {
-        const res = await query(`INSERT INTO public.doctors (
-            specialization_id, workday_start, workday_end, user_id, max_load)
+        const res = await query(`INSERT INTO doctors (
+            specialization_id, workday_start, workday_end, user_id, patient_load)
             VALUES (${this.specialization.id}, '${this.workdayStart}',
-            '${this.workdayEnd}', ${this.user.id}, ${this.maxLoad}) RETURNING *;`);
-        this.id = res.rows[0].id; // Assuming 'id' is returned from database upon insertion
+            '${this.workdayEnd}', ${this.user.id}, ${this.patientLoad}) RETURNING *;`);
+        this.id = res.rows[0].user_id; // Assuming 'user_id' is returned from database upon insertion
         console.log('Inserted:', res.rows[0]);
     }
 

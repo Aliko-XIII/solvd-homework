@@ -9,6 +9,7 @@ const Navigation = () => {
   const [linksArr, setLinksArr] = useState([]);
 
   useEffect(() => {
+    console.log(role);
     setLinksArr(getUserLinks(role.name));
   }, [role]);
 

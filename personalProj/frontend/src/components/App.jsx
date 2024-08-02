@@ -1,9 +1,8 @@
 import React from 'react';
-import { SetStateAction, createContext, useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
-import Login from "./Login/Login";
+import { createContext, useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Header from "./Header/Header";
+import Login from "./Login/Login";
 import Navigation from "./Navigation/Navigation";
 import NoPage from "./NoPage/NoPage";
 import Register from './Register/Register';
@@ -32,6 +31,14 @@ export const HospitalContext = createContext({
 const App = ({ dataFetchers, loginUser, registerUser }) => {
     const [user, setUser] = useState({});
     const [role, setRole] = useState({ name: 'guest' });
+
+    function setPatient(patient) {
+        setRole({ name: 'patient', ...patient });
+    }
+
+    function setDoctor(doctor) {
+        setRole({ name: 'doctor', ...doctor });
+    }
 
     /**
      * @param {string} phone 
@@ -75,7 +82,13 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
                             element={<Config updateUser={dataFetchers.updateUser} />} />
                         <Route exact path="/profile"
                             element={<Profile deleteUser={dataFetchers.deleteUser} />} />
-                        <Route exact path="/role" element={<Role />} />
+                        <Route exact path="/role"
+                            element={<Role setPatient={setPatient} setDoctor={setDoctor}
+                                getPatient={dataFetchers.getPatient}
+                                getDoctor={dataFetchers.getDoctor}
+                                createPatient={dataFetchers.createPatient}
+                                createDoctor={dataFetchers.createDoctor}
+                                deletePatient={dataFetchers.deletePatient} />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </div>

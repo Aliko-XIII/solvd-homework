@@ -7,7 +7,7 @@ const { User } = require('../models/User');
  */
 const getPatient = async (req, res) => {
     try {
-        const patient = (await Patient.getPatientsById(req.params.id))[0];
+        const patient = await Patient.getPatientById(req.params.id);
         res.status(200).send(patient);
     } catch (err) {
         res.status(500).send(err);
@@ -31,9 +31,10 @@ const getAllPatients = async (req, res) => {
  */
 const createPatient = async (req, res) => {
     try {
-        const { phone, insurance, userId } = req.body;
+        const { insuranceNumber, insuranceProvider, userId } = req.body;
+        console.log(userId);
         const user = await User.getUserById(userId);
-        const patient = new Patient(phone, insurance, user);
+        const patient = new Patient(insuranceNumber, insuranceProvider, user);
         await patient.insertPatient();
         res.status(201).send(patient);
     } catch (err) {
@@ -46,9 +47,9 @@ const createPatient = async (req, res) => {
  */
 const deletePatient = async (req, res) => {
     try {
-        const patient = (await Patient.getPatientsById(req.params.id))[0];
+        const patient = await Patient.getPatientById(req.params.id);
         if (patient) {
-            await patient.deletePatient();
+            await Patient.deletePatient(req.params.id);
             res.sendStatus(204);
         } else {
             res.sendStatus(404);

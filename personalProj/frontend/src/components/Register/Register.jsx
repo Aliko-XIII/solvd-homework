@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { SetStateAction, createContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import {useNavigate } from "react-router-dom";
 import { HospitalContext } from "../App";
 
 const Register = () => {
@@ -10,13 +11,21 @@ const Register = () => {
     const [age, setAge] = useState(-1);
     const [sex, setSex] = useState('');
 
-    const { register, login } = useContext(HospitalContext);
+    const { register, role, setRole } = useContext(HospitalContext);
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (role.name != 'guest') {
+            navigate('/profile');
+        }
+    }, [role]);
 
     const handleSubmit = async e => {
         e.preventDefault();
         const user = register(firstName, lastName, phone, password, age, sex);
-        user ? login(phone, password) :
-            (() => { throw new Error('Registration failed') })();
+        setRole({
+            name: 'user'
+        });
     };
 
     return (

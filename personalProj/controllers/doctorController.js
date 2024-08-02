@@ -23,10 +23,19 @@ const getAllDoctors = async (req, res) => {
 
 const createDoctor = async (req, res) => {
     try {
-        const { specializationId, maxLoad, userId } = req.body;
+        const { specializationId, patientLoad, userId, workdayStart, workdayEnd } = req.body;
         const user = (await User.getUsersById(userId))[0];
         const specialization = (await Specialization.getSpecializationsById(specializationId))[0];
-        const doctor = new Doctor(user, specialization, maxLoad);
+        const doctor = new Doctor(user, specialization);
+        if (patientLoad) {
+            doctor.patientLoad = patientLoad;
+        }
+        if(workdayStart){
+            doctor.workdayStart=workdayStart;
+        }
+        if(workdayEnd){
+            doctor.workdayEnd=workdayEnd;
+        }
         await doctor.insertDoctor();
         res.status(201).send(doctor);
     } catch (err) {

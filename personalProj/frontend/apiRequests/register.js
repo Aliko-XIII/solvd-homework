@@ -14,9 +14,11 @@ async function registerUser(firstName, lastName, phone, password, age, sex) {
         headers: {
             'Content-type': 'application/json; charset=UTF-8'
         }
-    }).then(res => res.json()).then(res => console.log(res));
+    }).then(res => res.json());
     return registeredUser;
 }
+
+
 
 export default {
     registerUser,
