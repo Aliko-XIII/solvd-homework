@@ -119,6 +119,30 @@ async function getSpecializations() {
     return specializations;
 }
 
+async function createDoctor(specializationId, patientLoad, userId, workdayStart, workdayEnd) {
+    await optionalRefresh();
+    const doctorData = {
+        specializationId: specializationId,
+        patientLoad: patientLoad,
+        userId: userId,
+        workdayStart: workdayStart,
+        workdayEnd: workdayEnd
+    };
+    console.log(doctorData);
+
+    const createdDoctor = await fetch('http://localhost:3000/api/doctors', {
+        method: 'POST',
+        body: JSON.stringify(doctorData),
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json; charset=UTF-8'
+        }
+    }).then(res => res.json());
+
+    return createdDoctor;
+}
+
+
 export default {
     getUsers,
     updateUser,
@@ -127,5 +151,6 @@ export default {
     createPatient,
     deletePatient,
     getDoctor, 
-    getSpecializations
+    getSpecializations,
+    createDoctor
 };

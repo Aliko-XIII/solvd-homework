@@ -41,11 +41,11 @@ class Doctor extends Role {
      * @param {Date|null} workdayEnd - End time of the workday.
      */
     constructor(user, specialization, patientLoad = 1, workdayStart = null, workdayEnd = null) {
-        if (user.age <= 18 || user.age > 70)
-            throw new Error('Doctor\'s age should be from 18 to 70.');
+        // if (user.age <= 18 || user.age > 70)
+        //     throw new Error('Doctor\'s age should be from 18 to 70.');
 
-        if (typeof patientLoad !== 'number' || patientLoad < 0)
-            throw new Error('Patient load is not valid.');
+        // if (typeof patientLoad !== 'number' || patientLoad < 0)
+        //     throw new Error('Patient load is not valid.');
 
         super(user);
         this.specialization = specialization;
@@ -110,7 +110,7 @@ class Doctor extends Role {
         const res = await query(`INSERT INTO doctors (
             specialization_id, workday_start, workday_end, user_id, patient_load)
             VALUES (${this.specialization.id}, '${this.workdayStart}',
-            '${this.workdayEnd}', ${this.user.id}, ${this.patientLoad}) RETURNING *;`);
+            '${this.workdayEnd}', '${this.user.id}', ${this.patientLoad}) RETURNING *;`);
         this.id = res.rows[0].user_id; // Assuming 'user_id' is returned from database upon insertion
         console.log('Inserted:', res.rows[0]);
     }

@@ -24,7 +24,7 @@ const getAllDoctors = async (req, res) => {
 const createDoctor = async (req, res) => {
     try {
         const { specializationId, patientLoad, userId, workdayStart, workdayEnd } = req.body;
-        const user = (await User.getUsersById(userId))[0];
+        const user = await User.getUserById(userId);
         const specialization = (await Specialization.getSpecializationsById(specializationId))[0];
         const doctor = new Doctor(user, specialization);
         if (patientLoad) {

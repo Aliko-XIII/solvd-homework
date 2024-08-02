@@ -3,7 +3,7 @@ import { HospitalContext } from '../App';
 import { useNavigate } from 'react-router-dom';
 import SpecializationInput from './SpecializationInput/SpecializationInput';
 
-const Role = ({setPatient, setDoctor}) => {
+const Role = ({ setPatient, setDoctor }) => {
     const [selectedRole, setSelectedRole] = useState('patient');
     const [showForm, setShowForm] = useState(false);
     const [roleData, setRoleData] = useState({});
@@ -57,7 +57,8 @@ const Role = ({setPatient, setDoctor}) => {
             data.createPatient(roleData.insuranceNumber, roleData.insuranceProvider, user.id);
             setPatient(roleData);
         } else if (selectedRole === 'doctor') {
-            data.createDoctor();
+            data.createDoctor(roleData.specializationId, roleData.patientLoad, user.id,
+                roleData.workdayStart, roleData.workdayEnd);
             setDoctor(roleData);
         }
     };
