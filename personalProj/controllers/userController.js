@@ -13,11 +13,20 @@ const getUser = async (req, res) => {
 };
 
 /**
- * Handles the request to get all users.
+ * Handles the request to get all users with optional filtering.
  */
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.getUsers();
+        const { firstName, lastName, minAge, maxAge, sex, phone } = req.query;
+        const filters = {
+            firstName,
+            lastName,
+            minAge: minAge ? parseInt(minAge, 10) : undefined,
+            maxAge: maxAge ? parseInt(maxAge, 10) : undefined,
+            sex,
+            phone
+        };
+        const users = await User.getUsers(filters);
         res.status(200).send(users);
     } catch (err) {
         res.status(500).send(err);

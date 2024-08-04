@@ -15,12 +15,17 @@ const getSymptom = async (req, res) => {
 
 const getAllSymptoms = async (req, res) => {
     try {
-        const symptoms = await Symptom.getSymptoms();
+        const filters = {
+            name: req.query.name,
+            description: req.query.description,
+        };
+        const symptoms = await Symptom.getSymptoms(filters);
         res.status(200).send(symptoms);
     } catch (err) {
         res.status(500).send(err);
     }
 };
+
 
 const createSymptom = async (req, res) => {
     try {

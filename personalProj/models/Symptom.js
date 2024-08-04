@@ -25,7 +25,7 @@ class Symptom {
      */
     toString() {
         return `Symptom "${this.name}"
-        Description: ${this.description.length == 0 ? 'Empty.' : this.description}`;
+        Description: ${this.description.length === 0 ? 'Empty.' : this.description}`;
     }
 
     /**
@@ -33,17 +33,34 @@ class Symptom {
      * @param {Array} rows - The rows of symptom data from the database.
      * @returns {Array<Symptom>} An array of Symptom objects.
      */
-    static async getSymptomsFromData(rows) {
+    static getSymptomsFromData(rows) {
         return rows.map(row => new Symptom(row.symptom_name, row.symptom_description, row.symptom_id));
     }
 
     /**
      * Get all symptoms from the database.
+     * @param {Object} filters - The filters to apply.
+     * @param {string} [filters.name] - Part of the symptom's name.
+     * @param {string} [filters.description] - Part of the symptom's description.
      * @returns {Promise<Array<Symptom>>} A promise that resolves to an array of Symptom objects.
      */
-    static async getSymptoms() {
-        const res = await query(`SELECT * FROM symptoms;`);
-        return await this.getSymptomsFromData(res.rows);
+    static async getSymptoms(filters = {}) {
+        let queryStr = `SELECT * FROM symptoms`;
+        const conditions = [];
+
+        if (filters.name) {
+            conditions.push(`symptom_name ILIKE '%${filters.name}%'`);
+        }
+        if (filters.description) {
+            conditions.push(`symptom_description ILIKE '%${filters.description}%'`);
+        }
+
+        if (conditions.length > 0) {
+            queryStr += ` WHERE ${conditions.join(' AND ')}`;
+        }
+
+        const res = await query(queryStr);
+        return this.getSymptomsFromData(res.rows);
     }
 
     /**
@@ -54,7 +71,7 @@ class Symptom {
     static async getSymptomsById(...id) {
         const res = await query(`SELECT * FROM symptoms 
             WHERE symptom_id IN (${id.toString()});`);
-        return await this.getSymptomsFromData(res.rows);
+        return this.getSymptomsFromData(res.rows);
     }
 
     /**
@@ -63,7 +80,11 @@ class Symptom {
      * @returns {Promise<Symptom|null>} A promise that resolves to a Symptom object or null if not found.
      */
     static async getSymptomById(id) {
-        return (await Symptom.getSymptomsById(id))[0];
+        const res = await query(`SELECT * FROM symptoms WHERE symptom_id = ${id};`);
+        if (res.rows.length === 0) {
+            return null;
+        }
+        return this.getSymptomsFromData(res.rows)[0];
     }
 
     /**
@@ -71,8 +92,7 @@ class Symptom {
      * @returns {Promise<void>} A promise that resolves when the symptom is inserted.
      */
     async insertSymptom() {
-        const res = await query(`INSERT INTO symptoms(
-	        symptom_name, symptom_description)
+        const res = await query(`INSERT INTO symptoms(symptom_name, symptom_description)
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].symptom_id;
         console.log('Inserted:', res.rows[0]);
@@ -89,18 +109,14 @@ class Symptom {
      */
     static async updateSymptom(id, { name, description }) {
         if (!id) throw new Error('There is no id passed to update symptom record.');
-        const hasParams = Object.keys({ name, description })
-            .some(key => key !== undefined);
+        const hasParams = Object.keys({ name, description }).some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
 
-        let queryStr = `UPDATE public.symptoms SET\n`;
-        queryStr += `${name ? `symptom_name = '${name}', ` : ''}
-        ${description ? `symptom_description = '${description}', ` : ''}`;
+        let queryStr = `UPDATE symptoms SET\n`;
+        queryStr += `${name ? `symptom_name = '${name}', ` : ''}${description ? `symptom_description = '${description}', ` : ''}`;
+        queryStr = queryStr.slice(0, -2) + `\nWHERE symptom_id = ${id};`;
 
-        queryStr = queryStr.slice(0, queryStr.length - 1) + '\n';
-        queryStr += `WHERE symptom_id='${id}';`;
         const res = await query(queryStr);
-        this.id = res.rows[0].symptom_id;
         console.log('Updated:', res.rows[0]);
     }
 

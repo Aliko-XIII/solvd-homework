@@ -7,8 +7,13 @@ const { User } = require('../models/User');
  */
 const getPatient = async (req, res) => {
     try {
-        const patient = await Patient.getPatientById(req.params.id);
-        res.status(200).send(patient);
+        const nestUser = req.query.nestUser === 'true';
+        const patient = await Patient.getPatientById(req.params.id, nestUser);
+        if (patient) {
+            res.status(200).send(patient);
+        } else {
+            res.status(404).send({ message: 'Patient not found' });
+        }
     } catch (err) {
         res.status(500).send(err);
     }
@@ -19,7 +24,8 @@ const getPatient = async (req, res) => {
  */
 const getAllPatients = async (req, res) => {
     try {
-        const patients = await Patient.getPatients();
+        const { insuranceNumber, insuranceProvider, nestUser } = req.query;
+        const patients = await Patient.getPatients({ insuranceNumber, insuranceProvider, nestUser: nestUser === 'true' });
         res.status(200).send(patients);
     } catch (err) {
         res.status(500).send(err);

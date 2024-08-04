@@ -25,12 +25,17 @@ class Patient extends Role {
     /**
      * Transforms database rows into Patient instances.
      * @param {Object[]} rows - The rows returned from the database query.
+     * @param {boolean} nestUser - Whether to include nested user records.
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
-    static async getPatientsFromData(rows) {
-            console.log(rows);
-            const patients = rows.map(async row => {
-            const user = (await User.getUsersFromData(rows))[0];
+    static async getPatientsFromData(rows, nestUser = false) {
+        const patients = rows.map(async row => {
+            let user;
+            if (nestUser) {
+                user = (await User.getUsersFromData([row]))[0];
+            } else {
+                user = { id: row.user_id };
+            }
             const patient = new Patient(row.insurance_number, row.insurance_provider, user);
             return patient;
         });
@@ -38,42 +43,50 @@ class Patient extends Role {
     }
 
     /**
-     * Retrieves all patients from the database.
+     * Retrieves all patients from the database with optional filtering.
+     * @param {Object} filters - The filters to apply.
+     * @param {string} [filters.insuranceNumber] - Part of the patient's insurance number.
+     * @param {string} [filters.insuranceProvider] - Part of the patient's insurance provider name.
+     * @param {boolean} [filters.nestUser] - Whether to include nested user records.
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
-    static async getPatients() {
-        const res = await query(`SELECT * FROM patients
-            INNER JOIN users ON
-	        users.user_id=patients.user_id;`);
-        return await this.getPatientsFromData(res.rows);
+    static async getPatients({ insuranceNumber, insuranceProvider, nestUser } = {}) {
+        let queryStr = `SELECT * FROM patients INNER JOIN users ON users.user_id=patients.user_id WHERE 1=1`;
+        if (insuranceNumber) {
+            queryStr += ` AND insurance_number LIKE '%${insuranceNumber}%'`;
+        }
+        if (insuranceProvider) {
+            queryStr += ` AND insurance_provider LIKE '%${insuranceProvider}%'`;
+        }
+        const res = await query(queryStr);
+        return await this.getPatientsFromData(res.rows, nestUser);
     }
 
     /**
      * Retrieves a patient by ID from the database.
      * @param {string} id - The patient ID.
+     * @param {boolean} nestUser - Whether to include nested user records.
      * @returns {Promise<Patient>} A promise that resolves to a Patient instance.
      */
-    static async getPatientById(id) {
+    static async getPatientById(id, nestUser = false) {
         const res = await query(`SELECT * FROM patients
-            INNER JOIN users ON
-	        users.user_id=patients.user_id
+            INNER JOIN users ON users.user_id=patients.user_id
             WHERE patients.user_id = '${id}';`);
-        console.log(res.rows);
-        return (await Patient.getPatientsFromData(res.rows))[0];
+        return (await Patient.getPatientsFromData(res.rows, nestUser))[0];
     }
 
     /**
      * Retrieves multiple patients by their IDs from the database.
+     * @param {boolean} nestUser - Whether to include nested user records.
      * @param {...string} ids - The patient IDs.
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
-    static async getPatientsByIds(...ids) {
+    static async getPatientsByIds(nestUser = false, ...ids) {
         const idArr = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM patients 
-            INNER JOIN users ON
-	        users.user_id=patients.user_id
-            WHERE patients.user_id IN (${idArr}) ;`);
-        return await Patient.getPatientsFromData(res.rows);
+            INNER JOIN users ON users.user_id=patients.user_id
+            WHERE patients.user_id IN (${idArr});`);
+        return await Patient.getPatientsFromData(res.rows, nestUser);
     }
 
     /**
@@ -97,16 +110,16 @@ class Patient extends Role {
      * @throws {Error} If no ID is provided or no parameters to update.
      * @returns {Promise<void>} A promise that resolves when the patient is updated.
      */
-    async updatePatient(id, { insuranceNumber, insuranceProvider }) {
+    static async updatePatient(id, { insuranceNumber, insuranceProvider }) {
         if (!id) throw new Error('No ID provided to update patient record.');
         const hasParams = Object.keys({ insuranceNumber, insuranceProvider })
             .some(key => key !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
-        let queryStr = `UPDATE patients SET\n`;
+        let queryStr = `UPDATE patients SET `;
         queryStr += `${insuranceNumber ? `insurance_number = '${insuranceNumber}', ` : ''}
             ${insuranceProvider ? `insurance_provider = '${insuranceProvider}', ` : ''}`;
-        queryStr = queryStr.slice(0, -2) + '\n';
+        queryStr = queryStr.slice(0, -2) + ' ';
         queryStr += `WHERE user_id = '${id}';`;
 
         const res = await query(queryStr);
@@ -114,12 +127,12 @@ class Patient extends Role {
     }
 
     /**
-     * Deletes the current Patient instance from the database.
+     * Deletes a patient by ID from the database.
+     * @param {string} id - The patient ID.
      * @returns {Promise<void>} A promise that resolves when the patient is deleted.
      */
     static async deletePatient(id) {
-        const res = await query(`DELETE FROM patients 
-            WHERE user_id = '${id}' RETURNING *;`);
+        const res = await query(`DELETE FROM patients WHERE user_id = '${id}' RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 }

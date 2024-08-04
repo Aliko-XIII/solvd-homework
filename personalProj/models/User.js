@@ -54,12 +54,27 @@ class User {
     }
 
     /**
-     * Retrieves all users from the database.
+     * Retrieves all users from the database with optional filtering.
      * 
+     * @param {Object} filters - The filters to apply.
+     * @param {string} [filters.firstName] - Part of users' first name.
+     * @param {string} [filters.lastName] - Part of users' last name.
+     * @param {number} [filters.minAge] - Bottom border for users' age.
+     * @param {number} [filters.maxAge] - Top border for users' age.
+     * @param {string} [filters.sex] - User's sex.
+     * @param {string} [filters.phone] - Part of users' phone number.
      * @returns {Promise<Array<User>>} - A promise that resolves to an array of User objects.
      */
-    static async getUsers() {
-        const res = await query(`SELECT * FROM users;`);
+    static async getUsers({ firstName, lastName, minAge, maxAge, sex, phone } = {}) {
+        let queryStr = 'SELECT * FROM users WHERE 1=1';
+        if (firstName) queryStr += ` AND first_name ILIKE '%${firstName}%'`;
+        if (lastName) queryStr += ` AND last_name ILIKE '%${lastName}%'`;
+        if (minAge) queryStr += ` AND age >= ${minAge}`;
+        if (maxAge) queryStr += ` AND age <= ${maxAge}`;
+        if (sex) queryStr += ` AND sex = '${sex}'`;
+        if (phone) queryStr += ` AND phone ILIKE '%${phone}%'`;
+        
+        const res = await query(queryStr);
         return await this.getUsersFromData(res.rows);
     }
 
