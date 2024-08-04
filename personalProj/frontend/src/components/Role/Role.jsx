@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { HospitalContext } from '../App';
 import { useNavigate } from 'react-router-dom';
-import SpecializationInput from './SpecializationInput/SpecializationInput';
+import PatientRole from './PatientRole/PatientRole';
+import DoctorRole from './DoctorRole/DoctorRole';
 
 const Role = ({ setPatient, setDoctor }) => {
     const [selectedRole, setSelectedRole] = useState('patient');
@@ -105,76 +106,21 @@ const Role = ({ setPatient, setDoctor }) => {
                 <button onClick={handleDeleteDoctor}>Delete Doctor</button>
             )}
             {showForm && (
-                <form onSubmit={handleSubmit}>
-                    {selectedRole === 'patient' ? (
-                        <>
-                            <div>
-                                <label htmlFor="insuranceNumber">Insurance Number:</label>
-                                <input
-                                    type="text"
-                                    id="insuranceNumber"
-                                    name="insuranceNumber"
-                                    value={roleData.insuranceNumber || ''}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="insuranceProvider">Insurance Provider:</label>
-                                <input
-                                    type="text"
-                                    id="insuranceProvider"
-                                    name="insuranceProvider"
-                                    value={roleData.insuranceProvider || ''}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div>
-                                <label htmlFor="patientLoad">Patient Load:</label>
-                                <input
-                                    type="number"
-                                    id="patientLoad"
-                                    name="patientLoad"
-                                    value={roleData.patientLoad || ''}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                            <SpecializationInput
-                                getSpecializations={data.getSpecializations}
-                                value={roleData.specializationId || ''}
-                                onChange={handleSpecializationChange}
-                            />
-                            <div>
-                                <label htmlFor="workdayStart">Workday Start:</label>
-                                <input
-                                    type="time"
-                                    id="workdayStart"
-                                    name="workdayStart"
-                                    value={roleData.workdayStart || ''}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="workdayEnd">Workday End:</label>
-                                <input
-                                    type="time"
-                                    id="workdayEnd"
-                                    name="workdayEnd"
-                                    value={roleData.workdayEnd || ''}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                        </>
-                    )}
-                    <button type="submit">Submit</button>
-                </form>
+                selectedRole === 'patient' ? (
+                    <PatientRole
+                        roleData={roleData}
+                        handleInputChange={handleInputChange}
+                        handleSubmit={handleSubmit}
+                    />
+                ) : (
+                    <DoctorRole
+                        roleData={roleData}
+                        handleInputChange={handleInputChange}
+                        handleSpecializationChange={handleSpecializationChange}
+                        handleSubmit={handleSubmit}
+                        data={data}
+                    />
+                )
             )}
         </div>
     );
