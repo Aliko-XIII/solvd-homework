@@ -15,7 +15,11 @@ const getOrgan = async (req, res) => {
 
 const getAllOrgans = async (req, res) => {
     try {
-        const organs = await Organ.getOrgans();
+        const filters = {
+            name: req.query.name,
+            description: req.query.description,
+        };
+        const organs = await Organ.getOrgans(filters);
         res.status(200).send(organs);
     } catch (err) {
         res.status(500).send(err);

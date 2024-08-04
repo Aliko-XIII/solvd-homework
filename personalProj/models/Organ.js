@@ -41,8 +41,19 @@ class Organ {
      * Get all organs from the database.
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
-    static async getOrgans() {
+    static async getOrgans(filters = {}) {
         const res = await query(`SELECT * FROM organs;`);
+        const conditions = [];
+        if (filters.name) {
+            conditions.push(`organ_name ILIKE '%${filters.name}%'`);
+        }
+        if (filters.description) {
+            conditions.push(`organ_description ILIKE '%${filters.description}%'`);
+        }
+
+        if (conditions.length > 0) {
+            queryStr += ` WHERE ${conditions.join(' AND ')}`;
+        }
         return await this.getOrgansFromData(res.rows);
     }
 
