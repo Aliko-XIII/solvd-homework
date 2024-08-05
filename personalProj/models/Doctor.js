@@ -65,42 +65,59 @@ class Doctor extends Role {
     /**
      * Static method to fetch doctors from database rows.
      * @param {Object[]} rows - Rows fetched from the database.
-     * @returns {Doctor[]} - Array of Doctor objects.
+     * @param {boolean} nestUser - Whether to include nested user records.
+     * @param {boolean} nestSpecialization - Whether to include nested specialization records.
+     * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor objects.
      */
-    static async getDoctorsFromData(rows) {
+    static async getDoctorsFromData(rows, nestUser = false, nestSpecialization = false) {
         if (rows.length === 0) { return []; }
         const doctors = rows.map(async row => {
-            const user = (await User.getUsersFromData(rows))[0];
-            const doctor = new Doctor(user, null, row.patient_load, row.workday_start, row.workday_end);
-            doctor.specialization = (await Specialization.getSpecializationsById(row.specialization_id))[0];
+            let user;
+            if (nestUser) {
+                user = (await User.getUsersFromData([row]))[0];
+            } else {
+                user = { id: row.user_id };
+            }
+
+            let specialization;
+            if (nestSpecialization) {
+                specialization = (await Specialization.getSpecializationsById(row.specialization_id))[0];
+            } else {
+                specialization = { id: row.specialization_id };
+            }
+
+            const doctor = new Doctor(user, specialization, row.patient_load, row.workday_start, row.workday_end);
             return doctor;
         });
         return Promise.all(doctors);
     }
 
     /**
-     * Static method to fetch all doctors from the database.
-     * @returns {Doctor[]} - Array of Doctor objects.
+     * Retrieves all doctors from the database with optional nesting.
+     * @param {boolean} [nestUser=false] - Whether to include nested user records.
+     * @param {boolean} [nestSpecialization=false] - Whether to include nested specialization records.
+     * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor instances.
      */
-    static async getDoctors() {
+    static async getDoctors(nestUser = false, nestSpecialization = false) {
         const res = await query(`SELECT * FROM doctors 
-            INNER JOIN users ON
-	        users.user_id=doctors.user_id;`);
-        return await Doctor.getDoctorsFromData(res.rows);
+        INNER JOIN users ON users.user_id = doctors.user_id;`);
+        return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);
     }
+
 
     /**
      * Static method to fetch doctors by their user IDs.
-     * @param {...number} id - User IDs of doctors to fetch.
-     * @returns {Doctor[]} - Array of Doctor objects.
+     * @param {boolean} [nestUser=false] - Whether to include nested user records.
+     * @param {boolean} [nestSpecialization=false] - Whether to include nested specialization records.
+     * @param {...number} ids - User IDs of doctors to fetch.
+     * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor objects.
      */
-    static async getDoctorsById(...ids) {
+    static async getDoctorsById(nestUser = false, nestSpecialization = false, ...ids) {
         const idArr = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM doctors
-            INNER JOIN users ON
-	        users.user_id=doctors.user_id
-            WHERE doctors.user_id IN (${idArr});`);
-        return Doctor.getDoctorsFromData(res.rows);
+        INNER JOIN users ON users.user_id = doctors.user_id
+        WHERE doctors.user_id IN (${idArr});`);
+        return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);
     }
 
     /**

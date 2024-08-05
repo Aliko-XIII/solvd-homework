@@ -5,8 +5,13 @@ const { Specialization } = require('../models/Specialization');
 
 const getDoctor = async (req, res) => {
     try {
-        const doctor = (await Doctor.getDoctorsById(req.params.id))[0];
-        res.status(200).send(doctor);
+        const { nestUser = false, nestSpecialization = false } = req.query; // Extract nesting parameters
+        const doctor = (await Doctor.getDoctorsById(req.params.id, nestUser, nestSpecialization))[0];
+        if (doctor) {
+            res.status(200).send(doctor);
+        } else {
+            res.sendStatus(404);
+        }
     } catch (err) {
         res.status(500).send(err);
     }
@@ -14,7 +19,8 @@ const getDoctor = async (req, res) => {
 
 const getAllDoctors = async (req, res) => {
     try {
-        const doctors = await Doctor.getDoctors();
+        const { nestUser = false, nestSpecialization = false } = req.query; // Extract nesting parameters
+        const doctors = await Doctor.getDoctors(nestUser, nestSpecialization);
         res.status(200).send(doctors);
     } catch (err) {
         res.status(500).send(err);
@@ -30,11 +36,11 @@ const createDoctor = async (req, res) => {
         if (patientLoad) {
             doctor.patientLoad = patientLoad;
         }
-        if(workdayStart){
-            doctor.workdayStart=workdayStart;
+        if (workdayStart) {
+            doctor.workdayStart = workdayStart;
         }
-        if(workdayEnd){
-            doctor.workdayEnd=workdayEnd;
+        if (workdayEnd) {
+            doctor.workdayEnd = workdayEnd;
         }
         await doctor.insertDoctor();
         res.status(201).send(doctor);
