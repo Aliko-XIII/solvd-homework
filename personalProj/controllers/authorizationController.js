@@ -51,7 +51,7 @@ async function loginUser(req, res) {
         const user = await User.getUserByPhone(req.body['phone']);
 
         if (!user || user.password != req.body['password']) {
-            res.send('Phone or password is not correct');
+            res.status(400).send('Phone or password is not correct');
             return;
         }
 
@@ -61,7 +61,7 @@ async function loginUser(req, res) {
 
         await updateRefresh(user.id, refresh_token);
 
-        res.send({
+        res.status(200).send({
             "access_token": access_token,
             "refresh_token": refresh_token
         });
@@ -189,7 +189,7 @@ async function refreshAccessToken(req, res) {
     try {
         const refreshToken = req.body.refresh_token;
         if (!refreshToken) {
-            res.send('No refresh token in request');
+            res.status(400).send('No refresh token in request');
             return;
         }
 
@@ -201,7 +201,7 @@ async function refreshAccessToken(req, res) {
         }
 
         const user = await User.getUserById(id);
-        res.send({
+        res.status(200).send({
             "access_token": createAccessToken(user)
         });
     } catch (err) {
