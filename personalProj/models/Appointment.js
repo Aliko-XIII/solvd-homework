@@ -22,15 +22,18 @@ class Appointment {
         this.description = description;
         this.patient = patient;
         this.doctor = doctor;
-        this.symptoms = [];
     }
 
-    static async getAppointmentsFromData(rows) {
-        if (rows.length == 0) { return []; }
+    static async getAppointmentsFromData(rows, nestDoctor = false, nestPatient = false) {
         const appointments = rows.map(async row => {
-            const patient = (await Patient.getPatientsByIds(row.patient_id))[0];
-            const doctor = (await Doctor.getDoctorsById(row.doctor_id))[0];
-            console.log(doctor);
+            let patient = { id: row.patient_id };
+            let doctor = { id: row.doctor_id };
+            if (nestPatient) {
+                patient = (await Patient.getPatientsByIds(false, row.patient_id))[0];
+            }
+            if (nestDoctor) {
+                doctor = (await Doctor.getDoctorsById(row.doctor_id))[0];
+            }
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);
             return appointment;
@@ -38,34 +41,48 @@ class Appointment {
         return Promise.all(appointments);
     }
 
-    static async getAppointments() {
-        const res = await query(`SELECT * FROM appointments;`);
-        return await Appointment.getAppointmentsFromData(res.rows);
+    static async getAppointments({ patientId, doctorId, nestDoctor, nestPatient, startBefore, startAfter, endBefore, endAfter } = {}) {
+        let queryStr = `SELECT * FROM appointments WHERE 1=1`;
+        if (patientId) {
+            queryStr += ` AND patient_id = '${patientId}'`;
+        }
+        if (doctorId) {
+            queryStr += ` AND doctor_id = '${doctorId}'`;
+        }
+        if (startBefore) {
+            queryStr += ` AND appointment_time < '${startBefore}'`;
+        }
+        if (startAfter) {
+            queryStr += ` AND appointment_time > '${startAfter}'`;
+        }
+        if (endBefore) {
+            queryStr += ` AND appointment_time + appointment_duration < '${endBefore}'`;
+        }
+        if (endAfter) {
+            queryStr += ` AND appointment_time + appointment_duration > '${endAfter}'`;
+        }
+        const res = await query(queryStr);
+        return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
     }
 
-    static async getAppointmentsById(...id) {
+    static async getAppointmentsById(ids, nestDoctor = false, nestPatient = false) {
+        const idList = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM appointments 
-            WHERE id IN (${id.toString()});`);
-        return await this.getAppointmentsFromData(res.rows);
+            WHERE appointment_id IN (${idList});`);
+        return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
     }
 
     async insertAppointment() {
         const res = await query(`INSERT INTO public.appointments(
-	        "time", duration_minutes, description, patient, doctor)
+	        appointment_time, appointment_duration, additional_info, patient_id, doctor_id)
 	        VALUES ('${this.time}', ${this.duration}, '${this.description}', 
             ${this.patient.id}, ${this.doctor.id}) RETURNING *;`);
-        this.id = res.rows[0].id;
-
-        for (let symptom of this.symptoms) {
-            const symptomRes = await query(`INSERT INTO public.appointments_to_symptoms(
-	            appointment, symptom, organ)
-	            VALUES (${this.id}, ${symptom.id}, NULL);`);
-        }
+        this.id = res.rows[0].appointment_id;
         console.log('Inserted:', res.rows[0]);
     }
 
     async deleteAppointment() {
-        const res = await query(`DELETE FROM appointments WHERE id = ${this.id} RETURNING *;`);
+        const res = await query(`DELETE FROM appointments WHERE appointment_id = ${this.id} RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 
@@ -75,7 +92,7 @@ class Appointment {
      */
     static async getDoctorAppointments(doctorId) {
         const res = await query(`SELECT * FROM appointments 
-            WHERE doctor = ${doctorId};`);
+            WHERE doctor_id = ${doctorId};`);
         return await this.getAppointmentsFromData(res.rows);
     }
 
@@ -85,11 +102,9 @@ class Appointment {
      */
     static async getPatientAppointments(patientId) {
         const res = await query(`SELECT * FROM appointments 
-            WHERE patient = ${patientId};`);
+            WHERE patient_id = ${patientId};`);
         return await this.getAppointmentsFromData(res.rows);
     }
-
 }
 
 module.exports = { Appointment };
-
