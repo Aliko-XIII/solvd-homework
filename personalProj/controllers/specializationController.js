@@ -2,7 +2,17 @@ const { Specialization } = require('../models/Specialization');
 
 const getSpecialization = async (req, res) => {
     try {
-        const specialization = (await Specialization.getSpecializationsById(req.params.id))[0];
+        // Extract query parameters for nesting
+        const nestOrgans = req.query.nestOrgans === 'true';
+        const nestSymptoms = req.query.nestSymptoms === 'true';
+
+        // Fetch specialization by ID with the specified nesting parameters
+        const specialization = (await Specialization.getSpecializationsById(
+            nestOrgans,
+            nestSymptoms,
+            req.params.id
+        ))[0];
+
         if (specialization) {
             res.status(200).send(specialization);
         } else {
@@ -16,11 +26,15 @@ const getSpecialization = async (req, res) => {
 const getAllSpecializations = async (req, res) => {
     try {
         // Extract query parameters
-        const nestOrgans = req.query.nestOrgans === 'true';
-        const nestSymptoms = req.query.nestSymptoms === 'true';
+        const filters = {
+            name: req.query.name,
+            description: req.query.description,
+            nestOrgans: req.query.nestOrgans === 'true',
+            nestSymptoms: req.query.nestSymptoms === 'true',
+        };
 
-        // Fetch specializations with the specified parameters
-        const specializations = await Specialization.getSpecializations(nestOrgans, nestSymptoms);
+        // Fetch specializations with the specified filters
+        const specializations = await Specialization.getSpecializations(filters);
 
         // Send the response with the fetched specializations
         res.status(200).send(specializations);
