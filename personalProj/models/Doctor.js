@@ -44,8 +44,8 @@ class Doctor extends Role {
         // if (user.age <= 18 || user.age > 70)
         //     throw new Error('Doctor\'s age should be from 18 to 70.');
 
-        // if (typeof patientLoad !== 'number' || patientLoad < 0)
-        //     throw new Error('Patient load is not valid.');
+        if (typeof patientLoad !== 'number' || patientLoad < 0)
+            throw new Error('Patient load is not valid.');
 
         super(user);
         this.specialization = specialization;
@@ -113,6 +113,35 @@ class Doctor extends Role {
             '${this.workdayEnd}', '${this.user.id}', ${this.patientLoad}) RETURNING *;`);
         this.id = res.rows[0].user_id; // Assuming 'user_id' is returned from database upon insertion
         console.log('Inserted:', res.rows[0]);
+    }
+
+    /**
+     * Update the current Doctor object in the database.
+     * @param {Object} updates - The fields to update.
+     * @param {number} [updates.specialization_id] - The new specialization ID.
+     * @param {number} [updates.patientLoad] - The new maximum number of patients per day.
+     * @param {Date|null} [updates.workdayStart] - The new start time of the workday.
+     * @param {Date|null} [updates.workdayEnd] - The new end time of the workday.
+     * @returns {Promise<void>} A promise that resolves when the doctor is updated.
+     */
+    async updateDoctor({ specialization_id, patientLoad, workdayStart, workdayEnd }) {
+        if (!this.user.id) throw new Error('No ID provided to update doctor record.');
+
+        const hasParams = Object.keys({ specialization_id, patientLoad, workdayStart, workdayEnd })
+            .some(key => updates[key] !== undefined);
+
+        if (!hasParams) throw new Error('No parameters to update.');
+
+        let queryStr = `UPDATE doctors SET `;
+        queryStr += specialization_id !== undefined ? `specialization_id = ${specialization_id}, ` : '';
+        queryStr += patientLoad !== undefined ? `patient_load = ${patientLoad}, ` : '';
+        queryStr += workdayStart !== undefined ? `workday_start = '${workdayStart}', ` : '';
+        queryStr += workdayEnd !== undefined ? `workday_end = '${workdayEnd}', ` : '';
+        queryStr = queryStr.slice(0, -2) + ' ';
+        queryStr += `WHERE user_id = '${this.user.id}';`;
+
+        const res = await query(queryStr);
+        console.log('Updated:', res.rows[0]);
     }
 
     /**
