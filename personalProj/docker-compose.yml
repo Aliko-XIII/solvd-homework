@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mydatabase
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +19,7 @@ services:
       DB_PASSWORD: postgres
       DB_HOST: db
       DB_PORT: 5432
-      DB_DATABASE: mydatabase
+      DB_DATABASE: postgres
     ports:
       - "3000:3000"
     depends_on:
