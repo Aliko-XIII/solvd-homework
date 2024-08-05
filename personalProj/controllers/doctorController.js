@@ -5,8 +5,8 @@ const { Specialization } = require('../models/Specialization');
 
 const getDoctor = async (req, res) => {
     try {
-        const { nestUser = false, nestSpecialization = false } = req.query; // Extract nesting parameters
-        const doctor = (await Doctor.getDoctorsById(req.params.id, nestUser, nestSpecialization))[0];
+        const { nestUser = false, nestSpecialization = false } = req.query;
+        const doctor = (await Doctor.getDoctorsById(nestUser, nestSpecialization, req.params.id))[0];
         if (doctor) {
             res.status(200).send(doctor);
         } else {
