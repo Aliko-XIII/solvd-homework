@@ -115,6 +115,65 @@ class Specialization {
     }
 
     /**
+ * Update the current Specialization object in the database.
+ * @param {Object} updates - The fields to update.
+ * @param {string} [updates.name] - The new name of the specialization.
+ * @param {string} [updates.description] - The new description of the specialization.
+ * @param {Symptom[]} [updates.symptoms] - The new symptoms associated with the specialization.
+ * @param {Organ[]} [updates.organs] - The new organs associated with the specialization.
+ * @returns {Promise<void>} A promise that resolves when the specialization is updated.
+ */
+async updateSpecialization({ name, description, symptoms, organs }) {
+    if (!this.id) throw new Error('No ID provided to update specialization record.');
+    
+    const hasParams = Object.keys({ name, description, symptoms, organs }).some(key => key !== undefined);
+    if (!hasParams) throw new Error('No parameters to update.');
+
+    let queryStr = `UPDATE specializations SET `;
+    queryStr += `${name ? `specialization_name = '${name}', ` : ''}`;
+    queryStr += `${description ? `specialization_description = '${description}', ` : ''}`;
+    queryStr = queryStr.slice(0, -2) + ' ';
+    queryStr += `WHERE specialization_id = ${this.id};`;
+
+    try {
+        // Update specialization name and description if provided
+        if (name || description) {
+            await query(queryStr);
+        }
+
+        // Clear the existing symptoms and organs associations if provided
+        if (symptoms) {
+            await query(`DELETE FROM specializations_to_symptoms WHERE specialization_id = ${this.id};`);
+            for (const symptom of symptoms) {
+                await query(`INSERT INTO specializations_to_symptoms(
+                    specialization_id, symptom_id)
+                VALUES(${this.id}, ${symptom.id});`);
+            }
+            this.symptoms = symptoms; // Update the current instance's symptoms
+        }
+
+        if (organs) {
+            await query(`DELETE FROM specializations_to_organs WHERE specialization_id = ${this.id};`);
+            for (const organ of organs) {
+                await query(`INSERT INTO specializations_to_organs(
+                    specialization_id, organ_id)
+                VALUES(${this.id}, ${organ.id});`);
+            }
+            this.organs = organs; // Update the current instance's organs
+        }
+
+        // Update the current instance's name and description if they were updated
+        if (name) this.name = name;
+        if (description) this.description = description;
+
+        console.log('Updated Specialization:', this);
+    } catch (err) {
+        console.error('Error updating specialization:', err);
+        throw err;
+    }
+}
+
+    /**
      * Insert the current Specialization object into the database.
      * @returns {Promise<void>} A promise that resolves when the specialization is inserted.
      */
