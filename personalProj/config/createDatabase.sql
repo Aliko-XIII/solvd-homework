@@ -7,7 +7,7 @@ BEGIN
 END$$;
 
 -- Create users table
-CREATE TABLE IF NOT EXISTS users
+CREATE TABLE IF NOT EXISTS  public.users
 (
     user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name character varying,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS patients
 -- Create symptoms table
 CREATE TABLE IF NOT EXISTS symptoms
 (
-    symptom_id integer NOT NULL DEFAULT nextval('symptoms_symptom_id_seq'::regclass),
+    symptom_id serial NOT NULL,
     symptom_name character varying NOT NULL,
     symptom_description text,
     CONSTRAINT symptoms_pkey PRIMARY KEY (symptom_id)
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS symptoms
 -- Create organs table
 CREATE TABLE IF NOT EXISTS organs
 (
-    organ_id integer NOT NULL DEFAULT nextval('organs_organ_id_seq'::regclass),
+    organ_id serial NOT NULL,
     organ_name character varying NOT NULL,
     organ_description text,
     CONSTRAINT organs_pkey PRIMARY KEY (organ_id)
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS organs
 -- Create specializations table
 CREATE TABLE IF NOT EXISTS specializations
 (
-    specialization_id integer NOT NULL DEFAULT nextval('specializations_specialization_id_seq'::regclass),
+    specialization_id serial NOT NULL,
     specialization_name character varying NOT NULL,
     specialization_description text,
     CONSTRAINT specializations_pkey PRIMARY KEY (specialization_id)
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS specializations
 -- Create specializations_to_symptoms table
 CREATE TABLE IF NOT EXISTS specializations_to_symptoms
 (
-    record_id integer NOT NULL DEFAULT nextval('specializations_to_symptoms_record_id_seq'::regclass),
+    record_id serial NOT NULL,
     specialization_id integer NOT NULL,
     symptom_id integer NOT NULL,
     CONSTRAINT specializations_to_symptoms_pkey PRIMARY KEY (record_id),
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS specializations_to_symptoms
 -- Create specializations_to_organs table
 CREATE TABLE IF NOT EXISTS specializations_to_organs
 (
-    record_id integer NOT NULL DEFAULT nextval('specializations_to_organs_record_id_seq'::regclass),
+    record_id serial NOT NULL,
     specialization_id integer NOT NULL,
     organ_id integer NOT NULL,
     CONSTRAINT specializations_to_organs_pkey PRIMARY KEY (record_id),
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS doctors
 -- Create appointments table
 CREATE TABLE IF NOT EXISTS appointments
 (
-    appointment_id integer NOT NULL DEFAULT nextval('appointments_appointment_id_seq'::regclass),
+    appointment_id serial NOT NULL,
     patient_id uuid,
     doctor_id uuid,
     appointment_time timestamp without time zone NOT NULL,

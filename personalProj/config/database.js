@@ -8,6 +8,11 @@ const client = new Client({
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
+    // user: 'postgres',
+    // host: 'localhost',
+    // database: 'postgres',
+    // password: 'postgres',
+    // port: 5432,
 });
 
 client.connect()
