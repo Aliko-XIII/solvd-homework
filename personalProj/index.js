@@ -37,7 +37,7 @@ app.use(express.json());
 app.use('/api/authorization', authorizationRoutes);
 
 //Access token validation middleware
-app.use('/api', validateToken);
+// app.use('/api', validateToken);
 
 app.use(express.json());
 // API routes

@@ -1,15 +1,20 @@
-FROM node:20
+# Use the official Node.js image as the base image
+FROM node:14
 
-WORKDIR /app
+# Set the working directory
+WORKDIR /usr/src/app
 
+# Copy the package.json and package-lock.json files
 COPY package*.json ./
 
-RUN npm i
+# Install the dependencies
+RUN npm install
 
+# Copy the rest of the application code
 COPY . .
 
-ENV PORT=8080
+# Expose the port the app runs on
+EXPOSE 3000
 
-EXPOSE 8080
-
-CMD [ "npm", "start" ]
+# Start the application
+CMD ["node", "index.js"]
