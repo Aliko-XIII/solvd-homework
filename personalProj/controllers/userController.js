@@ -71,6 +71,9 @@ const deleteUser = async (req, res) => {
     }
 };
 
+/**
+ * Handles the request to update a user by their ID.
+ */
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -80,7 +83,6 @@ const updateUser = async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Validate inputs (this can be more sophisticated based on your needs)
         if (firstName && typeof firstName !== 'string') return res.status(400).json({ error: 'Invalid first name' });
         if (lastName && typeof lastName !== 'string') return res.status(400).json({ error: 'Invalid last name' });
         if (phone && typeof phone !== 'string') return res.status(400).json({ error: 'Invalid phone number' });
