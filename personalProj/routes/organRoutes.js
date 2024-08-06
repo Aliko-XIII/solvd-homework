@@ -9,6 +9,8 @@ router.get('/:id', organController.getOrgan);
 
 router.post('/', organController.createOrgan);
 
+router.put('/:id', symptomController.updateSymptom);
+
 router.delete('/:id', organController.deleteOrgan);
 
 module.exports = router;
