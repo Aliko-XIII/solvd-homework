@@ -69,6 +69,28 @@ const deletePatient = async (req, res) => {
     }
 };
 
+const updatePatient = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { insuranceNumber, insuranceProvider } = req.body;
+
+        if (!userId) {
+            return res.status(400).send('No ID provided to update patient record.');
+        }
+
+        const updates = { insuranceNumber, insuranceProvider };
+
+        if (!hasParams) {
+            return res.status(400).send('No parameters to update.');
+        }
+
+        await Patient.updatePatient(userId, updates);
+        res.status(200).send('Patient updated successfully.');
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
 /**
  * Retrieves appointments for a patient and sends them in the response.
  */
@@ -86,5 +108,6 @@ module.exports = {
     createPatient,
     deletePatient,
     getAllPatients,
+    updatePatient,
     getAppointments
 };
