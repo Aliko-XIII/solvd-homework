@@ -38,6 +38,37 @@ const createSymptom = async (req, res) => {
     }
 };
 
+/**
+ * Handles the request to update a symptom by its ID.
+ */
+const updateSymptom = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Symptom ID is required' });
+        }
+
+        if (name && typeof name !== 'string') return res.status(400).json({ error: 'Invalid name' });
+        if (description && typeof description !== 'string') return res.status(400).json({ error: 'Invalid description' });
+
+        const updates = { name, description };
+        const hasParams = Object.values(updates).some(value => value !== undefined);
+
+        if (!hasParams) {
+            return res.status(400).json({ error: 'No parameters to update' });
+        }
+
+        await Symptom.updateSymptom(id, updates);
+
+        res.status(200).json({ message: 'Symptom updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while updating the symptom' });
+    }
+};
+
 const deleteSymptom = async (req, res) => {
     try {
         const symptom = (await Symptom.getSymptomsById(req.params.id))[0];
@@ -56,5 +87,6 @@ module.exports = {
     getSymptom,
     getAllSymptoms,
     createSymptom,
-    deleteSymptom
+    deleteSymptom,
+    updateSymptom
 };
