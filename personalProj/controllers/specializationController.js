@@ -2,11 +2,9 @@ const { Specialization } = require('../models/Specialization');
 
 const getSpecialization = async (req, res) => {
     try {
-        // Extract query parameters for nesting
         const nestOrgans = req.query.nestOrgans === 'true';
         const nestSymptoms = req.query.nestSymptoms === 'true';
 
-        // Fetch specialization by ID with the specified nesting parameters
         const specialization = (await Specialization.getSpecializationsById(
             nestOrgans,
             nestSymptoms,
@@ -25,7 +23,6 @@ const getSpecialization = async (req, res) => {
 
 const getAllSpecializations = async (req, res) => {
     try {
-        // Extract query parameters
         const filters = {
             name: req.query.name,
             description: req.query.description,
@@ -33,13 +30,10 @@ const getAllSpecializations = async (req, res) => {
             nestSymptoms: req.query.nestSymptoms === 'true',
         };
 
-        // Fetch specializations with the specified filters
         const specializations = await Specialization.getSpecializations(filters);
 
-        // Send the response with the fetched specializations
         res.status(200).send(specializations);
     } catch (err) {
-        // Handle any errors that occur during the request
         res.status(500).send(err);
     }
 };
@@ -69,9 +63,43 @@ const deleteSpecialization = async (req, res) => {
     }
 };
 
+const updateSpecialization = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, symptoms, organs } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Specialization ID is required' });
+        }
+
+        if (name && typeof name !== 'string') {
+            return res.status(400).json({ error: 'Invalid specialization name' });
+        }
+
+        if (description && typeof description !== 'string') {
+            return res.status(400).json({ error: 'Invalid specialization description' });
+        }
+
+        const updates = { name, description, symptoms, organs };
+        const hasParams = Object.values(updates).some(value => value !== undefined);
+
+        if (!hasParams) {
+            return res.status(400).json({ error: 'No parameters to update' });
+        }
+
+        await Specialization.updateSpecialization(updates);
+
+        res.status(200).json({ message: 'Specialization updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while updating the specialization' });
+    }
+};
+
 module.exports = {
     getSpecialization,
     getAllSpecializations,
     createSpecialization,
+    updateSpecialization,
     deleteSpecialization
 };
