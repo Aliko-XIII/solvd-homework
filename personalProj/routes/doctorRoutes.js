@@ -11,6 +11,8 @@ router.get('/:id/appointments', doctorController.getAppointments);
 
 router.post('/', doctorController.createDoctor);
 
+router.put('/:id', doctorController.updateDoctor);
+
 router.delete('/:id', doctorController.deleteDoctor);
 
 module.exports = router;
