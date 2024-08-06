@@ -117,10 +117,11 @@ class Patient extends Role {
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE patients SET `;
-        queryStr += `${insuranceNumber ? `insurance_number = '${insuranceNumber}', ` : ''}
-            ${insuranceProvider ? `insurance_provider = '${insuranceProvider}', ` : ''}`;
+        queryStr += `${insuranceNumber ? `insurance_number = '${insuranceNumber}', ` : ''}`;
+        queryStr += `${insuranceProvider ? `insurance_provider = '${insuranceProvider}', ` : ''}`;
         queryStr = queryStr.slice(0, -2) + ' ';
         queryStr += `WHERE user_id = '${id}';`;
+
 
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);

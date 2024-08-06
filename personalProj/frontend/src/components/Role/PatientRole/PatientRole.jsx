@@ -25,7 +25,12 @@ const PatientRole = ({ roleData, handleInputChange, handleSubmit }) => {
                     required
                 />
             </div>
-            <button type="submit">Submit</button>
+            <button type="button" onClick={(event) => handleSubmit(event, 'create')}>
+                Create Patient
+            </button>
+            <button type="button" onClick={(event) => handleSubmit(event, 'update')}>
+                Update Patient
+            </button>
         </form>
     );
 };

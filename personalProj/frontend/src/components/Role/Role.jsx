@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, act } from 'react';
 import { HospitalContext } from '../App';
 import { useNavigate } from 'react-router-dom';
 import PatientRole from './PatientRole/PatientRole';
@@ -55,21 +55,33 @@ const Role = ({ setPatient, setDoctor }) => {
     const handleSubmit = async (event, action) => {
         event.preventDefault();
         if (selectedRole === 'patient') {
-            data.createPatient(roleData.insuranceNumber, roleData.insuranceProvider, user.id);
-            setPatient(roleData);
+            try {
+                if (action === 'create') {
+                    await data.createPatient({ ...roleData, userId: user.id });
+                    console.log('Patient created successfully!');
+                } else if (action === 'update') {
+                    await data.updatePatient(user.id, { ...roleData });
+                    console.log('Patient updated successfully!');
+                }
+                setPatient(roleData);
+            } catch (error) {
+                console.log(error);
+                console.log(`Failed to ${action === 'create' ? 'create' : 'update'} patient.`);
+            }
         } else if (selectedRole === 'doctor') {
             try {
                 if (action === 'create') {
                     await data.createDoctor({ ...roleData, userId: user.id });
-                    alert('Doctor created successfully!');
+                    console.log('Doctor created successfully!');
                 } else if (action === 'update') {
-                    await data.updateDoctor(user.id, doctorData);
-                    alert('Doctor updated successfully!');
+                    await data.updateDoctor(user.id, { ...roleData });
+                    console.log('Doctor updated successfully!');
                 }
+                setDoctor(roleData);
             } catch (error) {
-                alert(`Failed to ${action === 'create' ? 'create' : 'update'} doctor.`);
+                console.log(error);
+                console.log(`Failed to ${action === 'create' ? 'create' : 'update'} doctor.`);
             }
-            setDoctor(roleData);
         }
     };
 

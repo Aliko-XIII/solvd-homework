@@ -53,37 +53,21 @@ const createDoctor = async (req, res) => {
 
 const updateDoctor = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const { specialization_id, patientLoad, workdayStart, workdayEnd } = req.body;
-
+        const userId = req.params.id;
+        let { specializationId, patientLoad, workdayStart, workdayEnd } = req.body;
+        console.log(specializationId);
         if (!userId) {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        if (specialization_id && typeof specialization_id !== 'number') {
-            return res.status(400).json({ error: 'Invalid specialization ID' });
-        }
-
-        if (patientLoad && (typeof patientLoad !== 'number' || patientLoad < 0)) {
-            return res.status(400).json({ error: 'Invalid patient load' });
-        }
-
-        if (workdayStart && isNaN(Date.parse(workdayStart))) {
-            return res.status(400).json({ error: 'Invalid workday start time' });
-        }
-
-        if (workdayEnd && isNaN(Date.parse(workdayEnd))) {
-            return res.status(400).json({ error: 'Invalid workday end time' });
-        }
-
-        const updates = { specialization_id, patientLoad, workdayStart, workdayEnd };
+        const updates = { specializationId, patientLoad, workdayStart, workdayEnd };
         const hasParams = Object.values(updates).some(value => value !== undefined);
 
         if (!hasParams) {
             return res.status(400).json({ error: 'No parameters to update' });
         }
-
-        await Doctor.updateDoctor(updates);
+        console.log(updates)
+        await Doctor.updateDoctor(userId, updates);
 
         res.status(200).json({ message: 'Doctor updated successfully' });
     } catch (error) {

@@ -318,7 +318,6 @@ const createDoctor = async (doctorData) => {
  */
 const updateDoctor = async (userId, updates) => {
     await optionalRefresh();
-
     const response = await fetch(`${API_URL}/doctors/${userId}`, {
         method: 'PUT',
         headers: {
@@ -400,7 +399,9 @@ export default {
     getPatientById,
     createPatient,
     deletePatient,
+    updatePatient,
     getDoctorById,
+    updateDoctor,
     getSpecializations,
     createDoctor,
     deleteDoctor

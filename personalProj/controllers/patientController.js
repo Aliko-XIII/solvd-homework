@@ -38,7 +38,7 @@ const getAllPatients = async (req, res) => {
 const createPatient = async (req, res) => {
     try {
         const { insuranceNumber, insuranceProvider, userId } = req.body;
-        const existingPatient = await Patient.getPatientByUserId(userId);
+        const existingPatient = await Patient.getPatientById(userId);
         if (existingPatient) {
             return res.status(409).json({ error: 'There is already a patient record for this user.' });
         }
@@ -74,7 +74,7 @@ const deletePatient = async (req, res) => {
  */
 const updatePatient = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.id;
         const { insuranceNumber, insuranceProvider } = req.body;
 
         if (!userId) {
