@@ -7,7 +7,7 @@ BEGIN
 END$$;
 
 -- Create users table
-CREATE TABLE IF NOT EXISTS  public.users
+CREATE TABLE IF NOT EXISTS users
 (
     user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name character varying,
@@ -16,7 +16,12 @@ CREATE TABLE IF NOT EXISTS  public.users
     sex sex,
     pass character varying NOT NULL,
     phone character varying NOT NULL,
-    CONSTRAINT phone_unique UNIQUE (phone)
+    CONSTRAINT phone_unique UNIQUE (phone),
+    CONSTRAINT age_valid CHECK (age >= 0 AND age <= 120),
+    CONSTRAINT pass_length CHECK (char_length(pass) > 6 AND char_length(pass) < 32),
+    CONSTRAINT phone_length CHECK (char_length(phone) >= 10),
+    CONSTRAINT first_name_length CHECK (char_length(first_name) > 0),
+    CONSTRAINT last_name_length CHECK (char_length(last_name) > 0)
 );
 
 -- Create refresh_tokens table
@@ -42,7 +47,9 @@ CREATE TABLE IF NOT EXISTS patients
     CONSTRAINT user_FK FOREIGN KEY (user_id)
         REFERENCES users (user_id) MATCH SIMPLE
         ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT insurance_number_length CHECK (char_length(insurance_number) > 0),
+    CONSTRAINT insurance_provider_length CHECK (char_length(insurance_provider) > 0)
 );
 
 -- Create symptoms table
@@ -51,7 +58,8 @@ CREATE TABLE IF NOT EXISTS symptoms
     symptom_id serial NOT NULL,
     symptom_name character varying NOT NULL,
     symptom_description text,
-    CONSTRAINT symptoms_pkey PRIMARY KEY (symptom_id)
+    CONSTRAINT symptoms_pkey PRIMARY KEY (symptom_id),
+    CONSTRAINT symptom_name_length CHECK (char_length(symptom_name) > 0)
 );
 
 -- Create organs table
@@ -60,7 +68,8 @@ CREATE TABLE IF NOT EXISTS organs
     organ_id serial NOT NULL,
     organ_name character varying NOT NULL,
     organ_description text,
-    CONSTRAINT organs_pkey PRIMARY KEY (organ_id)
+    CONSTRAINT organs_pkey PRIMARY KEY (organ_id),
+    CONSTRAINT organ_name_length CHECK (char_length(organ_name) > 0)
 );
 
 -- Create specializations table
@@ -69,7 +78,8 @@ CREATE TABLE IF NOT EXISTS specializations
     specialization_id serial NOT NULL,
     specialization_name character varying NOT NULL,
     specialization_description text,
-    CONSTRAINT specializations_pkey PRIMARY KEY (specialization_id)
+    CONSTRAINT specializations_pkey PRIMARY KEY (specialization_id),
+    CONSTRAINT specialization_name_length CHECK (char_length(specialization_name) > 0)
 );
 
 -- Create specializations_to_symptoms table
@@ -122,7 +132,9 @@ CREATE TABLE IF NOT EXISTS doctors
     CONSTRAINT user_FK FOREIGN KEY (user_id)
         REFERENCES users (user_id) MATCH SIMPLE
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT patient_load_valid CHECK (patient_load > 0),
+    CONSTRAINT workday_valid CHECK (workday_start < workday_end)
 );
 
 -- Create appointments table
