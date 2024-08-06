@@ -6,6 +6,9 @@ const { User } = require('../models/User');
 const getUser = async (req, res) => {
     try {
         const user = await User.getUserById(req.params.id);
+        if (!user) {
+            res.status(404).send('There is no such user found.');
+        }
         res.status(200).send(user);
     } catch (err) {
         res.status(500).send(err);
@@ -40,6 +43,9 @@ const createUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, password, age, sex } = req.body;
         const user = new User(firstName, lastName, phone, password, age, sex);
+        if(!user){
+            res.status(400).send('User object misses fields or their data is invalid.');
+        }
         await user.insertUser();
         res.status(201).send(user);
     } catch (err) {
