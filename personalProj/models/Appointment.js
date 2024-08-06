@@ -65,11 +65,42 @@ class Appointment {
         return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
     }
 
-    static async getAppointmentsById(ids, nestDoctor = false, nestPatient = false) {
+    static async getAppointmentsById(nestDoctor = false, nestPatient = false, ...ids) {
         const idList = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM appointments 
             WHERE appointment_id IN (${idList});`);
         return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
+    }
+
+    /**
+     * Update the current Appointment object in the database.
+     * @param {Object} updates - The fields to update.
+     * @param {Date|null} [updates.time] - The new appointment time.
+     * @param {string} [updates.duration] - The new appointment duration (Postgres interval).
+     * @param {string} [updates.description] - The new appointment description.
+     * @param {string} [updates.patientId] - The new patient ID.
+     * @param {string} [updates.doctorId] - The new doctor ID.
+     * @returns {Promise<void>} A promise that resolves when the appointment is updated.
+     */
+    async updateAppointment({ time, duration, description, patientId, doctorId }) {
+        if (this.id === -1) throw new Error('No ID provided to update appointment record.');
+
+        const hasParams = Object.keys({ time, duration, description, patientId, doctorId })
+            .some(key => updates[key] !== undefined);
+
+        if (!hasParams) throw new Error('No parameters to update.');
+
+        let queryStr = `UPDATE appointments SET `;
+        queryStr += time !== undefined ? `appointment_time = '${time}', ` : '';
+        queryStr += duration !== undefined ? `appointment_duration = '${duration}', ` : '';
+        queryStr += description !== undefined ? `additional_info = '${description}', ` : '';
+        queryStr += patientId !== undefined ? `patient_id = '${patientId}', ` : '';
+        queryStr += doctorId !== undefined ? `doctor_id = '${doctorId}', ` : '';
+        queryStr = queryStr.slice(0, -2) + ' '; // Remove the trailing comma and space
+        queryStr += `WHERE appointment_id = ${this.id};`;
+
+        const res = await query(queryStr);
+        console.log('Updated:', res.rows[0]);
     }
 
     async insertAppointment() {

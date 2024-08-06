@@ -36,6 +36,43 @@ const getAllAppointments = async (req, res) => {
     }
 };
 
+const updateAppointment = async (req, res) => {
+    try {
+        const { appointmentId } = req.params;
+        const { time, duration, description, patientId, doctorId } = req.body;
+
+        if (!appointmentId) {
+            return res.status(400).json({ error: 'Appointment ID is required' });
+        }
+
+        if (duration && typeof duration !== 'string') {
+            return res.status(400).json({ error: 'Invalid duration format' });
+        }
+
+        if (patientId && typeof patientId !== 'string') {
+            return res.status(400).json({ error: 'Invalid patient ID' });
+        }
+
+        if (doctorId && typeof doctorId !== 'string') {
+            return res.status(400).json({ error: 'Invalid doctor ID' });
+        }
+
+        const updates = { time, duration, description, patientId, doctorId };
+        const hasParams = Object.values(updates).some(value => value !== undefined);
+
+        if (!hasParams) {
+            return res.status(400).json({ error: 'No parameters to update' });
+        }
+
+        await Appointment.updateAppointment(updates);
+
+        res.status(200).json({ message: 'Appointment updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while updating the appointment' });
+    }
+};
+
 const createAppointment = async (req, res) => {
     try {
         const { patientId, doctorId, time, duration, description } = req.body;
@@ -67,5 +104,6 @@ module.exports = {
     getAppointment,
     getAllAppointments,
     createAppointment,
+    updateAppointment,
     deleteAppointment
 };
