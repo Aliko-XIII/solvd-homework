@@ -125,7 +125,6 @@ class User {
      * @param {string} [updates.sex] - The new sex.
      * @param {string} [updates.pass] - The new password.
      * @param {string} [updates.phone] - The new phone number.
-     * @throws {Error} If no ID is provided or no parameters to update.
      */
     static async updateUser(id, { firstName, lastName, age, sex, pass, phone }) {
         if (!id) throw new Error('There is no id passed to update user record.');
