@@ -10,12 +10,12 @@ const getPatient = async (req, res) => {
         const nestUser = req.query.nestUser === 'true';
         const patient = await Patient.getPatientById(req.params.id, nestUser);
         if (patient) {
-            res.status(200).send(patient);
+            res.status(200).json(patient);
         } else {
-            res.status(404).send('Patient not found');
+            res.status(404).json({ error: 'Patient not found' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -26,9 +26,9 @@ const getAllPatients = async (req, res) => {
     try {
         const { insuranceNumber, insuranceProvider, nestUser } = req.query;
         const patients = await Patient.getPatients({ insuranceNumber, insuranceProvider, nestUser: nestUser === 'true' });
-        res.status(200).send(patients);
+        res.status(200).json(patients);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -40,15 +40,15 @@ const createPatient = async (req, res) => {
         const { insuranceNumber, insuranceProvider, userId } = req.body;
         const existingPatient = await Patient.getPatientByUserId(userId);
         if (existingPatient) {
-            return res.status(409).send('There is already a patient record for this user.');
+            return res.status(409).json({ error: 'There is already a patient record for this user.' });
         }
 
         const user = await User.getUserById(userId);
         const patient = new Patient(insuranceNumber, insuranceProvider, user);
         await patient.insertPatient();
-        res.status(201).send(patient);
+        res.status(201).json(patient);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -62,32 +62,46 @@ const deletePatient = async (req, res) => {
             await Patient.deletePatient(req.params.id);
             res.sendStatus(204);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'Patient not found' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
+/**
+ * Handles the request to update a patient by their user ID.
+ */
 const updatePatient = async (req, res) => {
     try {
         const { userId } = req.params;
         const { insuranceNumber, insuranceProvider } = req.body;
 
         if (!userId) {
-            return res.status(400).send('No ID provided to update patient record.');
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        if (insuranceNumber && typeof insuranceNumber !== 'string') {
+            return res.status(400).json({ error: 'Invalid insurance number' });
+        }
+
+        if (insuranceProvider && typeof insuranceProvider !== 'string') {
+            return res.status(400).json({ error: 'Invalid insurance provider' });
         }
 
         const updates = { insuranceNumber, insuranceProvider };
+        const hasParams = Object.values(updates).some(value => value !== undefined);
 
         if (!hasParams) {
-            return res.status(400).send('No parameters to update.');
+            return res.status(400).json({ error: 'No parameters to update' });
         }
 
         await Patient.updatePatient(userId, updates);
-        res.status(200).send('Patient updated successfully.');
-    } catch (err) {
-        res.status(500).send(err);
+
+        res.status(200).json({ message: 'Patient updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while updating the patient' });
     }
 };
 
@@ -97,9 +111,9 @@ const updatePatient = async (req, res) => {
 const getAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.getPatientAppointments(req.params.id);
-        res.status(200).send(appointments);
+        res.status(200).json(appointments);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 

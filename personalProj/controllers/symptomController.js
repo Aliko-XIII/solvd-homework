@@ -4,12 +4,12 @@ const getSymptom = async (req, res) => {
     try {
         const symptom = (await Symptom.getSymptomsById(req.params.id))[0];
         if (symptom) {
-            res.status(200).send(symptom);
+            res.status(200).json(symptom);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'Symptom not found' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -20,21 +20,20 @@ const getAllSymptoms = async (req, res) => {
             description: req.query.description,
         };
         const symptoms = await Symptom.getSymptoms(filters);
-        res.status(200).send(symptoms);
+        res.status(200).json(symptoms);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
-
 
 const createSymptom = async (req, res) => {
     try {
         const { name, description, locationOrgan } = req.body;
         const symptom = new Symptom(name, description, locationOrgan);
         await symptom.insertSymptom();
-        res.status(201).send(symptom);
+        res.status(201).json(symptom);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -76,10 +75,10 @@ const deleteSymptom = async (req, res) => {
             await symptom.deleteSymptom();
             res.sendStatus(204);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'Symptom not found' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 

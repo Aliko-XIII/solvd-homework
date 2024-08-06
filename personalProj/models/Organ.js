@@ -62,7 +62,7 @@ class Organ {
      * @param {...number} id - The IDs of the organs.
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
-    static async getOrgansById(...id) {
+    static async getOrgansByIds(...id) {
         const res = await query(`SELECT * FROM organs 
             WHERE organ_id IN (${id.toString()});`);
         return await this.getOrgansFromData(res.rows);
@@ -74,7 +74,7 @@ class Organ {
      * @returns {Promise<Organ|null>} A promise that resolves to an Organ object or null if not found.
      */
     static async getOrganById(id) {
-        return (await Organ.getOrgansById(id))[0];
+        return (await Organ.getOrgansByIds(id))[0];
     }
 
     /**
@@ -104,7 +104,7 @@ class Organ {
             .some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
 
-        let queryStr = `UPDATE public.organs SET\n`;
+        let queryStr = `UPDATE organs SET\n`;
         queryStr += `${name ? `organ_name = '${name}', ` : ''}
         ${description ? `organ_description = '${description}', ` : ''}`;
 

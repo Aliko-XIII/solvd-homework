@@ -131,7 +131,7 @@ class User {
         const hasParams = Object.keys({ firstName, lastName, age, sex, pass, phone })
             .some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
-        let queryStr = `UPDATE public.users SET\n`;
+        let queryStr = `UPDATE users SET\n`;
         queryStr += `${firstName ? `first_name = '${firstName}', ` : ''}
         ${lastName ? `last_name = '${lastName}', ` : ''}
         ${age ? `age = ${age}, ` : ''}

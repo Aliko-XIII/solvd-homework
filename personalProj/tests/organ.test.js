@@ -68,7 +68,7 @@ describe('Organ Class', () => {
   test('should update an organ in the database', async () => {
     query.mockResolvedValue({ rows: [{ organ_id: 1, organ_name: 'Heart', organ_description: 'Pumps blood' }] });
     await Organ.updateOrgan(1, { name: 'Liver', description: 'Detoxifies' });
-    expect(query).toHaveBeenCalledWith(`UPDATE public.organs SET
+    expect(query).toHaveBeenCalledWith(`UPDATE organs SET
 organ_name = 'Liver', 
         organ_description = 'Detoxifies', 
 WHERE organ_id='1';`);

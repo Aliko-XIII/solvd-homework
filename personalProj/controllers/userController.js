@@ -7,11 +7,11 @@ const getUser = async (req, res) => {
     try {
         const user = await User.getUserById(req.params.id);
         if (!user) {
-            res.status(404).send('There is no such user found.');
+            return res.status(404).json({ error: 'There is no such user found.' });
         }
-        res.status(200).send(user);
+        res.status(200).json(user);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -30,9 +30,9 @@ const getAllUsers = async (req, res) => {
             phone
         };
         const users = await User.getUsers(filters);
-        res.status(200).send(users);
+        res.status(200).json(users);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -43,13 +43,15 @@ const createUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, password, age, sex } = req.body;
         const user = new User(firstName, lastName, phone, password, age, sex);
-        if(!user){
-            res.status(400).send('User object misses fields or their data is invalid.');
+        
+        if (!user) {
+            return res.status(400).json({ error: 'User object misses fields or their data is invalid.' });
         }
+        
         await user.insertUser();
-        res.status(201).send(user);
+        res.status(201).json(user);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -63,11 +65,11 @@ const deleteUser = async (req, res) => {
             await user.deleteUser();
             res.sendStatus(204);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'User not found.' });
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -105,4 +107,4 @@ module.exports = {
     deleteUser,
     getAllUsers,
     updateUser
-}
+};

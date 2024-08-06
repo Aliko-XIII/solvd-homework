@@ -11,7 +11,6 @@ router.post('/', symptomController.createSymptom);
 
 router.put('/:id', symptomController.updateSymptom);
 
-
 router.delete('/:id', symptomController.deleteSymptom);
 
 module.exports = router;

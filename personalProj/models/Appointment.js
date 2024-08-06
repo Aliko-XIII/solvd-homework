@@ -73,7 +73,7 @@ class Appointment {
     }
 
     async insertAppointment() {
-        const res = await query(`INSERT INTO public.appointments(
+        const res = await query(`INSERT INTO appointments(
 	        appointment_time, appointment_duration, additional_info, patient_id, doctor_id)
 	        VALUES ('${this.time}', ${this.duration}, '${this.description}', 
             ${this.patient.id}, ${this.doctor.id}) RETURNING *;`);
