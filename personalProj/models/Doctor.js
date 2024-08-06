@@ -123,12 +123,18 @@ class Doctor extends Role {
      * Method to insert the doctor into the database.
      */
     async insertDoctor() {
-        const res = await query(`INSERT INTO doctors (
+        try {
+            const res = await query(`INSERT INTO doctors (
             specialization_id, workday_start, workday_end, user_id, patient_load)
             VALUES (${this.specialization.id}, '${this.workdayStart}',
             '${this.workdayEnd}', '${this.user.id}', ${this.patientLoad}) RETURNING *;`);
-        this.id = res.rows[0].user_id; // Assuming 'user_id' is returned from database upon insertion
-        console.log('Inserted:', res.rows[0]);
+            this.id = res.rows[0].user_id;
+            console.log('Inserted:', res.rows[0]);
+        }
+        catch (err) {
+            console.log(err);
+        }
+
     }
 
     /**

@@ -12,7 +12,6 @@ const DoctorRole = ({ roleData, handleInputChange, handleSpecializationChange, h
                     name="patientLoad"
                     value={roleData.patientLoad || ''}
                     onChange={handleInputChange}
-                    required
                 />
             </div>
             <SpecializationInput
@@ -28,7 +27,6 @@ const DoctorRole = ({ roleData, handleInputChange, handleSpecializationChange, h
                     name="workdayStart"
                     value={roleData.workdayStart || ''}
                     onChange={handleInputChange}
-                    required
                 />
             </div>
             <div>
@@ -39,10 +37,14 @@ const DoctorRole = ({ roleData, handleInputChange, handleSpecializationChange, h
                     name="workdayEnd"
                     value={roleData.workdayEnd || ''}
                     onChange={handleInputChange}
-                    required
                 />
             </div>
-            <button type="submit">Submit</button>
+            <button type="button" onClick={(event) => handleSubmit(event, 'create')}>
+                Create Doctor
+            </button>
+            <button type="button" onClick={(event) => handleSubmit(event, 'update')}>
+                Update Doctor
+            </button>
         </form>
     );
 };

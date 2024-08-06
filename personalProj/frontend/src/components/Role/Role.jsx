@@ -52,14 +52,23 @@ const Role = ({ setPatient, setDoctor }) => {
         setShowForm(true);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event, action) => {
         event.preventDefault();
         if (selectedRole === 'patient') {
             data.createPatient(roleData.insuranceNumber, roleData.insuranceProvider, user.id);
             setPatient(roleData);
         } else if (selectedRole === 'doctor') {
-            data.createDoctor(roleData.specializationId, roleData.patientLoad, user.id,
-                roleData.workdayStart, roleData.workdayEnd);
+            try {
+                if (action === 'create') {
+                    await data.createDoctor({ ...roleData, userId: user.id });
+                    alert('Doctor created successfully!');
+                } else if (action === 'update') {
+                    await data.updateDoctor(user.id, doctorData);
+                    alert('Doctor updated successfully!');
+                }
+            } catch (error) {
+                alert(`Failed to ${action === 'create' ? 'create' : 'update'} doctor.`);
+            }
             setDoctor(roleData);
         }
     };

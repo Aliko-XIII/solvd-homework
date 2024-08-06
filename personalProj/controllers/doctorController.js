@@ -33,7 +33,7 @@ const createDoctor = async (req, res) => {
     try {
         const { specializationId, patientLoad, userId, workdayStart, workdayEnd } = req.body;
         const user = await User.getUserById(userId);
-        const specialization = (await Specialization.getSpecializationsById(specializationId))[0];
+        const specialization = (await Specialization.getSpecializationsById(false, false, specializationId))[0];
         const doctor = new Doctor(user, specialization);
         if (patientLoad) {
             doctor.patientLoad = patientLoad;
@@ -95,7 +95,7 @@ const updateDoctor = async (req, res) => {
 
 const deleteDoctor = async (req, res) => {
     try {
-        const doctor = (await Doctor.getDoctorsById(req.params.id))[0];
+        const doctor = (await Doctor.getDoctorsById(false, false, req.params.id))[0];
         if (doctor) {
             await doctor.deleteDoctor();
             res.sendStatus(204);
