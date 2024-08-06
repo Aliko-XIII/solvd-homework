@@ -12,7 +12,7 @@ const getPatient = async (req, res) => {
         if (patient) {
             res.status(200).send(patient);
         } else {
-            res.status(404).send({ message: 'Patient not found' });
+            res.status(404).send('Patient not found');
         }
     } catch (err) {
         res.status(500).send(err);
@@ -38,7 +38,11 @@ const getAllPatients = async (req, res) => {
 const createPatient = async (req, res) => {
     try {
         const { insuranceNumber, insuranceProvider, userId } = req.body;
-        console.log(userId);
+        const existingPatient = await Patient.getPatientByUserId(userId);
+        if (existingPatient) {
+            return res.status(409).send('There is already a patient record for this user.');
+        }
+
         const user = await User.getUserById(userId);
         const patient = new Patient(insuranceNumber, insuranceProvider, user);
         await patient.insertPatient();
@@ -71,7 +75,7 @@ const deletePatient = async (req, res) => {
 const getAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.getPatientAppointments(req.params.id);
-        res.status(200).send({ appointments: appointments });
+        res.status(200).send(appointments);
     } catch (err) {
         res.status(500).send(err);
     }
