@@ -5,7 +5,9 @@ const { Specialization } = require('../models/Specialization');
 
 const getDoctor = async (req, res) => {
     try {
-        const { nestUser = false, nestSpecialization = false } = req.query;
+        const nestUser = req.query.nestUser === 'true';
+        const nestSpecialization = req.query.nestSpecialization === 'true';
+        nestSpecialization
         const doctor = (await Doctor.getDoctorsById(nestUser, nestSpecialization, req.params.id))[0];
         if (doctor) {
             res.status(200).send(doctor);

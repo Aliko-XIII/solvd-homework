@@ -78,10 +78,9 @@ class Doctor extends Role {
             } else {
                 user = { id: row.user_id };
             }
-
             let specialization;
-            if (nestSpecialization) {
-                specialization = (await Specialization.getSpecializationsById(row.specialization_id))[0];
+            if (!nestSpecialization) {
+                specialization = (await Specialization.getSpecializationsById(false, false, row.specialization_id))[0];
             } else {
                 specialization = { id: row.specialization_id };
             }

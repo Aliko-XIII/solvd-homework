@@ -40,10 +40,10 @@ const Role = ({ setPatient, setDoctor }) => {
 
     const handleUseRole = async () => {
         if (selectedRole === 'patient') {
-            const patientData = await data.getPatient(user.id);
+            const patientData = await data.getPatientById(user.id);
             setPatient(patientData);
         } else if (selectedRole === 'doctor') {
-            const doctorData = await data.getDoctor(user.id);
+            const doctorData = await data.getDoctorById(user.id);
             setDoctor(doctorData);
         }
     };

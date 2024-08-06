@@ -9,7 +9,7 @@ router.get('/:id', organController.getOrgan);
 
 router.post('/', organController.createOrgan);
 
-router.put('/:id', symptomController.updateSymptom);
+router.put('/:id', organController.updateOrgan);
 
 router.delete('/:id', organController.deleteOrgan);
 
