@@ -171,12 +171,10 @@ class Specialization {
         queryStr += `WHERE specialization_id = ${this.id};`;
 
         try {
-            // Update specialization name and description if provided
             if (name || description) {
                 await query(queryStr);
             }
 
-            // Clear the existing symptoms and organs associations if provided
             if (symptoms) {
                 await query(`DELETE FROM specializations_to_symptoms WHERE specialization_id = ${this.id};`);
                 for (const symptom of symptoms) {
@@ -184,7 +182,7 @@ class Specialization {
                     specialization_id, symptom_id)
                 VALUES(${this.id}, ${symptom.id});`);
                 }
-                this.symptoms = symptoms; // Update the current instance's symptoms
+                this.symptoms = symptoms; 
             }
 
             if (organs) {
@@ -194,10 +192,9 @@ class Specialization {
                     specialization_id, organ_id)
                 VALUES(${this.id}, ${organ.id});`);
                 }
-                this.organs = organs; // Update the current instance's organs
+                this.organs = organs; 
             }
 
-            // Update the current instance's name and description if they were updated
             if (name) this.name = name;
             if (description) this.description = description;
 
@@ -220,14 +217,12 @@ class Specialization {
 
             this.id = res.rows[0].specialization_id;
 
-            // Insert into specializations_to_symptoms
             for (const symptom of this.symptoms) {
                 await query(`INSERT INTO specializations_to_symptoms(
                     specialization_id, symptom_id)
                 VALUES(${this.id}, ${symptom.id});`);
             }
 
-            // Insert into specializations_to_organs
             for (const organ of this.organs) {
                 await query(`INSERT INTO specializations_to_organs(
                     specialization_id, organ_id)
