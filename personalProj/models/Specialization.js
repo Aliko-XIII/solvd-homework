@@ -158,8 +158,8 @@ class Specialization {
      * @param {Organ[]} [updates.organs] - The new organs associated with the specialization.
      * @returns {Promise<void>} A promise that resolves when the specialization is updated.
      */
-    async updateSpecialization({ name, description, symptoms, organs }) {
-        if (!this.id) throw new Error('No ID provided to update specialization record.');
+    static async updateSpecialization(id, { name, description, symptoms, organs }) {
+        if (!id) throw new Error('No ID provided to update specialization record.');
 
         const hasParams = Object.keys({ name, description, symptoms, organs }).some(key => key !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
@@ -168,7 +168,7 @@ class Specialization {
         queryStr += `${name ? `specialization_name = '${name}', ` : ''}`;
         queryStr += `${description ? `specialization_description = '${description}', ` : ''}`;
         queryStr = queryStr.slice(0, -2) + ' ';
-        queryStr += `WHERE specialization_id = ${this.id};`;
+        queryStr += `WHERE specialization_id = ${id};`;
 
         try {
             if (name || description) {
@@ -176,29 +176,27 @@ class Specialization {
             }
 
             if (symptoms) {
-                await query(`DELETE FROM specializations_to_symptoms WHERE specialization_id = ${this.id};`);
+                await query(`DELETE FROM specializations_to_symptoms WHERE specialization_id = ${id};`);
                 for (const symptom of symptoms) {
                     await query(`INSERT INTO specializations_to_symptoms(
                     specialization_id, symptom_id)
-                VALUES(${this.id}, ${symptom.id});`);
+                VALUES(${id}, ${symptom.id});`);
                 }
-                this.symptoms = symptoms; 
+                this.symptoms = symptoms;
             }
 
             if (organs) {
-                await query(`DELETE FROM specializations_to_organs WHERE specialization_id = ${this.id};`);
+                await query(`DELETE FROM specializations_to_organs WHERE specialization_id = ${id};`);
                 for (const organ of organs) {
                     await query(`INSERT INTO specializations_to_organs(
                     specialization_id, organ_id)
-                VALUES(${this.id}, ${organ.id});`);
+                VALUES(${id}, ${organ.id});`);
                 }
-                this.organs = organs; 
+                this.organs = organs;
             }
 
-            if (name) this.name = name;
-            if (description) this.description = description;
 
-            console.log('Updated Specialization:', this);
+            console.log('Updated Specialization:', id);
         } catch (err) {
             console.error('Error updating specialization:', err);
             throw err;
@@ -216,7 +214,7 @@ class Specialization {
             VALUES('${this.name}', '${this.description}') RETURNING *;`);
 
             this.id = res.rows[0].specialization_id;
-
+            console.log(this.symptoms);
             for (const symptom of this.symptoms) {
                 await query(`INSERT INTO specializations_to_symptoms(
                     specialization_id, symptom_id)
@@ -228,6 +226,7 @@ class Specialization {
                     specialization_id, organ_id)
                 VALUES(${this.id}, ${organ.id});`);
             }
+            console.log('IT IS OK');
 
             console.log('Inserted:', res.rows[0]);
         } catch (err) {

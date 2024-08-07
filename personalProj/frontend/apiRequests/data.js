@@ -529,28 +529,130 @@ export const deleteSymptom = async (id) => {
 };
 
 
+// Fetch all specializations with optional filtering
+export const getSpecializations = async (filters = {}) => {
+    await optionalRefresh();
+    const params = new URLSearchParams(filters).toString();
+    const response = await fetch(`${API_URL}/specializations?${params}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch specializations');
+    }
+    return response.json();
+};
+
+// Fetch a single specialization by ID
+export const getSpecializationById = async (id, nestOrgans = false, nestSymptoms = false) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/specializations/${id}?nestOrgans=${nestOrgans}&nestSymptoms=${nestSymptoms}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch specialization');
+    }
+    return response.json();
+};
+
+// Create a new specialization
+export const createSpecialization = async (specializationData) => {
+    const specialization = {
+        name: specializationData.name,
+        description: specializationData.description
+    };
+    specialization.symptoms = specializationData.symptoms.map(id => ({ id: id }));
+    specialization.organs = specializationData.organs.map(id => ({ id: id }));
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/specializations`, {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(specialization)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create specialization');
+    }
+    return response.json();
+};
+
+// Update a specialization by ID
+export const updateSpecialization = async (id, specializationData) => {
+    await optionalRefresh();
+    const specialization = {
+        name: specializationData.name,
+        description: specializationData.description
+    };
+    specialization.symptoms = specializationData.symptoms.map(id => ({ id: id }));
+    specialization.organs = specializationData.organs.map(id => ({ id: id }));
+    const response = await fetch(`${API_URL}/specializations/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(specialization)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update specialization');
+    }
+    return response.json();
+};
+
+// Delete a specialization by ID
+export const deleteSpecialization = async (id) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/specializations/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete specialization');
+    }
+};
+
+
 
 export default {
     getUserById,
     getUsers,
     updateUser,
     deleteUser,
+
     getPatientById,
     createPatient,
     deletePatient,
     updatePatient,
+
     getDoctorById,
     updateDoctor,
     createDoctor,
-    deleteDoctor, 
-    getOrgans, 
+    deleteDoctor,
+
+    getOrgans,
     getOrganById,
     updateOrgan,
     deleteOrgan,
     createOrgan,
-    getSymptoms, 
+
+    getSymptoms,
     getSymptomById,
     updateSymptom,
     deleteSymptom,
-    createSymptom
+    createSymptom,
+
+    getSpecializations,
+    getSpecializationById,
+    updateSpecialization,
+    deleteSpecialization,
+    createSpecialization
 };

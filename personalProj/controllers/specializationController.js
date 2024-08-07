@@ -51,7 +51,8 @@ const createSpecialization = async (req, res) => {
 
 const deleteSpecialization = async (req, res) => {
     try {
-        const specialization = (await Specialization.getSpecializationsById(req.params.id))[0];
+        const specialization = (await Specialization.getSpecializationsById(
+            false, false, req.params.id))[0];
         if (specialization) {
             await specialization.deleteSpecialization();
             res.sendStatus(204);
@@ -59,6 +60,7 @@ const deleteSpecialization = async (req, res) => {
             res.sendStatus(404);
         }
     } catch (err) {
+        console.log(err);
         res.status(500).send(err);
     }
 };
@@ -87,7 +89,7 @@ const updateSpecialization = async (req, res) => {
             return res.status(400).json({ error: 'No parameters to update' });
         }
 
-        await Specialization.updateSpecialization(updates);
+        await Specialization.updateSpecialization(id, updates);
 
         res.status(200).json({ message: 'Specialization updated successfully' });
     } catch (error) {

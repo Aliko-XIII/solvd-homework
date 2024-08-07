@@ -11,6 +11,7 @@ import Profile from './Profile/Profile';
 import Role from './Role/Role';
 import Organs from './Organs/Organs';
 import Symptoms from './Symptoms/Symptoms';
+import Specializations from './Specializations/Specializations';
 
 export const HospitalContext = createContext({
     user: {
@@ -90,6 +91,7 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
                             element={<Role setPatient={setPatient} setDoctor={setDoctor} />} />
                         <Route exact path="/organs" element={<Organs />} />
                         <Route exact path="/symptoms" element={<Symptoms />} />
+                        <Route exact path="/specializations" element={<Specializations />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </div>
