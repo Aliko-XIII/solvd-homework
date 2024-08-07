@@ -113,7 +113,8 @@ class Symptom {
         if (!hasParams) throw new Error('There are no params to update.');
 
         let queryStr = `UPDATE symptoms SET\n`;
-        queryStr += `${name ? `symptom_name = '${name}', ` : ''}${description ? `symptom_description = '${description}', ` : ''}`;
+        queryStr += `${name ? `symptom_name = '${name}', ` : ''}`;
+        queryStr += `${description ? `symptom_description = '${description}', ` : ''}`;
         queryStr = queryStr.slice(0, -2) + `\nWHERE symptom_id = ${id};`;
 
         const res = await query(queryStr);

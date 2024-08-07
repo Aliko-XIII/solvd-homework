@@ -80,18 +80,15 @@ const updatePatient = async (req, res) => {
         if (!userId) {
             return res.status(400).json({ error: 'User ID is required' });
         }
-
         if (insuranceNumber && typeof insuranceNumber !== 'string') {
             return res.status(400).json({ error: 'Invalid insurance number' });
         }
-
         if (insuranceProvider && typeof insuranceProvider !== 'string') {
             return res.status(400).json({ error: 'Invalid insurance provider' });
         }
 
         const updates = { insuranceNumber, insuranceProvider };
         const hasParams = Object.values(updates).some(value => value !== undefined);
-
         if (!hasParams) {
             return res.status(400).json({ error: 'No parameters to update' });
         }

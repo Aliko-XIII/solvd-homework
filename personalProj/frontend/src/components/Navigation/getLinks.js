@@ -9,11 +9,13 @@ const linksConfig = {
         { title: 'Profile', link: '/profile' }
     ],
     patient: [
-        { title: 'Insurance', link: '/insurance' },
+        { title: 'Doctors', link: '/doctors' },
         { title: 'Appointments', link: '/appointments' },
     ],
     doctor: [
-        { title: 'Specialization', link: '/specialization' },
+        { title: 'Symptoms', link: '/symptoms' },
+        { title: 'Organs', link: '/organs' },
+        { title: 'Specializations', link: '/specializations' },
         { title: 'Patients', link: '/patients' },
         { title: 'Appointments', link: '/appointments' },
     ]

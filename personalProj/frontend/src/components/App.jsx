@@ -9,6 +9,8 @@ import Register from './Register/Register';
 import Config from './Config/Config';
 import Profile from './Profile/Profile';
 import Role from './Role/Role';
+import Organs from './Organs/Organs';
+import Symptoms from './Symptoms/Symptoms';
 
 export const HospitalContext = createContext({
     user: {
@@ -86,6 +88,8 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
                             element={<Profile deleteUser={dataFetchers.deleteUser} />} />
                         <Route exact path="/role"
                             element={<Role setPatient={setPatient} setDoctor={setDoctor} />} />
+                        <Route exact path="/organs" element={<Organs />} />
+                        <Route exact path="/symptoms" element={<Symptoms />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </div>

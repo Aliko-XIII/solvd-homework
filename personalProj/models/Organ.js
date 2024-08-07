@@ -105,13 +105,13 @@ class Organ {
         if (!hasParams) throw new Error('There are no params to update.');
 
         let queryStr = `UPDATE organs SET\n`;
-        queryStr += `${name ? `organ_name = '${name}', ` : ''}
-        ${description ? `organ_description = '${description}', ` : ''}`;
+        queryStr += `${name ? `organ_name = '${name}', ` : ''}`;
+        queryStr += `${description ? `organ_description = '${description}', ` : ''}`;
 
-        queryStr = queryStr.slice(0, queryStr.length - 1) + '\n';
-        queryStr += `WHERE organ_id='${id}';`;
+        queryStr = queryStr.slice(0, -2) + ' ';
+        queryStr += `WHERE organ_id=${id};`;
+        console.log(queryStr);
         const res = await query(queryStr);
-        this.id = res.rows[0].organ_id;
         console.log('Updated:', res.rows[0]);
     }
 

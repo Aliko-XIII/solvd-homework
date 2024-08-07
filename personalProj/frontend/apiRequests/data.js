@@ -370,24 +370,163 @@ const getDoctorAppointments = async (doctorId) => {
     return await response.json();
 };
 
-
-
-
-
-
-
-
-async function getSpecializations() {
+// Fetch all organs with optional filtering
+export const getOrgans = async (filters = {}) => {
     await optionalRefresh();
-    const specializations = fetch('http://localhost:3000/api/specializations',
-        {
-            headers: {
-                'Authorization': localStorage.getItem('access_token')
-            },
-        })
-        .then(res => res.json());
-    return specializations;
-}
+    const params = new URLSearchParams(filters).toString();
+    const response = await fetch(`${API_URL}/organs?${params}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch organs');
+    }
+    return response.json();
+};
+
+// Fetch a single organ by ID
+export const getOrganById = async (id) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/organs/${id}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch organ');
+    }
+    return response.json();
+};
+
+// Create a new organ
+export const createOrgan = async (organData) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/organs`, {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(organData)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create organ');
+    }
+    return response.json();
+};
+
+// Update an organ by ID
+export const updateOrgan = async (id, organData) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/organs/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(organData)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update organ');
+    }
+    return response.json();
+};
+
+// Delete an organ by ID
+export const deleteOrgan = async (id) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/organs/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete organ');
+    }
+};
+
+// Fetch all symptoms with optional filtering
+export const getSymptoms = async (filters = {}) => {
+    await optionalRefresh();
+    const params = new URLSearchParams(filters).toString();
+    const response = await fetch(`${API_URL}/symptoms?${params}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch symptoms');
+    }
+    return response.json();
+};
+
+// Fetch a single symptom by ID
+export const getSymptomById = async (id) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/symptoms/${id}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch symptom');
+    }
+    return response.json();
+};
+
+// Create a new symptom
+export const createSymptom = async (symptomData) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/symptoms`, {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(symptomData)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create symptom');
+    }
+    return response.json();
+};
+
+// Update a symptom by ID
+export const updateSymptom = async (id, symptomData) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/symptoms/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(symptomData)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update symptom');
+    }
+    return response.json();
+};
+
+// Delete a symptom by ID
+export const deleteSymptom = async (id) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/symptoms/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete symptom');
+    }
+};
 
 
 
@@ -402,7 +541,16 @@ export default {
     updatePatient,
     getDoctorById,
     updateDoctor,
-    getSpecializations,
     createDoctor,
-    deleteDoctor
+    deleteDoctor, 
+    getOrgans, 
+    getOrganById,
+    updateOrgan,
+    deleteOrgan,
+    createOrgan,
+    getSymptoms, 
+    getSymptomById,
+    updateSymptom,
+    deleteSymptom,
+    createSymptom
 };
