@@ -6,8 +6,7 @@
     "start": "node index.js",
     "dev:server": "npx nodemon index.js",
     "dev:bundler": "webpack -w --mode=development",
-    "dev:both": "concurrently \"npx nodemon index.js\" \"webpack -w --mode=development\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:both": "concurrently \"npx nodemon index.js\" \"webpack -w --mode=development\""
   },
   "author": "",
   "license": "ISC",

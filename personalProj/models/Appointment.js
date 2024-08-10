@@ -29,10 +29,10 @@ class Appointment {
             let patient = { id: row.patient_id };
             let doctor = { id: row.doctor_id };
             if (nestPatient) {
-                patient = (await Patient.getPatientsByIds(false, row.patient_id))[0];
+                patient = (await Patient.getPatientsByIds(true, row.patient_id))[0];
             }
             if (nestDoctor) {
-                doctor = (await Doctor.getDoctorsById(row.doctor_id))[0];
+                doctor = (await Doctor.getDoctorsById(true, true, row.doctor_id))[0];
             }
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);
@@ -124,7 +124,7 @@ class Appointment {
     static async getDoctorAppointments(doctorId) {
         const res = await query(`SELECT * FROM appointments 
             WHERE doctor_id = '${doctorId}';`);
-        return await Appointment.getAppointmentsFromData(res.rows);
+        return await Appointment.getAppointmentsFromData(res.rows, true, true);
     }
 
     /**
@@ -134,7 +134,7 @@ class Appointment {
     static async getPatientAppointments(patientId) {
         const res = await query(`SELECT * FROM appointments 
             WHERE patient_id = '${patientId}';`);
-        return await Appointment.getAppointmentsFromData(res.rows);
+        return await Appointment.getAppointmentsFromData(res.rows, true, true);
     }
 }
 
