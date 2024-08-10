@@ -29,7 +29,7 @@ class Appointment {
             let patient = { id: row.patient_id };
             let doctor = { id: row.doctor_id };
             if (nestPatient) {
-                patient = (await Patient.getPatientsByIds(true, row.patient_id))[0];
+                patient = (await Patient.getPatientById(row.patient_id, true))[0];
             }
             if (nestDoctor) {
                 doctor = (await Doctor.getDoctorsById(true, true, row.doctor_id))[0];

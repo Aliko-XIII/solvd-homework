@@ -93,9 +93,9 @@ const updatePatient = async (req, res) => {
             return res.status(400).json({ error: 'No parameters to update' });
         }
 
-        await Patient.updatePatient(userId, updates);
+        const updated = await Patient.updatePatient(userId, updates);
 
-        res.status(200).json({ message: 'Patient updated successfully' });
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the patient' });

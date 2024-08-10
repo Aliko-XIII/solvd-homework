@@ -52,12 +52,8 @@ class Patient extends Role {
      */
     static async getPatients({ insuranceNumber, insuranceProvider, nestUser } = {}) {
         let queryStr = `SELECT * FROM patients INNER JOIN users ON users.user_id=patients.user_id WHERE 1=1`;
-        if (insuranceNumber) {
-            queryStr += ` AND insurance_number LIKE '%${insuranceNumber}%'`;
-        }
-        if (insuranceProvider) {
-            queryStr += ` AND insurance_provider LIKE '%${insuranceProvider}%'`;
-        }
+        if (insuranceNumber) queryStr += ` AND insurance_number LIKE '%${insuranceNumber}%'`;
+        if (insuranceProvider) queryStr += ` AND insurance_provider LIKE '%${insuranceProvider}%'`;
         const res = await query(queryStr);
         return await this.getPatientsFromData(res.rows, nestUser);
     }
@@ -78,10 +74,10 @@ class Patient extends Role {
     /**
      * Retrieves multiple patients by their IDs from the database.
      * @param {boolean} nestUser - Whether to include nested user records.
-     * @param {...string} ids - The patient IDs.
+     * @param {string[]} ids - The patient IDs.
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
-    static async getPatientsByIds(nestUser = false, ...ids) {
+    static async getPatientsByIds(ids, nestUser = false) {
         const idArr = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM patients 
             INNER JOIN users ON users.user_id=patients.user_id
@@ -99,6 +95,7 @@ class Patient extends Role {
             RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
+        return { id: this.id };
     }
 
     /**
@@ -120,11 +117,13 @@ class Patient extends Role {
         queryStr += `${insuranceNumber ? `insurance_number = '${insuranceNumber}', ` : ''}`;
         queryStr += `${insuranceProvider ? `insurance_provider = '${insuranceProvider}', ` : ''}`;
         queryStr = queryStr.slice(0, -2) + ' ';
-        queryStr += `WHERE user_id = '${id}';`;
-
+        queryStr += `WHERE user_id = '${id}' RETURNING *;`;
 
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
+        const updated = res.rows[0];
+        return updated;
+
     }
 
     /**
