@@ -51,9 +51,20 @@ class Patient extends Role {
      * @returns {Promise<Patient[]>} A promise that resolves to an array of Patient instances.
      */
     static async getPatients({ insuranceNumber, insuranceProvider, nestUser } = {}) {
-        let queryStr = `SELECT * FROM patients INNER JOIN users ON users.user_id=patients.user_id WHERE 1=1`;
-        if (insuranceNumber) queryStr += ` AND insurance_number LIKE '%${insuranceNumber}%'`;
-        if (insuranceProvider) queryStr += ` AND insurance_provider LIKE '%${insuranceProvider}%'`;
+        let queryStr = `
+            SELECT * 
+            FROM patients 
+            INNER JOIN users ON users.user_id = patients.user_id
+        `;
+
+        const conditions = [];
+        if (insuranceNumber) conditions.push(`insurance_number LIKE '%${insuranceNumber}%'`);
+        if (insuranceProvider) conditions.push(`insurance_provider LIKE '%${insuranceProvider}%'`);
+
+        if (conditions.length > 0) {
+            queryStr += ` WHERE ${conditions.join(' AND ')}`;
+        }
+
         const res = await query(queryStr);
         return await this.getPatientsFromData(res.rows, nestUser);
     }
@@ -114,11 +125,13 @@ class Patient extends Role {
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE patients SET `;
-        queryStr += `${insuranceNumber ? `insurance_number = '${insuranceNumber}', ` : ''}`;
-        queryStr += `${insuranceProvider ? `insurance_provider = '${insuranceProvider}', ` : ''}`;
-        queryStr = queryStr.slice(0, -2) + ' ';
-        queryStr += `WHERE user_id = '${id}' RETURNING *;`;
-
+        const updates = [];
+        if (insuranceNumber) updates.push(`insurance_number = '${insuranceNumber}'`);
+        if (insuranceProvider) updates.push(`insurance_provider = '${insuranceProvider}'`);
+        if (updates.length > 0) {
+            queryStr += ` ${updates.join(', ')} `;
+        }
+        queryStr += ` WHERE user_id = '${id}' RETURNING *;`;
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
         const updated = res.rows[0];

@@ -97,10 +97,10 @@ class User {
     /**
      * Retrieves multiple users by their IDs.
      * 
-     * @param {...string} ids - The user IDs.
+     * @param {string[]} ids - The user IDs.
      * @returns {Promise<Array<User>>} - A promise that resolves to an array of User objects.
      */
-    static async getUsersByIds(...ids) {
+    static async getUsersByIds(ids) {
         const idArr = ids.map(id => `'${id.toString()}'`).join(',');
         const res = await query(`SELECT * FROM users WHERE user_id IN (${idArr});`);
         return User.getUsersFromData(res.rows);
