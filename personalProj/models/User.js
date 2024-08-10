@@ -73,7 +73,7 @@ class User {
         if (maxAge) queryStr += ` AND age <= ${maxAge}`;
         if (sex) queryStr += ` AND sex = '${sex}'`;
         if (phone) queryStr += ` AND phone ILIKE '%${phone}%'`;
-        
+
         const res = await query(queryStr);
         return await this.getUsersFromData(res.rows);
     }
@@ -85,8 +85,7 @@ class User {
      * @returns {Promise<User>} - A promise that resolves to a User object.
      */
     static async getUserById(id) {
-        const res = await query(`SELECT * FROM users 
-        WHERE user_id = '${id.toString()}';`);
+        const res = await query(`SELECT * FROM users WHERE user_id = '${id.toString()}';`);
         return (await User.getUsersFromData(res.rows))[0];
     }
 
@@ -109,8 +108,7 @@ class User {
      * @returns {Promise<User>} - A promise that resolves to a User object.
      */
     static async getUserByPhone(phone) {
-        const res = await query(`SELECT * FROM users 
-        WHERE phone = '${phone}';`);
+        const res = await query(`SELECT * FROM users WHERE phone = '${phone}';`);
         return (await this.getUsersFromData(res.rows))[0];
     }
 
@@ -132,15 +130,18 @@ class User {
             .some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
         let queryStr = `UPDATE users SET\n`;
-        queryStr += `${firstName ? `first_name = '${firstName}', ` : ''}
-        ${lastName ? `last_name = '${lastName}', ` : ''}
-        ${age ? `age = ${age}, ` : ''}
-        ${sex ? `sex = '${sex}', ` : ''}
-        ${pass ? `pass = '${pass}', ` : ''}
-        ${phone ? `phone = '${phone}', ` : ''}`;
-        queryStr = queryStr.slice(0, queryStr.length-2) + '\n';
-        queryStr += `WHERE user_id='${id}';`;
+        if (firstName) queryStr += `first_name = '${firstName}', `;
+        if (lastName) queryStr += `last_name = '${lastName}', `;
+        if (age) queryStr += `age = ${age},`;
+        if (sex) queryStr += `sex = '${sex}', `;
+        if (pass) queryStr += `pass = '${pass}', `;
+        if (phone) queryStr += `phone = '${phone}', `;
+        queryStr = queryStr.slice(0, queryStr.length - 2) + '\n';
+        queryStr += `WHERE user_id = '${id}' RETURNING *; `;
         const res = await query(queryStr);
+        const updated = res.rows[0];
+        delete updated.pass;
+        return updated;
     }
 
     /**
@@ -150,11 +151,12 @@ class User {
      */
     async insertUser() {
         const res = await query(`INSERT INTO users
-        (first_name, last_name, age, sex, pass, phone)
-        VALUES ('${this.firstName}', '${this.lastName}', ${this.age}, 
-        '${this.sex}', '${this.password}', '${this.phone}') RETURNING *;`);
+            (first_name, last_name, age, sex, pass, phone)
+        VALUES('${this.firstName}', '${this.lastName}', ${this.age},
+            '${this.sex}', '${this.password}', '${this.phone}') RETURNING *; `);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
+        return { id: this.id };
     }
 
     /**
@@ -163,7 +165,7 @@ class User {
      * @returns {Promise<void>}
      */
     async deleteUser() {
-        const res = await query(`DELETE FROM users WHERE user_id = '${this.id}' RETURNING *;`);
+        const res = await query(`DELETE FROM users WHERE user_id = '${this.id}' RETURNING *; `);
         console.log('Deleted:', res.rows[0]);
     }
 }

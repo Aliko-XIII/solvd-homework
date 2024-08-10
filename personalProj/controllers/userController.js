@@ -6,9 +6,7 @@ const { User } = require('../models/User');
 const getUser = async (req, res) => {
     try {
         const user = await User.getUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'There is no such user found.' });
-        }
+        if (!user) return res.status(404).json({ error: 'There is no such user found.' });
         res.status(200).json(user);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -22,12 +20,12 @@ const getAllUsers = async (req, res) => {
     try {
         const { firstName, lastName, minAge, maxAge, sex, phone } = req.query;
         const filters = {
-            firstName,
-            lastName,
+            firstName: firstName.length > 0 ? firstName : undefined,
+            lastName: lastName.length > 0 ? lastName : undefined,
             minAge: minAge ? parseInt(minAge, 10) : undefined,
             maxAge: maxAge ? parseInt(maxAge, 10) : undefined,
-            sex,
-            phone
+            sex: sex == 'M' || sex == 'F' ? sex : undefined,
+            phone: phone.length > 0 ? phone : undefined,
         };
         const users = await User.getUsers(filters);
         res.status(200).json(users);
@@ -43,11 +41,11 @@ const createUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, password, age, sex } = req.body;
         const user = new User(firstName, lastName, phone, password, age, sex);
-        
+
         if (!user) {
             return res.status(400).json({ error: 'User object misses fields or their data is invalid.' });
         }
-        
+
         await user.insertUser();
         res.status(201).json(user);
     } catch (err) {
@@ -89,12 +87,12 @@ const updateUser = async (req, res) => {
         if (lastName && typeof lastName !== 'string') return res.status(400).json({ error: 'Invalid last name' });
         if (phone && typeof phone !== 'string') return res.status(400).json({ error: 'Invalid phone number' });
         if (password && typeof password !== 'string') return res.status(400).json({ error: 'Invalid password' });
-        if (age && (typeof age !== 'number' || age <= 0)) return res.status(400).json({ error: 'Invalid age' });
+        // if (age && (typeof age !== 'number' || age <= 0)) return res.status(400).json({ error: 'Invalid age' });
         if (sex && !['F', 'M'].includes(sex)) return res.status(400).json({ error: 'Invalid sex' });
 
-        await User.updateUser(id, { firstName, lastName, phone, password, age, sex });
+        const updated = await User.updateUser(id, { firstName, lastName, phone, password, age, sex });
 
-        res.status(200).json({ message: 'User updated successfully' });
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the user' });
