@@ -34,7 +34,8 @@ class Symptom {
      * @returns {Array<Symptom>} An array of Symptom objects.
      */
     static getSymptomsFromData(rows) {
-        return rows.map(row => new Symptom(row.symptom_name, row.symptom_description, row.symptom_id));
+        return rows.map(row =>
+            new Symptom(row.symptom_name, row.symptom_description, row.symptom_id));
     }
 
     /**
@@ -48,13 +49,8 @@ class Symptom {
         let queryStr = `SELECT * FROM symptoms`;
         const conditions = [];
 
-        if (filters.name) {
-            conditions.push(`symptom_name ILIKE '%${filters.name}%'`);
-        }
-        if (filters.description) {
-            conditions.push(`symptom_description ILIKE '%${filters.description}%'`);
-        }
-
+        if (filters.name) conditions.push(`symptom_name ILIKE '%${filters.name}%'`);
+        if (filters.description) conditions.push(`symptom_description ILIKE '%${filters.description}%'`);
         if (conditions.length > 0) {
             queryStr += ` WHERE ${conditions.join(' AND ')}`;
         }
@@ -96,6 +92,8 @@ class Symptom {
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].symptom_id;
         console.log('Inserted:', res.rows[0]);
+        return { id: this.id };
+
     }
 
     /**
@@ -112,13 +110,19 @@ class Symptom {
         const hasParams = Object.keys({ name, description }).some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
 
-        let queryStr = `UPDATE symptoms SET\n`;
-        queryStr += `${name ? `symptom_name = '${name}', ` : ''}`;
-        queryStr += `${description ? `symptom_description = '${description}', ` : ''}`;
-        queryStr = queryStr.slice(0, -2) + `\nWHERE symptom_id = ${id};`;
+        let queryStr = `UPDATE symptoms SET `;
+        const updates = [];
+        if (name) updates.push(`symptom_name = '${name}'`);
+        if (description) updates.push(`symptom_description = '${description}'`);
+        if (updates.length > 0) {
+            queryStr += ` ${updates.join(', ')} `; 
+        }
+        queryStr += `WHERE symptom_id = ${id} RETURNING *; `;
 
         const res = await query(queryStr);
-        console.log('Updated:', res.rows[0]);
+        const updated = res.rows[0];
+        delete updated.pass;
+        return updated;
     }
 
     /**
