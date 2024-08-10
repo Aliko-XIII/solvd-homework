@@ -135,13 +135,16 @@ class User {
             .some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
         let queryStr = `UPDATE users SET\n`;
-        if (firstName) queryStr += `first_name = '${firstName}', `;
-        if (lastName) queryStr += `last_name = '${lastName}', `;
-        if (age) queryStr += `age = ${age},`;
-        if (sex) queryStr += `sex = '${sex}', `;
-        if (pass) queryStr += `pass = '${pass}', `;
-        if (phone) queryStr += `phone = '${phone}', `;
-        queryStr = queryStr.slice(0, queryStr.length - 2) + '\n';
+        const updates = [];
+        if (firstName) updates.push(`first_name = '${firstName}'`);
+        if (lastName) updates.push(`last_name = '${lastName}'`);
+        if (age) updates.push(`age = ${age}`);
+        if (sex) updates.push(`sex = '${sex}'`);
+        if (pass) updates.push(`pass = '${pass}'`);
+        if (phone) updates.push(`phone = '${phone}'`);
+        if (updates.length > 0) {
+            queryStr += ` ${updates.join(', ')} `; 
+        }
         queryStr += `WHERE user_id = '${id}' RETURNING *; `;
         const res = await query(queryStr);
         const updated = res.rows[0];
