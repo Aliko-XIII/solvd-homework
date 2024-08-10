@@ -620,6 +620,84 @@ export const deleteSpecialization = async (id) => {
     }
 };
 
+// Fetch all appointments with optional filtering
+export const getAppointments = async (filters = {}) => {
+    await optionalRefresh();
+    const params = new URLSearchParams(filters).toString();
+    const response = await fetch(`${API_URL}/appointments?${params}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch appointments');
+    }
+    return response.json();
+};
+
+// Fetch a single appointment by ID
+export const getAppointmentById = async (id, nestDoctor = false, nestPatient = false) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/appointments/${id}?nestDoctor=${nestDoctor}&nestPatient=${nestPatient}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch appointment');
+    }
+    return response.json();
+};
+
+// Create a new appointment
+export const createAppointment = async (appointmentData) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/appointments`, {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(appointmentData)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create appointment');
+    }
+    return response.json();
+};
+
+// Update an appointment by ID
+export const updateAppointment = async (id, appointmentData) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/appointments/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(appointmentData)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update appointment');
+    }
+    return response.json();
+};
+
+// Delete an appointment by ID
+export const deleteAppointment = async (id) => {
+    await optionalRefresh();
+    const response = await fetch(`${API_URL}/appointments/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': localStorage.getItem('access_token')
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete appointment');
+    }
+};
 
 
 export default {
@@ -654,5 +732,13 @@ export default {
     getSpecializationById,
     updateSpecialization,
     deleteSpecialization,
-    createSpecialization
+    createSpecialization,
+
+    getAppointments,
+    getAppointmentById,
+    updateAppointment,
+    deleteAppointment,
+    createAppointment,
+    getPatientAppointments, 
+    getDoctorAppointments
 };

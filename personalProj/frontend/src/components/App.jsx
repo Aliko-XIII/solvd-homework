@@ -12,6 +12,7 @@ import Role from './Role/Role';
 import Organs from './Organs/Organs';
 import Symptoms from './Symptoms/Symptoms';
 import Specializations from './Specializations/Specializations';
+import Appointments from './Appointments/Appointments';
 
 export const HospitalContext = createContext({
     user: {
@@ -76,7 +77,7 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
 
             <BrowserRouter>
                 <Header />
-                <Navigation />
+            <Navigation />
 
                 <div className="contentWrapper">
                     <Routes>
@@ -92,6 +93,7 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
                         <Route exact path="/organs" element={<Organs />} />
                         <Route exact path="/symptoms" element={<Symptoms />} />
                         <Route exact path="/specializations" element={<Specializations />} />
+                        <Route exact path="/appointments" element={<Appointments />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </div>

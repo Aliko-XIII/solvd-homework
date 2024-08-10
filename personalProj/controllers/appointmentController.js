@@ -6,7 +6,8 @@ const getAppointment = async (req, res) => {
     try {
         const nestDoctor = req.query.nestDoctor === 'true';
         const nestPatient = req.query.nestPatient === 'true';
-        const appointment = (await Appointment.getAppointmentsById([req.params.id], nestDoctor, nestPatient))[0];
+        const appointment = (await Appointment.getAppointmentsById(
+            nestDoctor, nestPatient, req.params.id))[0];
         if (appointment) {
             res.status(200).send(appointment);
         } else {
@@ -88,7 +89,8 @@ const createAppointment = async (req, res) => {
 
 const deleteAppointment = async (req, res) => {
     try {
-        const appointment = (await Appointment.getAppointmentsById([req.params.id]))[0];
+        const appointment = (await Appointment.getAppointmentsById(
+            false, false, req.params.id))[0];
         if (appointment) {
             await appointment.deleteAppointment();
             res.sendStatus(204);

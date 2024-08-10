@@ -1,4 +1,4 @@
-const { Patient } = require('../models/Patient');
+const { Appointment } = require('../models/Appointment');
 const { Doctor } = require('../models/Doctor');
 const { User } = require('../models/User');
 const { Specialization } = require('../models/Specialization');
@@ -94,7 +94,7 @@ const deleteDoctor = async (req, res) => {
 const getAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.getDoctorAppointments(req.params.id);
-        res.status(200).send({ appointments: appointments });
+        res.status(200).send(appointments);
     } catch (err) {
         res.status(500).send(err);
     }

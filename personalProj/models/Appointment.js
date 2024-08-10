@@ -106,7 +106,7 @@ class Appointment {
     async insertAppointment() {
         const res = await query(`INSERT INTO appointments(
 	        appointment_time, appointment_duration, additional_info, patient_id, doctor_id)
-	        VALUES ('${this.time}', ${this.duration}, '${this.description}', 
+	        VALUES ('${this.time}', '${this.duration}', '${this.description}', 
             ${this.patient.id}, ${this.doctor.id}) RETURNING *;`);
         this.id = res.rows[0].appointment_id;
         console.log('Inserted:', res.rows[0]);
@@ -123,8 +123,8 @@ class Appointment {
      */
     static async getDoctorAppointments(doctorId) {
         const res = await query(`SELECT * FROM appointments 
-            WHERE doctor_id = ${doctorId};`);
-        return await this.getAppointmentsFromData(res.rows);
+            WHERE doctor_id = '${doctorId}';`);
+        return await Appointment.getAppointmentsFromData(res.rows);
     }
 
     /**
@@ -133,8 +133,8 @@ class Appointment {
      */
     static async getPatientAppointments(patientId) {
         const res = await query(`SELECT * FROM appointments 
-            WHERE patient_id = ${patientId};`);
-        return await this.getAppointmentsFromData(res.rows);
+            WHERE patient_id = '${patientId}';`);
+        return await Appointment.getAppointmentsFromData(res.rows);
     }
 }
 
