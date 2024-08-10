@@ -66,13 +66,18 @@ class User {
      * @returns {Promise<Array<User>>} - A promise that resolves to an array of User objects.
      */
     static async getUsers({ firstName, lastName, minAge, maxAge, sex, phone } = {}) {
-        let queryStr = 'SELECT * FROM users WHERE 1=1';
-        if (firstName) queryStr += ` AND first_name ILIKE '%${firstName}%'`;
-        if (lastName) queryStr += ` AND last_name ILIKE '%${lastName}%'`;
-        if (minAge) queryStr += ` AND age >= ${minAge}`;
-        if (maxAge) queryStr += ` AND age <= ${maxAge}`;
-        if (sex) queryStr += ` AND sex = '${sex}'`;
-        if (phone) queryStr += ` AND phone ILIKE '%${phone}%'`;
+        let queryStr = 'SELECT * FROM users';
+        const conditions = [];
+        if (firstName) conditions.push(`first_name ILIKE '%${firstName}%'`);
+        if (lastName) conditions.push(`last_name ILIKE '%${lastName}%'`);
+        if (minAge) conditions.push(`age >= ${minAge}`);
+        if (maxAge) conditions.push(`age <= ${maxAge}`);
+        if (sex) conditions.push(`sex = '${sex}'`);
+        if (phone) conditions.push(`phone ILIKE '%${phone}%'`);
+
+        if (conditions.length > 0) {
+            queryStr += ` WHERE ${conditions.join(' AND ')}`;
+        }
 
         const res = await query(queryStr);
         return await this.getUsersFromData(res.rows);

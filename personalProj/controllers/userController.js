@@ -20,12 +20,12 @@ const getAllUsers = async (req, res) => {
     try {
         const { firstName, lastName, minAge, maxAge, sex, phone } = req.query;
         const filters = {
-            firstName: firstName.length > 0 ? firstName : undefined,
-            lastName: lastName.length > 0 ? lastName : undefined,
+            firstName: firstName && firstName.length > 0 ? firstName : undefined,
+            lastName: lastName && lastName.length > 0 ? lastName : undefined,
             minAge: minAge ? parseInt(minAge, 10) : undefined,
             maxAge: maxAge ? parseInt(maxAge, 10) : undefined,
             sex: sex == 'M' || sex == 'F' ? sex : undefined,
-            phone: phone.length > 0 ? phone : undefined,
+            phone: phone && phone.length > 0 ? phone : undefined,
         };
         const users = await User.getUsers(filters);
         res.status(200).json(users);
