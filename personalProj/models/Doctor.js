@@ -123,49 +123,46 @@ class Doctor extends Role {
      * Method to insert the doctor into the database.
      */
     async insertDoctor() {
-        try {
-            const res = await query(`INSERT INTO doctors (
+        const res = await query(`INSERT INTO doctors (
             specialization_id, workday_start, workday_end, user_id, patient_load)
             VALUES (${this.specialization.id}, '${this.workdayStart}',
             '${this.workdayEnd}', '${this.user.id}', ${this.patientLoad}) RETURNING *;`);
-            this.id = res.rows[0].user_id;
-            console.log('Inserted:', res.rows[0]);
-        }
-        catch (err) {
-            console.log(err);
-        }
-
+        this.id = res.rows[0].user_id;
+        console.log('Inserted:', res.rows[0]);
+        return { id: this.id };
     }
 
     /**
- * Updates a doctor's information in the database.
- * @param {string} id - The doctor ID.
- * @param {Object} updates - The fields to update.
- * @param {number} [updates.specialization_id] - The new specialization ID.
- * @param {number} [updates.patientLoad] - The new maximum number of patients per day.
- * @param {Date|null} [updates.workdayStart] - The new start time of the workday.
- * @param {Date|null} [updates.workdayEnd] - The new end time of the workday.
- * @throws {Error} If no ID is provided or no parameters to update.
- * @returns {Promise<void>} A promise that resolves when the doctor is updated.
- */
+     * Updates a doctor's information in the database.
+     * @param {string} id - The doctor ID.
+     * @param {Object} updates - The fields to update.
+     * @param {number} [updates.specialization_id] - The new specialization ID.
+     * @param {number} [updates.patientLoad] - The new maximum number of patients per day.
+     * @param {Date|null} [updates.workdayStart] - The new start time of the workday.
+     * @param {Date|null} [updates.workdayEnd] - The new end time of the workday.
+     * @throws {Error} If no ID is provided or no parameters to update.
+     * @returns {Promise<void>} A promise that resolves when the doctor is updated.
+     */
     static async updateDoctor(id, { specializationId, patientLoad, workdayStart, workdayEnd }) {
         if (!id) throw new Error('No ID provided to update doctor record.');
-        const updates = { specializationId, patientLoad, workdayStart, workdayEnd };
-        const hasParams = Object.values(updates).some(value => value !== undefined);
-
+        const hasParams = Object.values(
+            { specializationId, patientLoad, workdayStart, workdayEnd })
+            .some(value => value !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE doctors SET `;
-        queryStr += specializationId !== undefined ? `specialization_id = ${specializationId}, ` : '';
-        queryStr += patientLoad !== undefined ? `patient_load = ${patientLoad}, ` : '';
-        queryStr += workdayStart !== undefined ? `workday_start = '${workdayStart}', ` : '';
-        queryStr += workdayEnd !== undefined ? `workday_end = '${workdayEnd}', ` : '';
-        queryStr = queryStr.slice(0, -2) + ' ';
-        queryStr += `WHERE user_id = '${id}';`;
-        console.log(queryStr);
+        const updates = [];
+        if (specializationId) updates.push(`specialization_id = ${specializationId}`);
+        if (patientLoad) updates.push(`patient_load = ${patientLoad}`);
+        if (workdayStart) updates.push(`workday_start = '${workdayStart}'`);
+        if (workdayEnd) updates.push(`workday_end = '${workdayEnd}'`);
+        if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
+        queryStr += ` WHERE user_id = '${id}' RETURNING *;`;
 
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
+        const updated = res.rows[0];
+        return updated;
     }
 
 
