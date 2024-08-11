@@ -2,7 +2,7 @@ const { Organ } = require('../models/Organ');
 
 const getOrgan = async (req, res) => {
     try {
-        const organ = (await Organ.getOrgansByIds(req.params.id))[0];
+        const organ = (await Organ.getOrgansByIds([req.params.id]))[0];
         if (organ) {
             res.status(200).json(organ);
         } else {
@@ -67,7 +67,7 @@ const updateOrgan = async (req, res) => {
 
 const deleteOrgan = async (req, res) => {
     try {
-        const organ = (await Organ.getOrgansByIds(req.params.id))[0];
+        const organ = (await Organ.getOrgansByIds([req.params.id]))[0];
         if (organ) {
             await organ.deleteOrgan();
             res.sendStatus(204);

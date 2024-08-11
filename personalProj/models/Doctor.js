@@ -80,7 +80,7 @@ class Doctor extends Role {
             }
             let specialization;
             if (!nestSpecialization) {
-                specialization = (await Specialization.getSpecializationsById(false, false, row.specialization_id))[0];
+                specialization = (await Specialization.getSpecializationsByIds([row.specialization_id]))[0];
             } else {
                 specialization = { id: row.specialization_id };
             }
@@ -108,10 +108,10 @@ class Doctor extends Role {
      * Static method to fetch doctors by their user IDs.
      * @param {boolean} [nestUser=false] - Whether to include nested user records.
      * @param {boolean} [nestSpecialization=false] - Whether to include nested specialization records.
-     * @param {...number} ids - User IDs of doctors to fetch.
+     * @param {number[]} ids - User IDs of doctors to fetch.
      * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor objects.
      */
-    static async getDoctorsById(nestUser = false, nestSpecialization = false, ...ids) {
+    static async getDoctorsByIds(ids, nestUser = false, nestSpecialization = false) {
         const idArr = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM doctors
         INNER JOIN users ON users.user_id = doctors.user_id

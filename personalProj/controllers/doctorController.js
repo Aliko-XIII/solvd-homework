@@ -8,7 +8,7 @@ const getDoctor = async (req, res) => {
         const nestUser = req.query.nestUser === 'true';
         const nestSpecialization = req.query.nestSpecialization === 'true';
         nestSpecialization
-        const doctor = (await Doctor.getDoctorsById(nestUser, nestSpecialization, req.params.id))[0];
+        const doctor = (await Doctor.getDoctorsByIds([req.params.id], nestUser, nestSpecialization))[0];
         if (doctor) {
             res.status(200).send(doctor);
         } else {
@@ -33,17 +33,11 @@ const createDoctor = async (req, res) => {
     try {
         const { specializationId, patientLoad, userId, workdayStart, workdayEnd } = req.body;
         const user = await User.getUserById(userId);
-        const specialization = (await Specialization.getSpecializationsById(false, false, specializationId))[0];
+        const specialization = (await Specialization.getSpecializationsByIds([specializationId]))[0];
         const doctor = new Doctor(user, specialization);
-        if (patientLoad) {
-            doctor.patientLoad = patientLoad;
-        }
-        if (workdayStart) {
-            doctor.workdayStart = workdayStart;
-        }
-        if (workdayEnd) {
-            doctor.workdayEnd = workdayEnd;
-        }
+        if (patientLoad) doctor.patientLoad = patientLoad;
+        if (workdayStart) doctor.workdayStart = workdayStart;
+        if (workdayEnd) doctor.workdayEnd = workdayEnd;
         await doctor.insertDoctor();
         res.status(201).send(doctor);
     } catch (err) {
@@ -55,20 +49,14 @@ const updateDoctor = async (req, res) => {
     try {
         const userId = req.params.id;
         let { specializationId, patientLoad, workdayStart, workdayEnd } = req.body;
-        console.log(specializationId);
-        if (!userId) {
-            return res.status(400).json({ error: 'User ID is required' });
-        }
+        if (!userId) return res.status(400).json({ error: 'User ID is required' });
 
         const updates = { specializationId, patientLoad, workdayStart, workdayEnd };
         const hasParams = Object.values(updates).some(value => value !== undefined);
 
-        if (!hasParams) {
-            return res.status(400).json({ error: 'No parameters to update' });
-        }
-        console.log(updates)
-        await Doctor.updateDoctor(userId, updates);
+        if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
+        await Doctor.updateDoctor(userId, updates);
         res.status(200).json({ message: 'Doctor updated successfully' });
     } catch (error) {
         console.error(error);
@@ -79,7 +67,7 @@ const updateDoctor = async (req, res) => {
 
 const deleteDoctor = async (req, res) => {
     try {
-        const doctor = (await Doctor.getDoctorsById(false, false, req.params.id))[0];
+        const doctor = (await Doctor.getDoctorsByIds([req.params.id]))[0];
         if (doctor) {
             await doctor.deleteDoctor();
             res.sendStatus(204);

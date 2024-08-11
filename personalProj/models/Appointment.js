@@ -32,7 +32,7 @@ class Appointment {
                 patient = (await Patient.getPatientById(row.patient_id, true))[0];
             }
             if (nestDoctor) {
-                doctor = (await Doctor.getDoctorsById(true, true, row.doctor_id))[0];
+                doctor = (await Doctor.getDoctorsByIds(true, true, row.doctor_id))[0];
             }
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);

@@ -5,10 +5,10 @@ const getSpecialization = async (req, res) => {
         const nestOrgans = req.query.nestOrgans === 'true';
         const nestSymptoms = req.query.nestSymptoms === 'true';
 
-        const specialization = (await Specialization.getSpecializationsById(
+        const specialization = (await Specialization.getSpecializationsByIds(
+            [req.params.id],
             nestOrgans,
-            nestSymptoms,
-            req.params.id
+            nestSymptoms
         ))[0];
 
         if (specialization) {
@@ -42,8 +42,8 @@ const createSpecialization = async (req, res) => {
     try {
         const { name, description, symptoms, organs } = req.body;
         const specialization = new Specialization(name, description, symptoms, organs);
-        await specialization.insertSpecialization();
-        res.status(201).send(specialization);
+        const id = await specialization.insertSpecialization();
+        res.status(201).send(id);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -51,8 +51,7 @@ const createSpecialization = async (req, res) => {
 
 const deleteSpecialization = async (req, res) => {
     try {
-        const specialization = (await Specialization.getSpecializationsById(
-            false, false, req.params.id))[0];
+        const specialization = (await Specialization.getSpecializationsByIds([req.params.id]))[0];
         if (specialization) {
             await specialization.deleteSpecialization();
             res.sendStatus(204);
@@ -89,9 +88,8 @@ const updateSpecialization = async (req, res) => {
             return res.status(400).json({ error: 'No parameters to update' });
         }
 
-        await Specialization.updateSpecialization(id, updates);
-
-        res.status(200).json({ message: 'Specialization updated successfully' });
+        const updated = await Specialization.updateSpecialization(id, updates);
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the specialization' });

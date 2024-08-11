@@ -14,7 +14,7 @@ class Specialization {
      * @param {Organ[]} organs - The organs treated with the doctor's specialization.
      * @param {number} [id=-1] - The ID of the specialization (optional).
      */
-    constructor(name, description = '', symptoms = [], organs = [], id = -1) {
+    constructor(name, description, symptoms = [], organs = [], id = -1) {
         if (typeof name !== 'string') throw new Error('Name should be string');
         if (typeof description !== 'string') throw new Error('Description should be string');
         if (!Array.isArray(symptoms)) throw new Error('Symptoms should be array');
@@ -43,17 +43,11 @@ class Specialization {
      */
     static async getSpecializationsFromData(rows) {
         if (rows.length == 0) return [];
-
         const specializations = rows.map(row => {
-
             const specialization = new Specialization(row.specialization_name, row.specialization_description,
                 row.symptoms, row.organs, row.specialization_id);
-            if (specialization.symptoms[0] == null) {
-                specialization.symptoms = [];
-            }
-            if (specialization.organs[0] == null) {
-                specialization.organs = [];
-            }
+            if (specialization.symptoms[0] == null) specialization.symptoms = [];
+            if (specialization.organs[0] == null) specialization.organs = [];
             return specialization;
         }
         );
@@ -70,16 +64,16 @@ class Specialization {
     * @param {boolean} [filters.nestSymptoms=false] - Whether to nest symptoms as full objects.
     * @returns {Promise<Array<Specialization>>} A promise that resolves to an array of Specialization objects.
     */
-    static async getSpecializations(filters = {}) {
+    static async getSpecializations({ nestSymptoms, nestOrgans, name, description }) {
         let queryStr = `SELECT s.specialization_id, s.specialization_name, s.specialization_description,\n`;
 
-        queryStr += !filters.nestSymptoms
+        queryStr += !nestSymptoms
             ? `ARRAY_AGG(DISTINCT sy.symptom_id) AS symptoms,\n`
             : `COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', sy.symptom_id,
                     'name', sy.symptom_name, 'description', sy.symptom_description))
                     FILTER (WHERE sy.symptom_id IS NOT NULL), '[]') AS symptoms,\n`;
 
-        queryStr += !filters.nestOrgans
+        queryStr += !nestOrgans
             ? `ARRAY_AGG(DISTINCT o.organ_id) AS organs\n`
             : `COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', o.organ_id,
                     'name', o.organ_name, 'description', o.organ_description))
@@ -92,18 +86,9 @@ class Specialization {
                 LEFT JOIN organs o ON sto.organ_id = o.organ_id`;
 
         const conditions = [];
-
-        if (filters.name) {
-            conditions.push(`s.specialization_name ILIKE '%${filters.name}%'`);
-        }
-        if (filters.description) {
-            conditions.push(`s.specialization_description ILIKE '%${filters.description}%'`);
-        }
-
-        if (conditions.length > 0) {
-            queryStr += ` WHERE ${conditions.join(' AND ')}`;
-        }
-
+        if (name) conditions.push(`s.specialization_name ILIKE '%${name}%'`);
+        if (description) conditions.push(`s.specialization_description ILIKE '%${description}%'`);
+        if (conditions.length > 0) queryStr += ` WHERE ${conditions.join(' AND ')}`;
         queryStr += ` GROUP BY s.specialization_id;`;
 
         const res = await query(queryStr);
@@ -116,13 +101,11 @@ class Specialization {
      * Get specializations by their IDs from the database.
      * @param {boolean} nestOrgans - Whether to nest organs as full objects.
      * @param {boolean} nestSymptoms - Whether to nest symptoms as full objects.
-     * @param {...number} id - The IDs of the specializations.
+     * @param {number[]} ids - The IDs of the specializations.
      * @returns {Promise<Array<Specialization>>} A promise that resolves to an array of Specialization objects.
      */
-    static async getSpecializationsById(nestOrgans = false, nestSymptoms = false, ...id) {
-        let queryStr = `
-        SELECT s.specialization_id, s.specialization_name, s.specialization_description,
-    `;
+    static async getSpecializationsByIds(ids, nestOrgans = false, nestSymptoms = false) {
+        let queryStr = `SELECT s.specialization_id, s.specialization_name, s.specialization_description, `;
 
         queryStr += !nestSymptoms
             ? `ARRAY_AGG(DISTINCT sy.symptom_id) AS symptoms,\n`
@@ -141,9 +124,8 @@ class Specialization {
             LEFT JOIN specializations_to_organs sto ON s.specialization_id = sto.specialization_id
             LEFT JOIN symptoms sy ON sts.symptom_id = sy.symptom_id
             LEFT JOIN organs o ON sto.organ_id = o.organ_id
-            WHERE s.specialization_id IN(${id.toString()})
-            GROUP BY s.specialization_id;
-    `;
+            WHERE s.specialization_id IN(${ids.toString()})
+            GROUP BY s.specialization_id;`;
 
         const res = await query(queryStr);
         return await Specialization.getSpecializationsFromData(res.rows);
@@ -165,10 +147,13 @@ class Specialization {
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE specializations SET `;
-        queryStr += `${name ? `specialization_name = '${name}', ` : ''}`;
-        queryStr += `${description ? `specialization_description = '${description}', ` : ''}`;
-        queryStr = queryStr.slice(0, -2) + ' ';
-        queryStr += `WHERE specialization_id = ${id};`;
+        const updates = [];
+        if (name) updates.push(`specialization_name = '${name}'`);
+        if (description) updates.push(`specialization_description = '${description}'`);
+        if (updates.length > 0) {
+            queryStr += ` ${updates.join(', ')} `;
+        }
+        queryStr += ` WHERE specialization_id = ${id} RETURNING *;`;
 
         try {
             if (name || description) {
@@ -195,8 +180,8 @@ class Specialization {
                 this.organs = organs;
             }
 
-
             console.log('Updated Specialization:', id);
+            return (await Specialization.getSpecializationsByIds(id))[0];
         } catch (err) {
             console.error('Error updating specialization:', err);
             throw err;
@@ -212,9 +197,8 @@ class Specialization {
             const res = await query(`INSERT INTO specializations(
                 specialization_name, specialization_description)
             VALUES('${this.name}', '${this.description}') RETURNING *;`);
-
             this.id = res.rows[0].specialization_id;
-            console.log(this.symptoms);
+
             for (const symptom of this.symptoms) {
                 await query(`INSERT INTO specializations_to_symptoms(
                     specialization_id, symptom_id)
@@ -222,13 +206,13 @@ class Specialization {
             }
 
             for (const organ of this.organs) {
-                await query(`INSERT INTO specializations_to_organs(
+                await query(`INSER  
+                    T INTO specializations_to_organs(
                     specialization_id, organ_id)
                 VALUES(${this.id}, ${organ.id});`);
             }
-            console.log('IT IS OK');
-
             console.log('Inserted:', res.rows[0]);
+            return { id: this.id };
         } catch (err) {
             console.error('Error inserting specialization:', err);
             throw err;
