@@ -28,12 +28,9 @@ class Appointment {
         const appointments = rows.map(async row => {
             let patient = { id: row.patient_id };
             let doctor = { id: row.doctor_id };
-            if (nestPatient) {
-                patient = (await Patient.getPatientById(row.patient_id, true))[0];
-            }
-            if (nestDoctor) {
-                doctor = (await Doctor.getDoctorsByIds(true, true, row.doctor_id))[0];
-            }
+            if (nestPatient) patient = (await Patient.getPatientById(row.patient_id, true))[0];
+            if (nestDoctor) doctor = (await Doctor.getDoctorsByIds(true, true, row.doctor_id))[0];
+
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);
             return appointment;
@@ -42,30 +39,22 @@ class Appointment {
     }
 
     static async getAppointments({ patientId, doctorId, nestDoctor, nestPatient, startBefore, startAfter, endBefore, endAfter } = {}) {
-        let queryStr = `SELECT * FROM appointments WHERE 1=1`;
-        if (patientId) {
-            queryStr += ` AND patient_id = '${patientId}'`;
-        }
-        if (doctorId) {
-            queryStr += ` AND doctor_id = '${doctorId}'`;
-        }
-        if (startBefore) {
-            queryStr += ` AND appointment_time < '${startBefore}'`;
-        }
-        if (startAfter) {
-            queryStr += ` AND appointment_time > '${startAfter}'`;
-        }
-        if (endBefore) {
-            queryStr += ` AND appointment_time + appointment_duration < '${endBefore}'`;
-        }
-        if (endAfter) {
-            queryStr += ` AND appointment_time + appointment_duration > '${endAfter}'`;
-        }
+        let queryStr = `SELECT * FROM appointments `;
+
+        const conditions = [];
+        if (patientId) conditions.push(`patient_id = '${patientId}'`);
+        if (doctorId) conditions.push(`doctor_id = '${doctorId}'`);
+        if (startBefore) conditions.push(`appointment_time < '${startBefore}'`);
+        if (startAfter) conditions.push(`appointment_time > '${startAfter}'`);
+        if (endBefore) conditions.push(`appointment_time + appointment_duration < '${endBefore}'`);
+        if (endAfter) conditions.push(`appointment_time + appointment_duration > '${endAfter}'`);
+        if (conditions.length > 0) queryStr += ` WHERE ${conditions.join(' AND ')}`;
+
         const res = await query(queryStr);
         return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
     }
 
-    static async getAppointmentsById(nestDoctor = false, nestPatient = false, ...ids) {
+    static async getAppointmentsByIds(ids, nestDoctor = false, nestPatient = false) {
         const idList = ids.map(id => `'${id}'`).join(',');
         const res = await query(`SELECT * FROM appointments 
             WHERE appointment_id IN (${idList});`);
@@ -84,23 +73,24 @@ class Appointment {
      */
     async updateAppointment({ time, duration, description, patientId, doctorId }) {
         if (this.id === -1) throw new Error('No ID provided to update appointment record.');
-
         const hasParams = Object.keys({ time, duration, description, patientId, doctorId })
             .some(key => updates[key] !== undefined);
-
         if (!hasParams) throw new Error('No parameters to update.');
 
+        const updates = [];
         let queryStr = `UPDATE appointments SET `;
-        queryStr += time !== undefined ? `appointment_time = '${time}', ` : '';
-        queryStr += duration !== undefined ? `appointment_duration = '${duration}', ` : '';
-        queryStr += description !== undefined ? `additional_info = '${description}', ` : '';
-        queryStr += patientId !== undefined ? `patient_id = '${patientId}', ` : '';
-        queryStr += doctorId !== undefined ? `doctor_id = '${doctorId}', ` : '';
-        queryStr = queryStr.slice(0, -2) + ' '; // Remove the trailing comma and space
-        queryStr += `WHERE appointment_id = ${this.id};`;
+        if (time) updates.push(`appointment_time = '${time}'`);
+        if (duration) updates.push(`appointment_duration = '${duration}'`);
+        if (description) updates.push(`additional_info = '${description}'`);
+        if (patientId) updates.push(`patient_id = '${patientId}'`);
+        if (doctorId) updates.push(`doctor_id = '${doctorId}'`);
+        if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
+        queryStr += `WHERE appointment_id = ${this.id} RETURNING *;`;
 
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
+        const updated = res.rows[0];
+        return updated;
     }
 
     async insertAppointment() {
@@ -110,6 +100,7 @@ class Appointment {
             ${this.patient.id}, ${this.doctor.id}) RETURNING *;`);
         this.id = res.rows[0].appointment_id;
         console.log('Inserted:', res.rows[0]);
+        return { id: this.id };
     }
 
     async deleteAppointment() {

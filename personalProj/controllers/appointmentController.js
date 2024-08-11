@@ -6,8 +6,8 @@ const getAppointment = async (req, res) => {
     try {
         const nestDoctor = req.query.nestDoctor === 'true';
         const nestPatient = req.query.nestPatient === 'true';
-        const appointment = (await Appointment.getAppointmentsById(
-            nestDoctor, nestPatient, req.params.id))[0];
+        const appointment = (await Appointment.getAppointmentsByIds(
+            [req.params.id], nestDoctor, nestPatient))[0];
         if (appointment) {
             res.status(200).send(appointment);
         } else {
@@ -65,9 +65,9 @@ const updateAppointment = async (req, res) => {
             return res.status(400).json({ error: 'No parameters to update' });
         }
 
-        await Appointment.updateAppointment(updates);
+        const updated = await Appointment.updateAppointment(updates);
 
-        res.status(200).json({ message: 'Appointment updated successfully' });
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the appointment' });
@@ -80,8 +80,8 @@ const createAppointment = async (req, res) => {
         const patient = (await Patient.getPatientsByIds(false, patientId))[0];
         const doctor = (await Doctor.getDoctorsById(doctorId))[0];
         const appointment = new Appointment(patient, doctor, time, duration, description);
-        await appointment.insertAppointment();
-        res.status(201).send(appointment);
+        const id = await appointment.insertAppointment();
+        res.status(201).send(id);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -89,8 +89,7 @@ const createAppointment = async (req, res) => {
 
 const deleteAppointment = async (req, res) => {
     try {
-        const appointment = (await Appointment.getAppointmentsById(
-            false, false, req.params.id))[0];
+        const appointment = (await Appointment.getAppointmentsByIds([req.params.id]))[0];
         if (appointment) {
             await appointment.deleteAppointment();
             res.sendStatus(204);
