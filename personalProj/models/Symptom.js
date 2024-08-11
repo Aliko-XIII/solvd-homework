@@ -45,12 +45,12 @@ class Symptom {
      * @param {string} [filters.description] - Part of the symptom's description.
      * @returns {Promise<Array<Symptom>>} A promise that resolves to an array of Symptom objects.
      */
-    static async getSymptoms(filters = {}) {
+    static async getSymptoms({ name, description }) {
         let queryStr = `SELECT * FROM symptoms`;
         const conditions = [];
 
-        if (filters.name) conditions.push(`symptom_name ILIKE '%${filters.name}%'`);
-        if (filters.description) conditions.push(`symptom_description ILIKE '%${filters.description}%'`);
+        if (name) conditions.push(`symptom_name ILIKE '%${name}%'`);
+        if (description) conditions.push(`symptom_description ILIKE '%${description}%'`);
         if (conditions.length > 0) {
             queryStr += ` WHERE ${conditions.join(' AND ')}`;
         }
@@ -64,9 +64,9 @@ class Symptom {
      * @param {...number} id - The IDs of the symptoms.
      * @returns {Promise<Array<Symptom>>} A promise that resolves to an array of Symptom objects.
      */
-    static async getSymptomsById(...id) {
+    static async getSymptomsByIds(...ids) {
         const res = await query(`SELECT * FROM symptoms 
-            WHERE symptom_id IN (${id.toString()});`);
+            WHERE symptom_id IN (${ids.toString()});`);
         return this.getSymptomsFromData(res.rows);
     }
 
@@ -114,9 +114,7 @@ class Symptom {
         const updates = [];
         if (name) updates.push(`symptom_name = '${name}'`);
         if (description) updates.push(`symptom_description = '${description}'`);
-        if (updates.length > 0) {
-            queryStr += ` ${updates.join(', ')} `; 
-        }
+        if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
         queryStr += `WHERE symptom_id = ${id} RETURNING *; `;
 
         const res = await query(queryStr);

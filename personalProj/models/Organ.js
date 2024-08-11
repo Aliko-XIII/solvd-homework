@@ -41,30 +41,26 @@ class Organ {
      * Get all organs from the database.
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
-    static async getOrgans(filters = {}) {
+    static async getOrgans({ name, description }) {
         const res = await query(`SELECT * FROM organs;`);
         const conditions = [];
-        if (filters.name) {
-            conditions.push(`organ_name ILIKE '%${filters.name}%'`);
-        }
-        if (filters.description) {
-            conditions.push(`organ_description ILIKE '%${filters.description}%'`);
-        }
+        if (name) conditions.push(`organ_name ILIKE '%${name}%'`);
+        if (description) conditions.push(`organ_description ILIKE '%${description}%'`);
 
         if (conditions.length > 0) {
             queryStr += ` WHERE ${conditions.join(' AND ')}`;
         }
-        return await this.getOrgansFromData(res.rows);
+        return await Organ.getOrgansFromData(res.rows);
     }
 
     /**
      * Get organs by their IDs from the database.
-     * @param {...number} id - The IDs of the organs.
+     * @param {number[]} ids - The IDs of the organs.
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
-    static async getOrgansByIds(...id) {
+    static async getOrgansByIds(ids) {
         const res = await query(`SELECT * FROM organs 
-            WHERE organ_id IN (${id.toString()});`);
+            WHERE organ_id IN (${ids.toString()});`);
         return await this.getOrgansFromData(res.rows);
     }
 
@@ -87,6 +83,7 @@ class Organ {
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].id;
         console.log('Inserted:', res.rows[0]);
+        return { id: this.id };
     }
 
     /**
@@ -104,15 +101,17 @@ class Organ {
             .some(key => key !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
 
-        let queryStr = `UPDATE organs SET\n`;
-        queryStr += `${name ? `organ_name = '${name}', ` : ''}`;
-        queryStr += `${description ? `organ_description = '${description}', ` : ''}`;
+        let queryStr = `UPDATE organs SET `;
+        const updates = [];
+        if (name) updates.push(`organ_name = '${name}'`);
+        if (description) updates.push(`organ_description = '${description}'`);
+        if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
+        queryStr += ` WHERE organ_id=${id} RETURNING *;`;
 
-        queryStr = queryStr.slice(0, -2) + ' ';
-        queryStr += `WHERE organ_id=${id};`;
-        console.log(queryStr);
         const res = await query(queryStr);
-        console.log('Updated:', res.rows[0]);
+        const updated = res.rows[0];
+        delete updated.pass;
+        return updated;
     }
 
     /**
