@@ -38,8 +38,8 @@ const createDoctor = async (req, res) => {
         if (patientLoad) doctor.patientLoad = patientLoad;
         if (workdayStart) doctor.workdayStart = workdayStart;
         if (workdayEnd) doctor.workdayEnd = workdayEnd;
-        await doctor.insertDoctor();
-        res.status(201).send(doctor);
+        const id = await doctor.insertDoctor();
+        res.status(201).send(id);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -53,11 +53,10 @@ const updateDoctor = async (req, res) => {
 
         const updates = { specializationId, patientLoad, workdayStart, workdayEnd };
         const hasParams = Object.values(updates).some(value => value !== undefined);
-
         if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
-        await Doctor.updateDoctor(userId, updates);
-        res.status(200).json({ message: 'Doctor updated successfully' });
+        const updated = await Doctor.updateDoctor(userId, updates);
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the doctor' });
