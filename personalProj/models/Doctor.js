@@ -73,17 +73,13 @@ class Doctor extends Role {
         if (rows.length === 0) { return []; }
         const doctors = rows.map(async row => {
             let user;
-            if (nestUser) {
-                user = (await User.getUsersFromData([row]))[0];
-            } else {
-                user = { id: row.user_id };
-            }
+            if (nestUser) user = (await User.getUsersFromData([row]))[0];
+            else user = { id: row.user_id };
+
             let specialization;
-            if (!nestSpecialization) {
-                specialization = (await Specialization.getSpecializationsByIds([row.specialization_id]))[0];
-            } else {
-                specialization = { id: row.specialization_id };
-            }
+            if (!nestSpecialization) specialization = (await Specialization
+                .getSpecializationsByIds([row.specialization_id]))[0];
+            else specialization = { id: row.specialization_id };
 
             const doctor = new Doctor(user, specialization, row.patient_load, row.workday_start, row.workday_end);
             return doctor;
