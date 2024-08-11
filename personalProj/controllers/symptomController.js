@@ -30,8 +30,8 @@ const createSymptom = async (req, res) => {
     try {
         const { name, description, locationOrgan } = req.body;
         const symptom = new Symptom(name, description, locationOrgan);
-        await symptom.insertSymptom();
-        res.status(201).json(symptom);
+        const id = await symptom.insertSymptom();
+        res.status(201).json(id);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -59,9 +59,9 @@ const updateSymptom = async (req, res) => {
             return res.status(400).json({ error: 'No parameters to update' });
         }
 
-        await Symptom.updateSymptom(id, updates);
+        const updated = await Symptom.updateSymptom(id, updates);
 
-        res.status(200).json({ message: 'Symptom updated successfully' });
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the symptom' });

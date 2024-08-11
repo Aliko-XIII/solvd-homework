@@ -30,8 +30,8 @@ const createOrgan = async (req, res) => {
     try {
         const { name, description } = req.body;
         const organ = new Organ(name, description);
-        await organ.insertOrgan();
-        res.status(201).json(organ);
+        const id = await organ.insertOrgan();
+        res.status(201).json(id);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -54,14 +54,11 @@ const updateOrgan = async (req, res) => {
 
         const updates = { name, description };
         const hasParams = Object.values(updates).some(value => value !== undefined);
+        if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
-        if (!hasParams) {
-            return res.status(400).json({ error: 'No parameters to update' });
-        }
+        const updated = await Organ.updateOrgan(id, updates);
 
-        await Organ.updateOrgan(id, updates);
-
-        res.status(200).json({ message: 'Organ updated successfully' });
+        res.status(200).json(updated);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the organ' });
