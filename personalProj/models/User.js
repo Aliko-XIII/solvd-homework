@@ -9,7 +9,7 @@ class User {
      * @param {string} id - user's id
      * @param {string} firstName - user's first name
      * @param {string} lastName - user's last name
-     * @param {string} pgone - user's phone number
+     * @param {string} phone - user's phone number
      * @param {number} age - user's age
      * @param {string} sex - user's sex
      * @param {string} password - user's password
@@ -20,7 +20,7 @@ class User {
         if (!this.validateString(phone)) throw new Error('Phone is not valid.');
         if (!this.validateString(password)) throw new Error('Password is not valid.');
         if (typeof age !== 'number' || age <= 0) throw new Error('Age is not valid.');
-        if (!this.validateString(sex)) throw new Error('Sex is not valid.');
+        if (!this.validateString(sex) || (sex != 'M' && sex != 'F')) throw new Error('Sex is not valid.');
         if (typeof id !== 'string') throw new Error('User id is not valid.');
 
         this.firstName = firstName;
@@ -143,12 +143,12 @@ class User {
         if (pass) updates.push(`pass = '${pass}'`);
         if (phone) updates.push(`phone = '${phone}'`);
         if (updates.length > 0) {
-            queryStr += ` ${updates.join(', ')} `; 
+            queryStr += ` ${updates.join(', ')} `;
         }
         queryStr += `WHERE user_id = '${id}' RETURNING *; `;
         const res = await query(queryStr);
-        const updated = res.rows[0];
-        delete updated.pass;
+        const updated = (await User.getUsersFromData(res.rows))[0];
+        delete updated.password;
         return updated;
     }
 
@@ -162,7 +162,7 @@ class User {
             (first_name, last_name, age, sex, pass, phone)
         VALUES('${this.firstName}', '${this.lastName}', ${this.age},
             '${this.sex}', '${this.password}', '${this.phone}') RETURNING *; `);
-        this.id = res.rows[0].id;
+        this.id = res.rows[0].user_id;
         console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
@@ -174,7 +174,7 @@ class User {
      */
     async deleteUser() {
         const res = await query(`DELETE FROM users WHERE user_id = '${this.id}' RETURNING *; `);
-        console.log('Deleted:', res.rows[0]);
+        // console.log('Deleted:', res.rows[0]);
     }
 }
 

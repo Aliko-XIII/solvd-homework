@@ -118,8 +118,7 @@ class Symptom {
         queryStr += `WHERE symptom_id = ${id} RETURNING *; `;
 
         const res = await query(queryStr);
-        const updated = res.rows[0];
-        delete updated.pass;
+        const updated = (await this.getSymptomsFromData(res.rows))[0];
         return updated;
     }
 

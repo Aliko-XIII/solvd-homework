@@ -42,14 +42,15 @@ class Organ {
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
     static async getOrgans({ name, description }) {
-        const res = await query(`SELECT * FROM organs;`);
+        let queryStr = `SELECT * FROM organs`;
         const conditions = [];
         if (name) conditions.push(`organ_name ILIKE '%${name}%'`);
         if (description) conditions.push(`organ_description ILIKE '%${description}%'`);
 
         if (conditions.length > 0) {
-            queryStr += ` WHERE ${conditions.join(' AND ')}`;
+            queryStr += ` WHERE ${conditions.join(' AND ')};`;
         }
+        const res = await query(queryStr);
         return await Organ.getOrgansFromData(res.rows);
     }
 
@@ -81,7 +82,7 @@ class Organ {
         const res = await query(`INSERT INTO organs(
 	        organ_name, organ_description)
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
-        this.id = res.rows[0].id;
+        this.id = res.rows[0].organ_id;
         console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
@@ -109,8 +110,7 @@ class Organ {
         queryStr += ` WHERE organ_id=${id} RETURNING *;`;
 
         const res = await query(queryStr);
-        const updated = res.rows[0];
-        delete updated.pass;
+        const updated = (await this.getOrgansFromData(res.rows))[0];
         return updated;
     }
 
