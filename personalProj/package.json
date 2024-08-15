@@ -6,7 +6,15 @@
     "start": "node index.js",
     "dev:server": "npx nodemon index.js",
     "dev:bundler": "webpack -w --mode=development",
-    "dev:both": "concurrently \"npx nodemon index.js\" \"webpack -w --mode=development\""
+    "dev:both": "concurrently \"npx nodemon index.js\" \"webpack -w --mode=development\"",
+    "test": "jest",
+    "test:server": "concurrently \"node index.js\" \"jest\""
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -43,6 +51,7 @@
     "jest": "^29.7.0",
     "prettier": "^3.1.1",
     "react-router-dom": "^6.25.1",
+    "supertest": "^7.0.0",
     "ts-node-dev": "^2.0.0"
   }
 }
