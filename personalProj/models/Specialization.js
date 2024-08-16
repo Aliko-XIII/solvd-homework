@@ -206,8 +206,7 @@ class Specialization {
             }
 
             for (const organ of this.organs) {
-                await query(`INSER  
-                    T INTO specializations_to_organs(
+                await query(`INSERT INTO specializations_to_organs(
                     specialization_id, organ_id)
                 VALUES(${this.id}, ${organ.id});`);
             }
