@@ -104,7 +104,7 @@ class Patient extends Role {
         const res = await query(`INSERT INTO patients(insurance_number, insurance_provider, user_id)
             VALUES ('${this.insuranceNumber}', '${this.insuranceProvider}', '${this.user.id}')
             RETURNING *;`);
-        this.id = res.rows[0].id;
+        this.id = res.rows[0].user_id;
         console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
@@ -134,7 +134,7 @@ class Patient extends Role {
         queryStr += ` WHERE user_id = '${id}' RETURNING *;`;
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
-        const updated = res.rows[0];
+        const updated = (await this.getPatientsFromData(res.rows))[0];
         return updated;
 
     }
@@ -144,8 +144,8 @@ class Patient extends Role {
      * @param {string} id - The patient ID.
      * @returns {Promise<void>} A promise that resolves when the patient is deleted.
      */
-    static async deletePatient(id) {
-        const res = await query(`DELETE FROM patients WHERE user_id = '${id}' RETURNING *;`);
+    async deletePatient() {
+        const res = await query(`DELETE FROM patients WHERE user_id = '${this.user.id}' RETURNING *;`);
         console.log('Deleted:', res.rows[0]);
     }
 }
