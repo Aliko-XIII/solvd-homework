@@ -22,7 +22,7 @@ const getDoctor = async (req, res) => {
 const getAllDoctors = async (req, res) => {
     try {
         const { nestUser = false, nestSpecialization = false } = req.query;
-        const doctors = await Doctor.getDoctors(nestUser, nestSpecialization);
+        const doctors = await Doctor.getDoctors({nestUser, nestSpecialization});
         res.status(200).send(doctors);
     } catch (err) {
         res.status(500).send(err);

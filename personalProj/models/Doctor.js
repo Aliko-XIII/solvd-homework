@@ -77,11 +77,12 @@ class Doctor extends Role {
             else user = { id: row.user_id };
 
             let specialization;
-            if (!nestSpecialization) specialization = (await Specialization
+            if (nestSpecialization) specialization = (await Specialization
                 .getSpecializationsByIds([row.specialization_id]))[0];
             else specialization = { id: row.specialization_id };
 
-            const doctor = new Doctor(user, specialization, row.patient_load, row.workday_start, row.workday_end);
+            const doctor = new Doctor(user, specialization, row.patient_load,
+                row.workday_start, row.workday_end);
             return doctor;
         });
         return Promise.all(doctors);
@@ -93,7 +94,7 @@ class Doctor extends Role {
      * @param {boolean} [nestSpecialization=false] - Whether to include nested specialization records.
      * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor instances.
      */
-    static async getDoctors(nestUser = false, nestSpecialization = false) {
+    static async getDoctors({ nestUser, nestSpecialization } = {}) {
         const res = await query(`SELECT * FROM doctors 
         INNER JOIN users ON users.user_id = doctors.user_id;`);
         return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);
@@ -157,7 +158,7 @@ class Doctor extends Role {
 
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
-        const updated = res.rows[0];
+        const updated = (await Doctor.getDoctorsFromData(res.rows))[0];
         return updated;
     }
 
