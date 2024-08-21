@@ -14,12 +14,22 @@ class Patient extends Role {
      * @param {User} user - The patient's user record.
      */
     constructor(insuranceNumber, insuranceProvider, user) {
-        if (typeof insuranceNumber != 'string') throw new Error('Insurance number is not valid.');
-        if (typeof insuranceProvider != 'string') throw new Error('Insurance provider is not valid.');
-
         super(user);
+        if (!this.validateString(insuranceNumber)) throw new Error('Insurance number is not valid.');
+        if (!this.validateString(insuranceProvider)) throw new Error('Insurance provider is not valid.');
+
         this.insuranceNumber = insuranceNumber;
         this.insuranceProvider = insuranceProvider;
+    }
+
+    /**
+     * Validates that the input value is a non-empty string.
+     * 
+     * @param {string} value - The value to validate.
+     * @returns {boolean} - Returns true if the value is a non-empty string, otherwise false.
+     */
+    validateString(value) {
+        return typeof value === 'string' && value.length > 0;
     }
 
     /**
@@ -30,12 +40,9 @@ class Patient extends Role {
      */
     static async getPatientsFromData(rows, nestUser = false) {
         const patients = rows.map(async row => {
-            let user;
-            if (nestUser) {
-                user = (await User.getUsersFromData([row]))[0];
-            } else {
-                user = { id: row.user_id };
-            }
+            const user = nestUser ?
+                (await User.getUsersFromData([row]))[0] :
+                { id: row.user_id };
             const patient = new Patient(row.insurance_number, row.insurance_provider, user);
             return patient;
         });

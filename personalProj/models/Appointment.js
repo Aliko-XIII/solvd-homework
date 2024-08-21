@@ -9,7 +9,7 @@ class Appointment {
      * @param {Patient} patient 
      * @param {Doctor} doctor 
      * @param {Date} time 
-     * @param {number} duration 
+     * @param {Date} duration 
      * @param {string} description 
      * @param {number} id 
      */
@@ -24,12 +24,29 @@ class Appointment {
         this.doctor = doctor;
     }
 
+    /**
+     * Validates that the input value is a non-empty string.
+     * 
+     * @param {string} value - The value to validate.
+     * @returns {boolean} - Returns true if the value is a non-empty string, otherwise false.
+     */
+    validateString(value) {
+        return typeof value === 'string' && value.length > 0;
+    }
+
     static async getAppointmentsFromData(rows, nestDoctor = false, nestPatient = false) {
         const appointments = rows.map(async row => {
-            let patient = { id: row.patient_id };
-            let doctor = { id: row.doctor_id };
-            if (nestPatient) patient = (await Patient.getPatientById(row.patient_id, true))[0];
-            if (nestDoctor) doctor = (await Doctor.getDoctorsByIds(true, true, row.doctor_id))[0];
+            let patient = null;
+            if (row.patient_id != null) {
+                patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id], true))[0] :
+                    { id: row.patient_id };
+            }
+            let doctor = null;
+            if (row.doctor_id != null) {
+                doctor = nestDoctor ? (await Doctor.getDoctorsByIds([row.doctor_id]))[0] :
+                    { id: row.doctor_id };
+            }
+
 
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);
@@ -71,10 +88,10 @@ class Appointment {
      * @param {string} [updates.doctorId] - The new doctor ID.
      * @returns {Promise<void>} A promise that resolves when the appointment is updated.
      */
-    async updateAppointment({ time, duration, description, patientId, doctorId }) {
-        if (this.id === -1) throw new Error('No ID provided to update appointment record.');
+    static async updateAppointment(id, { time, duration, description, patientId, doctorId }) {
+        if (id === -1) throw new Error('No ID provided to update appointment record.');
         const hasParams = Object.keys({ time, duration, description, patientId, doctorId })
-            .some(key => updates[key] !== undefined);
+            .some(value => value !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
         const updates = [];
@@ -85,11 +102,11 @@ class Appointment {
         if (patientId) updates.push(`patient_id = '${patientId}'`);
         if (doctorId) updates.push(`doctor_id = '${doctorId}'`);
         if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
-        queryStr += `WHERE appointment_id = ${this.id} RETURNING *;`;
+        queryStr += `WHERE appointment_id = ${id} RETURNING *;`;
 
         const res = await query(queryStr);
         console.log('Updated:', res.rows[0]);
-        const updated = res.rows[0];
+        const updated = (await Appointment.getAppointmentsFromData(res.rows))[0];
         return updated;
     }
 
@@ -97,7 +114,7 @@ class Appointment {
         const res = await query(`INSERT INTO appointments(
 	        appointment_time, appointment_duration, additional_info, patient_id, doctor_id)
 	        VALUES ('${this.time}', '${this.duration}', '${this.description}', 
-            ${this.patient.id}, ${this.doctor.id}) RETURNING *;`);
+            '${this.patient.id}', '${this.doctor.id}') RETURNING *;`);
         this.id = res.rows[0].appointment_id;
         console.log('Inserted:', res.rows[0]);
         return { id: this.id };
@@ -109,7 +126,7 @@ class Appointment {
     }
 
     /**
-     * 
+     *  
      * @param {Doctor} doctor 
      */
     static async getDoctorAppointments(doctorId) {

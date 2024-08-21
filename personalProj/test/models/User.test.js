@@ -1,13 +1,13 @@
 const { User } = require('../../models/User');
 
 const userFields = {
-    firstName: 'John',
-    lastName: 'Black',
-    phone: '1324234532',
-    password: 'pass1234324',
+    firstName: 'TestFirst',
+    lastName: 'TestLast',
+    phone: '0000000000',
+    password: 'testpass',
     age: 25,
     sex: 'M',
-    id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12'
+    id: 'test-2test1-test-test134'
 };
 let userId = null;
 
@@ -22,8 +22,8 @@ describe('User constructor', () => {
         expect(user.lastName).toEqual(userFields.lastName);
         expect(user.phone).toEqual(userFields.phone);
         expect(user.password).toEqual(userFields.password);
-        expect(user.age).toEqual(25);
-        expect(user.id).toEqual('fsdfsda-23jnrewj1-vdvjdsn132-sdv12');
+        expect(user.age).toEqual(userFields.age);
+        expect(user.id).toEqual(userFields.id);
     });
 
     test('should throw an error for invalid age', () => {
@@ -104,6 +104,24 @@ describe('Get users array from DB recors', () => {
     });
 });
 
+describe('Insert a user to DB', () => {
+    test('should return an object with user\'s id', async () => {
+        const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
+            userFields.password, userFields.age, userFields.sex);
+        const id = (await user.insertUser()).id;
+        userId = id;
+        expect(id.length > 0).toBeTruthy();
+    });
+});
+
+describe('Get user by id from DB', () => {
+    test('should return a User object', async () => {
+        const user = await User.getUserById(userId);
+        expect(user).toBeInstanceOf(User);
+        expect(user.id).toEqual(userId);
+    });
+});
+
 describe('Get all users from DB', () => {
     test('should return array of User objects', async () => {
         const users = await User.getUsers();
@@ -114,11 +132,11 @@ describe('Get all users from DB', () => {
     });
 
     test('should return array with name filter applied', async () => {
-        const users = await User.getUsers({ firstName: 'o', lastName: 'a' });
+        const users = await User.getUsers({ firstName: 'e', lastName: 'a' });
         expect(users).toBeInstanceOf(Array);
         users.forEach(user => {
             expect(user).toBeInstanceOf(User);
-            expect(user.firstName.indexOf('o') != -1).toBeTruthy();
+            expect(user.firstName.indexOf('e') != -1).toBeTruthy();
             expect(user.lastName.indexOf('a') != -1).toBeTruthy();
         });
     });
@@ -143,30 +161,12 @@ describe('Get all users from DB', () => {
     });
 
     test('should return array with phone filter applied', async () => {
-        const users = await User.getUsers({ phone: '1' });
+        const users = await User.getUsers({ phone: '0' });
         expect(users).toBeInstanceOf(Array);
         users.forEach(user => {
             expect(user).toBeInstanceOf(User);
-            expect(user.phone.indexOf('1') != -1).toBeTruthy();
+            expect(user.phone.indexOf('0') != -1).toBeTruthy();
         });
-    });
-});
-
-describe('Insert a user to DB', () => {
-    test('should return an object with user\'s id', async () => {
-        const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
-            userFields.password, userFields.age, userFields.sex);
-        const id = (await user.insertUser()).id;
-        userId = id;
-        expect(id.length > 0).toBeTruthy();
-    });
-});
-
-describe('Get user by id from DB', () => {
-    test('should return a User object', async () => {
-        const user = await User.getUserById(userId);
-        expect(user).toBeInstanceOf(User);
-        expect(user.id).toEqual(userId);
     });
 });
 

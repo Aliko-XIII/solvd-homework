@@ -4,7 +4,7 @@ const { User } = require('../../models/User');
 const userFields = {
     firstName: 'John',
     lastName: 'Black',
-    phone: '1324234532',
+    phone: '9999999999',
     password: 'pass1234324',
     age: 25,
     sex: 'M',
@@ -89,11 +89,11 @@ describe('Get all patients from DB', () => {
     });
 
     test('should return array with insuranceNumber filter applied', async () => {
-        const patients = await Patient.getPatients({ insuranceNumber: '123' });
+        const patients = await Patient.getPatients({ insuranceNumber: '1' });
         expect(patients).toBeInstanceOf(Array);
         patients.forEach(patient => {
             expect(patient).toBeInstanceOf(Patient);
-            expect(patient.insuranceNumber.indexOf('123') !== -1).toBeTruthy();
+            expect(patient.insuranceNumber.indexOf('1') !== -1).toBeTruthy();
         });
     });
 

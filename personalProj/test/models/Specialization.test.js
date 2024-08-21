@@ -10,22 +10,47 @@ const specializationFields = {
     id: 13
 };
 
+const organs = [
+    {
+        name: 'Heart',
+        description: 'Pumps blood throughout the body.',
+        id: 1
+    },
+    {
+        name: 'Lung',
+        description: 'Proceeds oxygen for body.',
+        id: 2
+    },
+    {
+        name: 'Kidney',
+        description: 'Cleans blood for body.',
+        id: 3
+    }
+].map(fields => new Organ(fields.name, fields.description, fields.id));
+
+const symptoms = [
+    {
+        name: 'Headache',
+        description: 'Pain in the head or upper neck.',
+        id: 1
+    },
+    {
+        name: 'Fever',
+        description: 'Body temperature above the normal range.',
+        id: 2
+    },
+    {
+        name: 'Nausea',
+        description: 'Feeling of sickness with an inclination to vomit.',
+        id: 3
+    }
+].map(fields => new Symptom(fields.name, fields.description, fields.id));
 
 let specializationId = null;
 
 describe('Specialization constructor', () => {
-    let specialization;
-
-    beforeAll(() => {
-        // Create a new instance of Specialization for testing
-        specialization = new Specialization(
-            specializationFields.name,
-            specializationFields.description,
-            specializationFields.symptoms,
-            specializationFields.organs,
-            specializationFields.id
-        );
-    });
+    let specialization = new Specialization(specializationFields.name,
+        specializationFields.description, symptoms, organs, specializationFields.id);
 
     test('should return instance of Specialization', () => {
         expect(specialization).toBeInstanceOf(Specialization);
@@ -34,8 +59,8 @@ describe('Specialization constructor', () => {
     test('should return object with corresponding fields', () => {
         expect(specialization.name).toEqual(specializationFields.name);
         expect(specialization.description).toEqual(specializationFields.description);
-        expect(specialization.symptoms).toEqual(specializationFields.symptoms);
-        expect(specialization.organs).toEqual(specializationFields.organs);
+        expect(specialization.symptoms).toEqual(symptoms);
+        expect(specialization.organs).toEqual(organs);
         expect(specialization.id).toEqual(specializationFields.id);
     });
 
@@ -148,7 +173,7 @@ describe('Get specialization by id from DB', () => {
     test('should return a Specialization object', async () => {
         const specialization = await Specialization.getSpecializationsByIds([specializationId]);
         expect(specialization).toBeInstanceOf(Array);
-        expect(specialization.length).toBeGreaterThan(0); 
+        expect(specialization.length).toBeGreaterThan(0);
         expect(specialization[0]).toBeInstanceOf(Specialization);
         expect(specialization[0].id).toEqual(specializationId);
     });
@@ -158,9 +183,9 @@ describe('Update specialization by id in DB', () => {
     test('should return a specialization with updated description', async () => {
         const updates = { description: 'Updated description' };
         const updatedSpecialization = await Specialization.updateSpecialization(specializationId, updates);
-        
+
         expect(updatedSpecialization.description).toEqual('Updated description');
-        
+
         const [specialization] = await Specialization.getSpecializationsByIds([specializationId]);
         expect(specialization.description).toEqual('Updated description');
     });
@@ -168,9 +193,9 @@ describe('Update specialization by id in DB', () => {
     test('should return a specialization with updated name', async () => {
         const updates = { name: 'Updated Specialization Name' };
         const updatedSpecialization = await Specialization.updateSpecialization(specializationId, updates);
-        
+
         expect(updatedSpecialization.name).toEqual('Updated Specialization Name');
-        
+
         const [specialization] = await Specialization.getSpecializationsByIds([specializationId]);
         expect(specialization.name).toEqual('Updated Specialization Name');
     });
@@ -181,7 +206,7 @@ describe('Remove specialization from DB', () => {
         const specialization = (await Specialization.getSpecializationsByIds([specializationId]))[0];
 
         expect(async () => { await specialization.deleteSpecialization() }).not.toThrow();
-        
+
         const deletedSpecialization = await Specialization.getSpecializationsByIds([specializationId]);
         expect(deletedSpecialization.length).toBe(0);
     });

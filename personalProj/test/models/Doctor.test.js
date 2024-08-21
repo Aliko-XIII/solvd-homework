@@ -5,7 +5,7 @@ const { User } = require('../../models/User');
 const userFields = {
     firstName: 'John',
     lastName: 'Black',
-    phone: '1324234532',
+    phone: '88888888888',
     password: 'pass1234324',
     age: 25,
     sex: 'M',
