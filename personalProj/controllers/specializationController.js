@@ -42,8 +42,8 @@ const createSpecialization = async (req, res) => {
     try {
         const { name, description, symptoms, organs } = req.body;
         const specialization = new Specialization(name, description, symptoms, organs);
-        const id = await specialization.insertSpecialization();
-        res.status(201).send(id);
+        await specialization.insertSpecialization();
+        res.status(201).send(specialization);
     } catch (err) {
         res.status(500).send(err);
     }

@@ -38,8 +38,8 @@ const createDoctor = async (req, res) => {
         if (patientLoad) doctor.patientLoad = patientLoad;
         if (workdayStart) doctor.workdayStart = workdayStart;
         if (workdayEnd) doctor.workdayEnd = workdayEnd;
-        const id = await doctor.insertDoctor();
-        res.status(201).send(id);
+        await doctor.insertDoctor();
+        res.status(201).send(doctor);
     } catch (err) {
         res.status(500).send(err);
     }

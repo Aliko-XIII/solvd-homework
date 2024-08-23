@@ -2,7 +2,7 @@ const { Symptom } = require('../models/Symptom');
 
 const getSymptom = async (req, res) => {
     try {
-        const symptom = (await Symptom.getSymptomsById(req.params.id))[0];
+        const symptom = (await Symptom.getSymptomsByIds([req.params.id]))[0];
         if (symptom) {
             res.status(200).json(symptom);
         } else {
@@ -28,10 +28,10 @@ const getAllSymptoms = async (req, res) => {
 
 const createSymptom = async (req, res) => {
     try {
-        const { name, description, locationOrgan } = req.body;
-        const symptom = new Symptom(name, description, locationOrgan);
-        const id = await symptom.insertSymptom();
-        res.status(201).json(id);
+        const { name, description } = req.body;
+        const symptom = new Symptom(name, description);
+        await symptom.insertSymptom();
+        res.status(201).json(symptom);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -49,8 +49,8 @@ const updateSymptom = async (req, res) => {
             return res.status(400).json({ error: 'Symptom ID is required' });
         }
 
-        if (name && typeof name !== 'string') return res.status(400).json({ error: 'Invalid name' });
-        if (description && typeof description !== 'string') return res.status(400).json({ error: 'Invalid description' });
+        if ((name && typeof name !== 'string') || name == '') return res.status(400).json({ error: 'Invalid name' });
+        if ((description && typeof description !== 'string') || description == '') return res.status(400).json({ error: 'Invalid description' });
 
         const updates = { name, description };
         const hasParams = Object.values(updates).some(value => value !== undefined);
@@ -70,7 +70,7 @@ const updateSymptom = async (req, res) => {
 
 const deleteSymptom = async (req, res) => {
     try {
-        const symptom = (await Symptom.getSymptomsById(req.params.id))[0];
+        const symptom = (await Symptom.getSymptomsByIds([req.params.id]))[0];
         if (symptom) {
             await symptom.deleteSymptom();
             res.sendStatus(204);

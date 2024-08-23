@@ -30,8 +30,8 @@ const createOrgan = async (req, res) => {
     try {
         const { name, description } = req.body;
         const organ = new Organ(name, description);
-        const id = await organ.insertOrgan();
-        res.status(201).json(id);
+        await organ.insertOrgan();
+        res.status(201).json(organ);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -49,8 +49,8 @@ const updateOrgan = async (req, res) => {
             return res.status(400).json({ error: 'Organ ID is required' });
         }
 
-        if (name && typeof name !== 'string') return res.status(400).json({ error: 'Invalid name' });
-        if (description && typeof description !== 'string') return res.status(400).json({ error: 'Invalid description' });
+        if ((name && typeof name !== 'string') || name == '') return res.status(400).json({ error: 'Invalid name' });
+        if ((description && typeof description !== 'string') || description == '') return res.status(400).json({ error: 'Invalid description' });
 
         const updates = { name, description };
         const hasParams = Object.values(updates).some(value => value !== undefined);

@@ -80,8 +80,8 @@ const createAppointment = async (req, res) => {
         const patient = (await Patient.getPatientsByIds(false, patientId))[0];
         const doctor = (await Doctor.getDoctorsById(doctorId))[0];
         const appointment = new Appointment(patient, doctor, time, duration, description);
-        const id = await appointment.insertAppointment();
-        res.status(201).send(id);
+        await appointment.insertAppointment();
+        res.status(201).send(appointment);
     } catch (err) {
         res.status(500).send(err);
     }
