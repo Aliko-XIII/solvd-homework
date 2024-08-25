@@ -49,8 +49,12 @@ class User {
      * @returns {Promise<User[]>} - A promise that resolves to an array of User objects.
      */
     static async getUsersFromData(rows) {
-        return rows.map(row => new User(row.first_name, row.last_name, row.phone,
-            row.pass, row.age, row.sex, row.user_id));
+        return rows.map(row => {
+            const user = new User(row.first_name, row.last_name, row.phone, row.pass,
+                row.age, row.sex, row.user_id);
+            delete user.password;
+            return user;
+        });
     }
 
     /**
