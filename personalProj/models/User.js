@@ -46,7 +46,7 @@ class User {
      * Converts rows of user data into User objects.
      * 
      * @param {Array} rows - The rows of user data.
-     * @returns {Promise<Array<User>>} - A promise that resolves to an array of User objects.
+     * @returns {Promise<User[]>} - A promise that resolves to an array of User objects.
      */
     static async getUsersFromData(rows) {
         return rows.map(row => new User(row.first_name, row.last_name, row.phone,
@@ -63,10 +63,10 @@ class User {
      * @param {number} [filters.maxAge] - Top border for users' age.
      * @param {string} [filters.sex] - User's sex.
      * @param {string} [filters.phone] - Part of users' phone number.
-     * @returns {Promise<Array<User>>} - A promise that resolves to an array of User objects.
+     * @returns {Promise<User[]>} - A promise that resolves to an array of User objects.
      */
     static async getUsers({ firstName, lastName, minAge, maxAge, sex, phone } = {}) {
-        let queryStr = 'SELECT * FROM users';
+        let queryStr = 'SELECT user_id, first_name, last_name, age, sex, pass, phone FROM users';
         const conditions = [];
         if (firstName) conditions.push(`first_name ILIKE '%${firstName}%'`);
         if (lastName) conditions.push(`last_name ILIKE '%${lastName}%'`);
@@ -75,12 +75,22 @@ class User {
         if (sex) conditions.push(`sex = '${sex}'`);
         if (phone) conditions.push(`phone ILIKE '%${phone}%'`);
 
-        if (conditions.length > 0) {
-            queryStr += ` WHERE ${conditions.join(' AND ')}`;
-        }
+        if (conditions.length > 0) queryStr += ` WHERE ${conditions.join(' AND ')}`;
 
         const res = await query(queryStr);
         return await this.getUsersFromData(res.rows);
+    }
+
+    /**
+     * Retrieves multiple users by their IDs.
+     * 
+     * @param {string[]} ids - The user IDs.
+     * @returns {Promise<User[]>} - A promise that resolves to an array of User objects.
+     */
+    static async getUsersByIds(ids) {
+        const idArr = ids.map(id => `'${id.toString()}'`).join(',');
+        const res = await query(`SELECT * FROM users WHERE user_id IN (${idArr});`);
+        return User.getUsersFromData(res.rows);
     }
 
     /**
@@ -90,20 +100,7 @@ class User {
      * @returns {Promise<User>} - A promise that resolves to a User object.
      */
     static async getUserById(id) {
-        const res = await query(`SELECT * FROM users WHERE user_id = '${id.toString()}';`);
-        return (await User.getUsersFromData(res.rows))[0];
-    }
-
-    /**
-     * Retrieves multiple users by their IDs.
-     * 
-     * @param {string[]} ids - The user IDs.
-     * @returns {Promise<Array<User>>} - A promise that resolves to an array of User objects.
-     */
-    static async getUsersByIds(ids) {
-        const idArr = ids.map(id => `'${id.toString()}'`).join(',');
-        const res = await query(`SELECT * FROM users WHERE user_id IN (${idArr});`);
-        return User.getUsersFromData(res.rows);
+        return (await User.getUsersByIds([id]))[0];
     }
 
     /**
@@ -142,9 +139,8 @@ class User {
         if (sex) updates.push(`sex = '${sex}'`);
         if (pass) updates.push(`pass = '${pass}'`);
         if (phone) updates.push(`phone = '${phone}'`);
-        if (updates.length > 0) {
-            queryStr += ` ${updates.join(', ')} `;
-        }
+        if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
+
         queryStr += `WHERE user_id = '${id}' RETURNING *; `;
         const res = await query(queryStr);
         const updated = (await User.getUsersFromData(res.rows))[0];
@@ -163,7 +159,6 @@ class User {
         VALUES('${this.firstName}', '${this.lastName}', ${this.age},
             '${this.sex}', '${this.password}', '${this.phone}') RETURNING *; `);
         this.id = res.rows[0].user_id;
-        console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
 
@@ -173,8 +168,7 @@ class User {
      * @returns {Promise<void>}
      */
     async deleteUser() {
-        const res = await query(`DELETE FROM users WHERE user_id = '${this.id}' RETURNING *; `);
-        // console.log('Deleted:', res.rows[0]);
+        await query(`DELETE FROM users WHERE user_id = '${this.id}' RETURNING *; `);
     }
 }
 

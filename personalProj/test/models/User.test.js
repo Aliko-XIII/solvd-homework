@@ -28,22 +28,22 @@ describe('User constructor', () => {
 
     test('should throw an error for invalid age', () => {
         expect(() => {
-            const userInvalidAge = new User(userFields.firstName, userFields.lastName,
-                userFields.phone, userFields.password, -3, userFields.sex, userFields.id);
+            new User(userFields.firstName, userFields.lastName, userFields.phone,
+                userFields.password, -1, userFields.sex, userFields.id);
         }).toThrow(Error);
     });
 
     test('should throw an error for invalid string fields', () => {
         expect(() => {
-            const userInvalidName = new User('', '', userFields.phone, userFields.password,
-                userFields.age, userFields.sex, userFields.id);
+            new User('', '', userFields.phone, userFields.password, userFields.age,
+                userFields.sex, userFields.id);
         }).toThrow(Error);
     });
 
     test('should throw an error for invalid sex', () => {
         expect(() => {
-            const userInvalidSex = new User(userFields.firstName, userFields.lastName,
-                userFields.phone, userFields.password, userFields.age, 'Invalid', userFields.id);
+            new User(userFields.firstName, userFields.lastName, userFields.phone,
+                userFields.password, userFields.age, 'Invalid', userFields.id);
         }).toThrow(Error);
     });
 });
@@ -105,12 +105,16 @@ describe('Get users array from DB recors', () => {
 });
 
 describe('Insert a user to DB', () => {
+    beforeEach(async () => {
+        const userOld = await User.getUserByPhone(userFields.phone);
+        if (userOld) await userOld.deleteUser();
+    });
     test('should return an object with user\'s id', async () => {
         const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
             userFields.password, userFields.age, userFields.sex);
-        const id = (await user.insertUser()).id;
-        userId = id;
-        expect(id.length > 0).toBeTruthy();
+        userId = (await user.insertUser()).id;
+        expect(userId).toBeTruthy();
+        expect(typeof userId).toBe('string');
     });
 });
 
@@ -126,9 +130,7 @@ describe('Get all users from DB', () => {
     test('should return array of User objects', async () => {
         const users = await User.getUsers();
         expect(users).toBeInstanceOf(Array);
-        users.forEach(user => {
-            expect(user).toBeInstanceOf(User);
-        });
+        users.forEach(user => expect(user).toBeInstanceOf(User));
     });
 
     test('should return array with name filter applied', async () => {
@@ -190,7 +192,7 @@ describe('Update user by id in DB', () => {
 describe('Remove user from DB', () => {
     test('should remove user from DB', async () => {
         const user = await User.getUserById(userId);
-        expect(async () => { await user.deleteUser() }).not.toThrow();
+        expect(async () => await user.deleteUser()).not.toThrow();
     });
 });
 
