@@ -14,6 +14,9 @@ const organFields = {
 let organId = null;
 let organProperties = [];
 
+const testOrgan = new Organ(organFields.name, organFields.description);
+    organProperties = Object.getOwnPropertyNames(testOrgan).filter(prop =>
+        typeof testOrgan[prop] !== 'function');
 describe('POST /organs', () => {
     test('should insert a organ object to DB', async () => {
         const res = await request(app).post('/api/organs').send({
@@ -29,9 +32,6 @@ describe('POST /organs', () => {
 });
 
 describe('GET /organs', () => {
-    const testOrgan = new Organ(organFields.name, organFields.description);
-    organProperties = Object.getOwnPropertyNames(testOrgan).filter(prop =>
-        typeof testOrgan[prop] !== 'function');
     test('should return an array of organs', async () => {
         const res = await request(app).get('/api/organs');
         expect(res.statusCode).toEqual(200);

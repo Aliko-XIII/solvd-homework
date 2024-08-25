@@ -14,6 +14,10 @@ const symptomFields = {
 let symptomId = null;
 let symptomProperties = [];
 
+const testSymptom = new Symptom(symptomFields.name, symptomFields.description);
+symptomProperties = Object.getOwnPropertyNames(testSymptom).filter(prop =>
+    typeof testSymptom[prop] !== 'function');
+
 describe('POST /symptoms', () => {
     test('should insert a symptom object to DB', async () => {
         const res = await request(app).post('/api/symptoms').send({
@@ -29,9 +33,6 @@ describe('POST /symptoms', () => {
 });
 
 describe('GET /symptoms', () => {
-    const testSymptom = new Symptom(symptomFields.name, symptomFields.description);
-    symptomProperties = Object.getOwnPropertyNames(testSymptom).filter(prop =>
-        typeof testSymptom[prop] !== 'function');
     test('should return an array of symptoms', async () => {
         const res = await request(app).get('/api/symptoms');
         expect(res.statusCode).toEqual(200);
