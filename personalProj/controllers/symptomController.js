@@ -2,7 +2,7 @@ const { Symptom } = require('../models/Symptom');
 
 const getSymptom = async (req, res) => {
     try {
-        const symptom = (await Symptom.getSymptomsByIds([req.params.id]))[0];
+        const symptom = await Symptom.getSymptomById(req.params.id);
         if (symptom) {
             res.status(200).json(symptom);
         } else {
@@ -45,22 +45,15 @@ const updateSymptom = async (req, res) => {
         const { id } = req.params;
         const { name, description } = req.body;
 
-        if (!id) {
-            return res.status(400).json({ error: 'Symptom ID is required' });
-        }
-
+        if (!id) return res.status(400).json({ error: 'Symptom ID is required' });
         if ((name && typeof name !== 'string') || name == '') return res.status(400).json({ error: 'Invalid name' });
         if ((description && typeof description !== 'string') || description == '') return res.status(400).json({ error: 'Invalid description' });
 
         const updates = { name, description };
         const hasParams = Object.values(updates).some(value => value !== undefined);
-
-        if (!hasParams) {
-            return res.status(400).json({ error: 'No parameters to update' });
-        }
+        if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
         const updated = await Symptom.updateSymptom(id, updates);
-
         res.status(200).json(updated);
     } catch (error) {
         console.error(error);

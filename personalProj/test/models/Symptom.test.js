@@ -45,6 +45,23 @@ describe('Get symptoms array from DB records', () => {
     });
 });
 
+describe('Insert a symptom to DB', () => {
+    test('should return an object with symptom\'s id', async () => {
+        const symptom = new Symptom(symptomFields.name, symptomFields.description);
+        const result = await symptom.insertSymptom();
+        symptomId = result.id;
+        expect(symptomId).toBeTruthy();
+    });
+});
+
+describe('Get symptom by id from DB', () => {
+    test('should return a Symptom object', async () => {
+        const symptom = await Symptom.getSymptomById(symptomId);
+        expect(symptom).toBeInstanceOf(Symptom);
+        expect(symptom.id).toEqual(symptomId);
+    });
+});
+
 describe('Get all symptoms from DB', () => {
     test('should return array of Symptom objects', async () => {
         const symptoms = await Symptom.getSymptoms({});
@@ -68,23 +85,6 @@ describe('Get all symptoms from DB', () => {
         symptoms.forEach(symptom => {
             expect(symptom.description.indexOf('a') !== -1).toBeTruthy();
         });
-    });
-});
-
-describe('Get symptom by id from DB', () => {
-    test('should return a Symptom object', async () => {
-        const symptom = await Symptom.getSymptomById(symptomFields.id);
-        expect(symptom).toBeInstanceOf(Symptom);
-        expect(symptom.id).toEqual(symptomFields.id);
-    });
-});
-
-describe('Insert a symptom to DB', () => {
-    test('should return an object with symptom\'s id', async () => {
-        const symptom = new Symptom(symptomFields.name, symptomFields.description);
-        const result = await symptom.insertSymptom();
-        symptomId = result.id;
-        expect(symptomId).toBeTruthy();
     });
 });
 

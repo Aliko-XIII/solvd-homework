@@ -31,7 +31,7 @@ class Symptom {
     /**
      * Create an array of Symptom objects from database rows.
      * @param {Array} rows - The rows of symptom data from the database.
-     * @returns {Array<Symptom>} An array of Symptom objects.
+     * @returns {Symptom[]} An array of Symptom objects.
      */
     static getSymptomsFromData(rows) {
         return rows.map(row =>
@@ -43,17 +43,15 @@ class Symptom {
      * @param {Object} filters - The filters to apply.
      * @param {string} [filters.name] - Part of the symptom's name.
      * @param {string} [filters.description] - Part of the symptom's description.
-     * @returns {Promise<Array<Symptom>>} A promise that resolves to an array of Symptom objects.
+     * @returns {Promise<Symptom[]>} A promise that resolves to an array of Symptom objects.
      */
     static async getSymptoms({ name, description }) {
-        let queryStr = `SELECT * FROM symptoms`;
+        let queryStr = `SELECT symptom_name, symptom_description, symptom_id FROM symptoms`;
         const conditions = [];
 
         if (name) conditions.push(`symptom_name ILIKE '%${name}%'`);
         if (description) conditions.push(`symptom_description ILIKE '%${description}%'`);
-        if (conditions.length > 0) {
-            queryStr += ` WHERE ${conditions.join(' AND ')}`;
-        }
+        if (conditions.length > 0) queryStr += ` WHERE ${conditions.join(' AND ')}`;
 
         const res = await query(queryStr);
         return this.getSymptomsFromData(res.rows);
@@ -61,26 +59,22 @@ class Symptom {
 
     /**
      * Get symptoms by their IDs from the database.
-     * @param {...number} id - The IDs of the symptoms.
-     * @returns {Promise<Array<Symptom>>} A promise that resolves to an array of Symptom objects.
+     * @param {number[]} id - The IDs of the symptoms.
+     * @returns {Promise<Symptom[]>} A promise that resolves to an array of Symptom objects.
      */
-    static async getSymptomsByIds(...ids) {
-        const res = await query(`SELECT * FROM symptoms 
-            WHERE symptom_id IN (${ids.toString()});`);
+    static async getSymptomsByIds([ids]) {
+        const res = await query(`SELECT symptom_name, symptom_description, symptom_id
+            FROM symptoms WHERE symptom_id IN (${ids.toString()});`);
         return this.getSymptomsFromData(res.rows);
     }
 
     /**
      * Get a symptom by its ID from the database.
      * @param {number} id - The ID of the symptom.
-     * @returns {Promise<Symptom|null>} A promise that resolves to a Symptom object or null if not found.
+     * @returns {Promise<Symptom>} A promise that resolves to a Symptom object or null if not found.
      */
     static async getSymptomById(id) {
-        const res = await query(`SELECT * FROM symptoms WHERE symptom_id = ${id};`);
-        if (res.rows.length === 0) {
-            return null;
-        }
-        return this.getSymptomsFromData(res.rows)[0];
+        return (await Symptom.getSymptomsByIds([id]))[0];
     }
 
     /**
@@ -91,9 +85,7 @@ class Symptom {
         const res = await query(`INSERT INTO symptoms(symptom_name, symptom_description)
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].symptom_id;
-        console.log('Inserted:', res.rows[0]);
         return { id: this.id };
-
     }
 
     /**
@@ -118,7 +110,7 @@ class Symptom {
         queryStr += `WHERE symptom_id = ${id} RETURNING *; `;
 
         const res = await query(queryStr);
-        const updated = (await this.getSymptomsFromData(res.rows))[0];
+        const updated = (Symptom.getSymptomsFromData(res.rows))[0];
         return updated;
     }
 
@@ -127,8 +119,7 @@ class Symptom {
      * @returns {Promise<void>} A promise that resolves when the symptom is deleted.
      */
     async deleteSymptom() {
-        const res = await query(`DELETE FROM symptoms WHERE symptom_id = ${this.id} RETURNING *;`);
-        console.log('Deleted:', res.rows[0]);
+        await query(`DELETE FROM symptoms WHERE symptom_id = ${this.id} RETURNING *;`);
     }
 }
 
