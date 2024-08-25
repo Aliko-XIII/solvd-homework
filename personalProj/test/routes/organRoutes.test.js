@@ -1,11 +1,11 @@
 const request = require('supertest');
 const express = require('express');
-const routes = require('../../routes/organRoutes');
+const organRoutes = require('../../routes/organRoutes');
 const { Organ } = require('../../models/Organ');
 
 const app = express();
 app.use(express.json());
-app.use('/api/organs', routes);
+app.use('/api/organs', organRoutes);
 
 const organFields = {
     name: 'Heart',
@@ -13,6 +13,20 @@ const organFields = {
 };
 let organId = null;
 let organProperties = [];
+
+describe('POST /organs', () => {
+    test('should insert a organ object to DB', async () => {
+        const res = await request(app).post('/api/organs').send({
+            name: organFields.name,
+            description: organFields.description
+        });
+        expect(res.statusCode).toEqual(201);
+        organId = res.body.id;
+        expect(res.body.id > 0).toBeTruthy();
+        organProperties.forEach(prop => expect(res.body).toHaveProperty(prop));
+    });
+
+});
 
 describe('GET /organs', () => {
     const testOrgan = new Organ(organFields.name, organFields.description);
@@ -35,20 +49,6 @@ describe('GET /organs', () => {
             expect(organ.name.indexOf('a')).toBeTruthy();
         });
     });
-});
-
-describe('POST /organs', () => {
-    test('should insert a organ object to DB', async () => {
-        const res = await request(app).post('/api/organs').send({
-            name: organFields.name,
-            description: organFields.description
-        });
-        expect(res.statusCode).toEqual(201);
-        organId = res.body.id;
-        expect(res.body.id > 0).toBeTruthy();
-        organProperties.forEach(prop => expect(res.body).toHaveProperty(prop));
-    });
-
 });
 
 describe('GET /organs/:id', () => {

@@ -42,14 +42,12 @@ class Organ {
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
     static async getOrgans({ name, description }) {
-        let queryStr = `SELECT * FROM organs`;
+        let queryStr = `SELECT organ_id, organ_name, organ_description FROM organs`;
         const conditions = [];
         if (name) conditions.push(`organ_name ILIKE '%${name}%'`);
         if (description) conditions.push(`organ_description ILIKE '%${description}%'`);
+        if (conditions.length > 0) queryStr += ` WHERE ${conditions.join(' AND ')};`;
 
-        if (conditions.length > 0) {
-            queryStr += ` WHERE ${conditions.join(' AND ')};`;
-        }
         const res = await query(queryStr);
         return await Organ.getOrgansFromData(res.rows);
     }
@@ -60,9 +58,9 @@ class Organ {
      * @returns {Promise<Array<Organ>>} A promise that resolves to an array of Organ objects.
      */
     static async getOrgansByIds(ids) {
-        const res = await query(`SELECT * FROM organs 
+        const res = await query(`SELECT organ_id, organ_name, organ_description FROM organs 
             WHERE organ_id IN (${ids.toString()});`);
-        return await this.getOrgansFromData(res.rows);
+        return await Organ.getOrgansFromData(res.rows);
     }
 
     /**
@@ -71,7 +69,7 @@ class Organ {
      * @returns {Promise<Organ|null>} A promise that resolves to an Organ object or null if not found.
      */
     static async getOrganById(id) {
-        return (await Organ.getOrgansByIds(id))[0];
+        return (await Organ.getOrgansByIds([id]))[0];
     }
 
     /**
@@ -83,7 +81,6 @@ class Organ {
 	        organ_name, organ_description)
             VALUES ('${this.name}', '${this.description}') RETURNING *;`);
         this.id = res.rows[0].organ_id;
-        console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
 
@@ -119,8 +116,7 @@ class Organ {
      * @returns {Promise<void>} A promise that resolves when the organ is deleted.
      */
     async deleteOrgan() {
-        const res = await query(`DELETE FROM organs WHERE organ_id = ${this.id} RETURNING *;`);
-        console.log('Deleted:', res.rows[0]);
+        await query(`DELETE FROM organs WHERE organ_id = ${this.id} RETURNING *;`);
     }
 }
 

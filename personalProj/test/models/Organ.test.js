@@ -45,6 +45,15 @@ describe('Get organs array from DB records', () => {
     });
 });
 
+describe('Insert an organ to DB', () => {
+    test('should return an object with organ\'s id', async () => {
+        const organ = new Organ(organFields.name, organFields.description);
+        const result = await organ.insertOrgan();
+        organId = result.id;
+        expect(organId).toBeTruthy();
+    });
+});
+
 describe('Get all organs from DB', () => {
     test('should return array of Organ objects', async () => {
         const organs = await Organ.getOrgans({});
@@ -55,10 +64,10 @@ describe('Get all organs from DB', () => {
     });
 
     test('should return array with name filter applied', async () => {
-        const organs = await Organ.getOrgans({ name: 'Heart' });
+        const organs = await Organ.getOrgans({ name: 'e' });
         expect(organs).toBeInstanceOf(Array);
         organs.forEach(organ => {
-            expect(organ.name.indexOf('Heart') !== -1).toBeTruthy();
+            expect(organ.name.indexOf('e')).toBeTruthy();
         });
     });
 
@@ -73,18 +82,9 @@ describe('Get all organs from DB', () => {
 
 describe('Get organ by id from DB', () => {
     test('should return an Organ object', async () => {
-        const organ = await Organ.getOrganById(organFields.id);
+        const organ = await Organ.getOrganById(organId);
         expect(organ).toBeInstanceOf(Organ);
-        expect(organ.id).toEqual(organFields.id);
-    });
-});
-
-describe('Insert an organ to DB', () => {
-    test('should return an object with organ\'s id', async () => {
-        const organ = new Organ(organFields.name, organFields.description);
-        const result = await organ.insertOrgan();
-        organId = result.id;
-        expect(organId).toBeTruthy();
+        expect(organ.id).toEqual(organId);
     });
 });
 

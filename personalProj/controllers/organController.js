@@ -2,7 +2,7 @@ const { Organ } = require('../models/Organ');
 
 const getOrgan = async (req, res) => {
     try {
-        const organ = (await Organ.getOrgansByIds([req.params.id]))[0];
+        const organ = await Organ.getOrganById(req.params.id);
         if (organ) {
             res.status(200).json(organ);
         } else {
@@ -37,18 +37,12 @@ const createOrgan = async (req, res) => {
     }
 };
 
-/**
- * Handles the request to update an organ by its ID.
- */
 const updateOrgan = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, description } = req.body;
 
-        if (!id) {
-            return res.status(400).json({ error: 'Organ ID is required' });
-        }
-
+        if (!id) return res.status(400).json({ error: 'Organ ID is required' });
         if ((name && typeof name !== 'string') || name == '') return res.status(400).json({ error: 'Invalid name' });
         if ((description && typeof description !== 'string') || description == '') return res.status(400).json({ error: 'Invalid description' });
 
@@ -57,7 +51,6 @@ const updateOrgan = async (req, res) => {
         if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
         const updated = await Organ.updateOrgan(id, updates);
-
         res.status(200).json(updated);
     } catch (error) {
         console.error(error);
@@ -67,7 +60,7 @@ const updateOrgan = async (req, res) => {
 
 const deleteOrgan = async (req, res) => {
     try {
-        const organ = (await Organ.getOrgansByIds([req.params.id]))[0];
+        const organ = await Organ.getOrganById(req.params.id);
         if (organ) {
             await organ.deleteOrgan();
             res.sendStatus(204);
