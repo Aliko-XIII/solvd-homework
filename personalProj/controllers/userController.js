@@ -22,8 +22,8 @@ const getAllUsers = async (req, res) => {
         const filters = {
             firstName: firstName && firstName.length > 0 ? firstName : undefined,
             lastName: lastName && lastName.length > 0 ? lastName : undefined,
-            minAge: minAge ? parseInt(minAge, 10) : undefined,
-            maxAge: maxAge ? parseInt(maxAge, 10) : undefined,
+            minAge: minAge ? parseInt(minAge) : undefined,
+            maxAge: maxAge ? parseInt(maxAge) : undefined,
             sex: sex == 'M' || sex == 'F' ? sex : undefined,
             phone: phone && phone.length > 0 ? phone : undefined,
         };
@@ -87,7 +87,7 @@ const updateUser = async (req, res) => {
         if (lastName && typeof lastName !== 'string') return res.status(400).json({ error: 'Invalid last name' });
         if (phone && typeof phone !== 'string') return res.status(400).json({ error: 'Invalid phone number' });
         if (password && typeof password !== 'string') return res.status(400).json({ error: 'Invalid password' });
-        // if (age && (typeof age !== 'number' || age <= 0)) return res.status(400).json({ error: 'Invalid age' });
+        if (age && (typeof age !== 'number' || age <= 0)) return res.status(400).json({ error: 'Invalid age' });
         if (sex && !['F', 'M'].includes(sex)) return res.status(400).json({ error: 'Invalid sex' });
 
         const updated = await User.updateUser(id, { firstName, lastName, phone, password, age, sex });
