@@ -93,7 +93,8 @@ class User {
      */
     static async getUsersByIds(ids) {
         const idArr = ids.map(id => `'${id.toString()}'`).join(',');
-        const res = await query(`SELECT * FROM users WHERE user_id IN (${idArr});`);
+        const res = await query(`SELECT user_id, first_name, last_name, age, sex, pass, phone
+            FROM users WHERE user_id IN (${idArr});`);
         return User.getUsersFromData(res.rows);
     }
 
@@ -114,7 +115,8 @@ class User {
      * @returns {Promise<User>} - A promise that resolves to a User object.
      */
     static async getUserByPhone(phone) {
-        const res = await query(`SELECT * FROM users WHERE phone = '${phone}';`);
+        const res = await query(`SELECT user_id, first_name, last_name, age, sex, pass, phone
+            FROM users WHERE phone = '${phone}';`);
         return (await this.getUsersFromData(res.rows))[0];
     }
 
