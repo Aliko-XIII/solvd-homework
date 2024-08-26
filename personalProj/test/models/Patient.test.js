@@ -21,7 +21,7 @@ let patientId = null;
 describe('Patient constructor', () => {
     const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
         userFields.password, userFields.age, userFields.sex, userFields.id);
-    const patient = new Patient(patientFields.insuranceNumber, patientFields.insuranceProvider, user);
+    const patient = new Patient(user, patientFields.insuranceNumber, patientFields.insuranceProvider);
 
     test('should return instance of Patient', () => {
         expect(patient).toBeInstanceOf(Patient);
@@ -35,13 +35,13 @@ describe('Patient constructor', () => {
 
     test('should throw an error for invalid insuranceNumber', () => {
         expect(() => {
-            const invalidPatient = new Patient(12345, patientFields.insuranceProvider, user);
+            const invalidPatient = new Patient(user, 12345, patientFields.insuranceProvider);
         }).toThrow(Error);
     });
 
     test('should throw an error for invalid insuranceProvider', () => {
         expect(() => {
-            const invalidPatient = new Patient(patientFields.insuranceNumber, 12345, user);
+            const invalidPatient = new Patient(user, patientFields.insuranceNumber, 12345);
         }).toThrow(Error);
     });
 });
@@ -112,7 +112,7 @@ describe('Insert a patient to DB', () => {
         const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
             userFields.password, userFields.age, userFields.sex);
         await user.insertUser();
-        const patient = new Patient(patientFields.insuranceNumber, patientFields.insuranceProvider, user);
+        const patient = new Patient(user, patientFields.insuranceNumber, patientFields.insuranceProvider);
         const id = (await patient.insertPatient()).id;
         patientId = id;
         expect(id.length > 0).toBeTruthy();

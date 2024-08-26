@@ -66,8 +66,8 @@ describe('GET /appointments', () => {
         doctorFields.workdayStart, doctorFields.workdayEnd);
     const testUser2 = new User(userFields.firstName, userFields.lastName, userFields.phone2,
         userFields.password, userFields.age, userFields.sex);
-    const testPatient = new Patient(patientFields.insuranceNumber,
-        patientFields.insuranceProvider, testUser2);
+    const testPatient = new Patient(testUser2, patientFields.insuranceNumber,
+        patientFields.insuranceProvider);
     const testAppointments = new Appointment(testPatient, testDoctor, appointmentFields.time,
         appointmentFields.duration, appointmentFields.description);
     appointmentProperties = Object.getOwnPropertyNames(testAppointments).filter(prop =>

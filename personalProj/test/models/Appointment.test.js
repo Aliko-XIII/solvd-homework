@@ -45,8 +45,8 @@ describe('Appointment constructor', () => {
 
     const user2 = new User(userFields.firstName, userFields.lastName, userFields.phone,
         userFields.password, userFields.age, userFields.sex, userFields.id1);
-    const patient = new Patient(patientFields.insuranceNumber,
-        patientFields.insuranceProvider, user2);
+    const patient = new Patient(user2, patientFields.insuranceNumber,
+        patientFields.insuranceProvider);
 
     const appointment = new Appointment(patient, doctor, appointmentFields.time,
         appointmentFields.duration, appointmentFields.description, appointmentFields.id);
@@ -81,8 +81,8 @@ describe('Get appointments array from DB records', () => {
 
     const user2 = new User(userFields.firstName, userFields.lastName, userFields.phone,
         userFields.password, userFields.age, userFields.sex, userFields.id2);
-    const patient = new Patient(patientFields.insuranceNumber,
-        patientFields.insuranceProvider, user2);
+    const patient = new Patient(user2, patientFields.insuranceNumber,
+        patientFields.insuranceProvider);
 
     test('should return array of appointment objects', async () => {
         const appointments = await Appointment.getAppointmentsFromData([
@@ -169,7 +169,7 @@ describe('Insert an appointment to DB', () => {
         const existing2 = await User.getUserByPhone('555555555555');
         if (existing2) await existing2.deleteUser();
         await user2.insertUser();
-        const patient = new Patient(patientFields.insuranceNumber, patientFields.insuranceProvider, user2);
+        const patient = new Patient(user2, patientFields.insuranceNumber, patientFields.insuranceProvider);
         user2Id = (await patient.insertPatient()).id;
 
         const appointment = new Appointment(patient, doctor, appointmentFields.time,

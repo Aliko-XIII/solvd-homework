@@ -44,7 +44,7 @@ const createPatient = async (req, res) => {
         }
 
         const user = await User.getUserById(userId);
-        const patient = new Patient(insuranceNumber, insuranceProvider, user);
+        const patient = new Patient(user, insuranceNumber, insuranceProvider);
         await patient.insertPatient();
         res.status(201).json(patient);
     } catch (err) {

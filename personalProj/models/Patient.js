@@ -13,7 +13,7 @@ class Patient extends Role {
      * @param {string} insuranceProvider - The patient's insurance provider.
      * @param {User} user - The patient's user record.
      */
-    constructor(insuranceNumber, insuranceProvider, user) {
+    constructor(user, insuranceNumber, insuranceProvider) {
         super(user);
         if (!this.validateString(insuranceNumber)) throw new Error('Insurance number is not valid.');
         if (!this.validateString(insuranceProvider)) throw new Error('Insurance provider is not valid.');
@@ -43,7 +43,7 @@ class Patient extends Role {
             const user = nestUser ?
                 (await User.getUsersFromData([row]))[0] :
                 { id: row.user_id };
-            const patient = new Patient(row.insurance_number, row.insurance_provider, user);
+            const patient = new Patient(user, row.insurance_number, row.insurance_provider);
             return patient;
         });
         return Promise.all(patients);

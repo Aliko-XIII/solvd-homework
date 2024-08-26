@@ -28,8 +28,8 @@ let patientProperties = [];
 describe('GET /patients', () => {
     const testUser = new User(userFields.firstName, userFields.lastName, userFields.phone,
         userFields.password, userFields.age, userFields.sex);
-    const testPatient = new Patient(patientFields.insuranceNumber,
-        patientFields.insuranceProvider, testUser)
+    const testPatient = new Patient(testUser, patientFields.insuranceNumber,
+        patientFields.insuranceProvider)
     patientProperties = Object.getOwnPropertyNames(testPatient).filter(prop =>
         typeof testPatient[prop] !== 'function'
     );
