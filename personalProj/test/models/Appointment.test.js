@@ -80,7 +80,7 @@ describe('Get appointments array from DB records', () => {
         doctorFields.workdayStart, doctorFields.workdayEnd);
 
     const user2 = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex, userFields.id1);
+        userFields.password, userFields.age, userFields.sex, userFields.id2);
     const patient = new Patient(patientFields.insuranceNumber,
         patientFields.insuranceProvider, user2);
 
@@ -154,8 +154,11 @@ describe('Get all appointments from DB', () => {
 
 describe('Insert an appointment to DB', () => {
     test('should return an object with appointment\'s id', async () => {
-        const user1 = new User(userFields.firstName, userFields.lastName, '66666666666',
+        const user1 = new User(userFields.firstName, userFields.lastName, '555555666666',
             userFields.password, userFields.age, userFields.sex);
+
+        const existing1 = await User.getUserByPhone('555555666666');
+        if (existing1) await existing1.deleteUser();
         await user1.insertUser();
         const doctor = new Doctor(user1, doctorFields.specialization, doctorFields.patientLoad,
             doctorFields.workdayStart, doctorFields.workdayEnd);
@@ -163,6 +166,8 @@ describe('Insert an appointment to DB', () => {
 
         const user2 = new User(userFields.firstName, userFields.lastName, '555555555555',
             userFields.password, userFields.age, userFields.sex);
+        const existing2 = await User.getUserByPhone('555555555555');
+        if (existing2) await existing2.deleteUser();
         await user2.insertUser();
         const patient = new Patient(patientFields.insuranceNumber, patientFields.insuranceProvider, user2);
         user2Id = (await patient.insertPatient()).id;
@@ -171,7 +176,6 @@ describe('Insert an appointment to DB', () => {
             appointmentFields.duration, appointmentFields.description);
         const id = (await appointment.insertAppointment()).id;
         appointmentId = id;
-
         expect(id).toBeTruthy();
     });
 });

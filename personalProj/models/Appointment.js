@@ -114,7 +114,7 @@ class Appointment {
         const res = await query(`INSERT INTO appointments(
 	        appointment_time, appointment_duration, additional_info, patient_id, doctor_id)
 	        VALUES ('${this.time}', '${this.duration}', '${this.description}', 
-            '${this.patient.id}', '${this.doctor.id}') RETURNING *;`);
+            '${this.patient.user.id}', '${this.doctor.user.id}') RETURNING *;`);
         this.id = res.rows[0].appointment_id;
         console.log('Inserted:', res.rows[0]);
         return { id: this.id };

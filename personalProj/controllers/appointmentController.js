@@ -77,9 +77,10 @@ const updateAppointment = async (req, res) => {
 const createAppointment = async (req, res) => {
     try {
         const { patientId, doctorId, time, duration, description } = req.body;
-        const patient = (await Patient.getPatientsByIds(false, patientId))[0];
-        const doctor = (await Doctor.getDoctorsById(doctorId))[0];
+        const patient = (await Patient.getPatientsByIds([patientId]))[0];
+        const doctor = (await Doctor.getDoctorsByIds([doctorId]))[0];
         const appointment = new Appointment(patient, doctor, time, duration, description);
+        console.log('Appointment:', appointment);
         await appointment.insertAppointment();
         res.status(201).send(appointment);
     } catch (err) {

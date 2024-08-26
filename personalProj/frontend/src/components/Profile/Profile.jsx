@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const Profile = ({ deleteUser }) => {
     const { user, setUser, role, setRole } = useContext(HospitalContext);
     const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(() => {
         if (role.name == 'guest') {
