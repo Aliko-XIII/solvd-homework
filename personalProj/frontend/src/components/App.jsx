@@ -1,6 +1,6 @@
 import React from 'react';
 import { createContext, useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./Header/Header";
 import Login from "./Login/Login";
 import Navigation from "./Navigation/Navigation";
@@ -60,10 +60,6 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
         setUser(user);
     }
 
-    async function logUsers() {
-        console.log(await dataFetchers.getUsers());
-    }
-
     return (
         <HospitalContext.Provider value={{
             user: user,
@@ -77,19 +73,16 @@ const App = ({ dataFetchers, loginUser, registerUser }) => {
 
             <BrowserRouter>
                 <Header />
-            <Navigation />
+                <Navigation />
 
                 <div className="contentWrapper">
                     <Routes>
                         <Route exact path="/" element={<Login />} />
                         <Route exact path="/login" element={<Login />} />
                         <Route exact path="/register" element={<Register />} />
-                        <Route exact path="/config"
-                            element={<Config updateUser={dataFetchers.updateUser} />} />
-                        <Route exact path="/profile"
-                            element={<Profile deleteUser={dataFetchers.deleteUser} />} />
-                        <Route exact path="/role"
-                            element={<Role setPatient={setPatient} setDoctor={setDoctor} />} />
+                        <Route exact path="/config" element={<Config updateUser={dataFetchers.updateUser}/>} />
+                        <Route exact path="/profile" element={<Profile deleteUser={dataFetchers.deleteUser}/>} />
+                        <Route eUxact path="/role" element={<Role setDoctor={setDoctor} setPatient={setPatient} />} />
                         <Route exact path="/organs" element={<Organs />} />
                         <Route exact path="/symptoms" element={<Symptoms />} />
                         <Route exact path="/specializations" element={<Specializations />} />

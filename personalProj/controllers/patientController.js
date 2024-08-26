@@ -57,12 +57,17 @@ const createPatient = async (req, res) => {
  */
 const deletePatient = async (req, res) => {
     try {
+
         const patient = await Patient.getPatientById(req.params.id);
         if (patient) {
-            await Patient.deletePatient(req.params.id);
+            await patient.deletePatient(req.params.id);
             res.sendStatus(204);
         } else {
-            res.status(404).json({ error: 'Patient not found' });
+            res.status(404).json({
+                error: 'Patient not found',
+                id: req.params.id,
+                patient: patient + ''
+            });
         }
     } catch (err) {
         res.status(500).json({ error: err.message });
