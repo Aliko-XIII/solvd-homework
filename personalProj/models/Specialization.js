@@ -39,7 +39,7 @@ class Specialization {
     /**
      * Create an array of Specialization objects from database rows.
      * @param {Array} rows - The rows of specialization data from the database.
-     * @returns {Promise<Array<Specialization>>} A promise that resolves to an array of Specialization objects.
+     * @returns {Promise<Specialization[]>} A promise that resolves to an array of Specialization objects.
      */
     static async getSpecializationsFromData(rows) {
         if (rows.length == 0) return [];
@@ -62,9 +62,9 @@ class Specialization {
     * @param {string} [filters.description] - Part of the specialization's description.
     * @param {boolean} [filters.nestOrgans=false] - Whether to nest organs as full objects.
     * @param {boolean} [filters.nestSymptoms=false] - Whether to nest symptoms as full objects.
-    * @returns {Promise<Array<Specialization>>} A promise that resolves to an array of Specialization objects.
+    * @returns {Promise<Specialization[]>} A promise that resolves to an array of Specialization objects.
     */
-    static async getSpecializations({ nestSymptoms, nestOrgans, name, description }) {
+    static async getSpecializations({ nestSymptoms, nestOrgans, name, description } = {}) {
         let queryStr = `SELECT s.specialization_id, s.specialization_name, s.specialization_description,\n`;
 
         queryStr += !nestSymptoms
@@ -102,7 +102,7 @@ class Specialization {
      * @param {boolean} nestOrgans - Whether to nest organs as full objects.
      * @param {boolean} nestSymptoms - Whether to nest symptoms as full objects.
      * @param {number[]} ids - The IDs of the specializations.
-     * @returns {Promise<Array<Specialization>>} A promise that resolves to an array of Specialization objects.
+     * @returns {Promise<Specialization[]>} A promise that resolves to an array of Specialization objects.
      */
     static async getSpecializationsByIds(ids, nestOrgans = false, nestSymptoms = false) {
         let queryStr = `SELECT s.specialization_id, s.specialization_name, s.specialization_description, `;
@@ -131,6 +131,10 @@ class Specialization {
         return await Specialization.getSpecializationsFromData(res.rows);
     }
 
+    static async getSpecializationById(id, nestOrgans = false, nestSymptoms = false) {
+        return (await Specialization.getSpecializationsByIds([id], nestOrgans, nestSymptoms))[0];
+    }
+
     /**
      * Update the current Specialization object in the database.
      * @param {Object} updates - The fields to update.
@@ -150,9 +154,8 @@ class Specialization {
         const updates = [];
         if (name) updates.push(`specialization_name = '${name}'`);
         if (description) updates.push(`specialization_description = '${description}'`);
-        if (updates.length > 0) {
-            queryStr += ` ${updates.join(', ')} `;
-        }
+        if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
+
         queryStr += ` WHERE specialization_id = ${id} RETURNING *;`;
 
         try {

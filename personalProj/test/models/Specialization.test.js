@@ -125,34 +125,6 @@ describe('Get specializations array from DB records', () => {
     });
 });
 
-describe('Get all specializations from DB', () => {
-    test('should return array of Specialization objects from getSpecializations()', async () => {
-        const specializations = await Specialization.getSpecializations({});
-        expect(specializations).toBeInstanceOf(Array);
-        specializations.forEach(specialization => {
-            expect(specialization).toBeInstanceOf(Specialization);
-        });
-    });
-
-    test('should return array with name filter applied in getSpecializations()', async () => {
-        const specializations = await Specialization.getSpecializations({ name: 'log' });
-        expect(specializations).toBeInstanceOf(Array);
-        specializations.forEach(specialization => {
-            expect(specialization).toBeInstanceOf(Specialization);
-            expect(specialization.name.toLowerCase()).toContain('log');
-        });
-    });
-
-    test('should return array with description filter applied in getSpecializations()', async () => {
-        const specializations = await Specialization.getSpecializations({ description: 'ea' });
-        expect(specializations).toBeInstanceOf(Array);
-        specializations.forEach(specialization => {
-            expect(specialization).toBeInstanceOf(Specialization);
-            expect(specialization.description.toLowerCase()).toContain('ea');
-        });
-    });
-});
-
 describe('Insert a specialization to DB', () => {
     test('should return an object with specialization\'s id', async () => {
         const specialization = new Specialization(
@@ -166,6 +138,34 @@ describe('Insert a specialization to DB', () => {
         specializationId = id
         expect(id).toBeDefined();
         expect(id > 0).toBeTruthy();
+    });
+});
+
+describe('Get all specializations from DB', () => {
+    test('should return array of Specialization objects from getSpecializations()', async () => {
+        const specializations = await Specialization.getSpecializations();
+        expect(specializations).toBeInstanceOf(Array);
+        specializations.forEach(specialization => {
+            expect(specialization).toBeInstanceOf(Specialization);
+        });
+    });
+
+    test('should return array with name filter applied in getSpecializations()', async () => {
+        const specializations = await Specialization.getSpecializations({ name: 'l' });
+        expect(specializations).toBeInstanceOf(Array);
+        specializations.forEach(specialization => {
+            expect(specialization).toBeInstanceOf(Specialization);
+            expect(specialization.name.toLowerCase()).toContain('l');
+        });
+    });
+
+    test('should return array with description filter applied in getSpecializations()', async () => {
+        const specializations = await Specialization.getSpecializations({ description: 'ea' });
+        expect(specializations).toBeInstanceOf(Array);
+        specializations.forEach(specialization => {
+            expect(specialization).toBeInstanceOf(Specialization);
+            expect(specialization.description.toLowerCase()).toContain('ea');
+        });
     });
 });
 
@@ -204,9 +204,7 @@ describe('Update specialization by id in DB', () => {
 describe('Remove specialization from DB', () => {
     test('should remove specialization from DB', async () => {
         const specialization = (await Specialization.getSpecializationsByIds([specializationId]))[0];
-
-        expect(async () => { await specialization.deleteSpecialization() }).not.toThrow();
-
+        expect(async () => await specialization.deleteSpecialization()).not.toThrow();
         const deletedSpecialization = await Specialization.getSpecializationsByIds([specializationId]);
         expect(deletedSpecialization.length).toBe(0);
     });

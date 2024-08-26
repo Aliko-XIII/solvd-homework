@@ -5,11 +5,11 @@ const getSpecialization = async (req, res) => {
         const nestOrgans = req.query.nestOrgans === 'true';
         const nestSymptoms = req.query.nestSymptoms === 'true';
 
-        const specialization = (await Specialization.getSpecializationsByIds(
-            [req.params.id],
+        const specialization = await Specialization.getSpecializationById(
+            req.params.id,
             nestOrgans,
             nestSymptoms
-        ))[0];
+        );
 
         if (specialization) {
             res.status(200).send(specialization);
@@ -66,27 +66,21 @@ const deleteSpecialization = async (req, res) => {
 
 const updateSpecialization = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const { name, description, symptoms, organs } = req.body;
 
         if (!id) {
             return res.status(400).json({ error: 'Specialization ID is required' });
         }
-
         if (name && typeof name !== 'string') {
             return res.status(400).json({ error: 'Invalid specialization name' });
         }
-
         if (description && typeof description !== 'string') {
             return res.status(400).json({ error: 'Invalid specialization description' });
         }
-
         const updates = { name, description, symptoms, organs };
         const hasParams = Object.values(updates).some(value => value !== undefined);
-
-        if (!hasParams) {
-            return res.status(400).json({ error: 'No parameters to update' });
-        }
+        if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
         const updated = await Specialization.updateSpecialization(id, updates);
         res.status(200).json(updated);
