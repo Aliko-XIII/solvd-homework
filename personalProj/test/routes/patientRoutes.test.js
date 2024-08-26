@@ -24,33 +24,13 @@ const patientFields = {
 };
 let patientId = null;
 let patientProperties = [];
-
-describe('GET /patients', () => {
-    const testUser = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex);
-    const testPatient = new Patient(testUser, patientFields.insuranceNumber,
-        patientFields.insuranceProvider)
-    patientProperties = Object.getOwnPropertyNames(testPatient).filter(prop =>
-        typeof testPatient[prop] !== 'function'
-    );
-    test('should return an array of patients', async () => {
-        const res = await request(app).get('/api/patients');
-        expect(res.statusCode).toEqual(200);
-
-        res.body.forEach(patient => {
-            patientProperties.forEach(prop => expect(patient).toHaveProperty(prop));
-        });
-    });
-
-    test('should return an array of users with filter by insurance number', async () => {
-        const res = await request(app).get('/api/patients?insuranceNumber=e');
-        expect(res.statusCode).toEqual(200);
-        res.body.forEach(patient => {
-            patientProperties.forEach(prop => expect(patient).toHaveProperty(prop));
-            expect(patient.insuranceNumber.indexOf('e') !== -1).toBeTruthy();
-        });
-    });
-});
+const testUser = new User(userFields.firstName, userFields.lastName, userFields.phone,
+    userFields.password, userFields.age, userFields.sex);
+const testPatient = new Patient(testUser, patientFields.insuranceNumber,
+    patientFields.insuranceProvider)
+patientProperties = Object.getOwnPropertyNames(testPatient).filter(prop =>
+    typeof testPatient[prop] !== 'function'
+);
 
 describe('POST /patients', () => {
     test('should insert a patient object to DB', async () => {
@@ -76,6 +56,27 @@ describe('POST /patients', () => {
     });
 
 });
+
+describe('GET /patients', () => {
+    test('should return an array of patients', async () => {
+        const res = await request(app).get('/api/patients');
+        expect(res.statusCode).toEqual(200);
+
+        res.body.forEach(patient => {
+            patientProperties.forEach(prop => expect(patient).toHaveProperty(prop));
+        });
+    });
+
+    test('should return an array of users with filter by insurance number', async () => {
+        const res = await request(app).get('/api/patients?insuranceNumber=e');
+        expect(res.statusCode).toEqual(200);
+        res.body.forEach(patient => {
+            patientProperties.forEach(prop => expect(patient).toHaveProperty(prop));
+            expect(patient.insuranceNumber.indexOf('e') !== -1).toBeTruthy();
+        });
+    });
+});
+
 
 describe('DELETE /patients/:id', () => {
     test('should delete a patient from DB', async () => {

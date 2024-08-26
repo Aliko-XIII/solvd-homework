@@ -43,7 +43,7 @@ class Patient extends Role {
             const user = nestUser ?
                 (await User.getUsersFromData([row]))[0] :
                 { id: row.user_id };
-            const patient = new Patient(user, row.insurance_number, row.insurance_provider);
+            const patient = new Patient(user,row.insurance_number, row.insurance_provider);
             return patient;
         });
         return Promise.all(patients);
@@ -59,7 +59,8 @@ class Patient extends Role {
      */
     static async getPatients({ insuranceNumber, insuranceProvider, nestUser } = {}) {
         let queryStr = `
-            SELECT * 
+            SELECT patients.user_id, insurance_number, insurance_provider,
+            first_name, last_name, age, sex, pass, phone 
             FROM patients 
             INNER JOIN users ON users.user_id = patients.user_id
         `;
@@ -83,10 +84,7 @@ class Patient extends Role {
      * @returns {Promise<Patient>} A promise that resolves to a Patient instance.
      */
     static async getPatientById(id, nestUser = false) {
-        const res = await query(`SELECT * FROM patients
-            INNER JOIN users ON users.user_id=patients.user_id
-            WHERE patients.user_id = '${id}';`);
-        return (await Patient.getPatientsFromData(res.rows, nestUser))[0];
+        return (await Patient.getPatientsByIds([id], nestUser))[0];
     }
 
     /**
@@ -97,7 +95,8 @@ class Patient extends Role {
      */
     static async getPatientsByIds(ids, nestUser = false) {
         const idArr = ids.map(id => `'${id}'`).join(',');
-        const res = await query(`SELECT * FROM patients 
+        const res = await query(`SELECT patients.user_id, insurance_number, insurance_provider,
+            first_name, last_name, age, sex, pass, phone FROM patients 
             INNER JOIN users ON users.user_id=patients.user_id
             WHERE patients.user_id IN (${idArr});`);
         return await Patient.getPatientsFromData(res.rows, nestUser);

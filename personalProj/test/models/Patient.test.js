@@ -66,7 +66,7 @@ describe('Get patients array from DB records', () => {
                 user_id: 'another-user-id',
                 first_name: 'Jane',
                 last_name: 'Doe',
-                phone: '0987654321',
+                phone: '0000000000',
                 pass: 'securepass',
                 age: 28,
                 sex: 'F'
@@ -108,6 +108,10 @@ describe('Get all patients from DB', () => {
 });
 
 describe('Insert a patient to DB', () => {
+    beforeEach(async () => {
+        const userOld = await User.getUserByPhone(userFields.phone);
+        if (userOld) await userOld.deleteUser();
+    });
     test('should return an object with patient\'s id', async () => {
         const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
             userFields.password, userFields.age, userFields.sex);
