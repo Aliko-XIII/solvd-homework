@@ -105,7 +105,6 @@ class Appointment {
         queryStr += `WHERE appointment_id = ${id} RETURNING *;`;
 
         const res = await query(queryStr);
-        console.log('Updated:', res.rows[0]);
         const updated = (await Appointment.getAppointmentsFromData(res.rows))[0];
         return updated;
     }
@@ -116,13 +115,11 @@ class Appointment {
 	        VALUES ('${this.time}', '${this.duration}', '${this.description}', 
             '${this.patient.user.id}', '${this.doctor.user.id}') RETURNING *;`);
         this.id = res.rows[0].appointment_id;
-        console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
 
     async deleteAppointment() {
         const res = await query(`DELETE FROM appointments WHERE appointment_id = ${this.id} RETURNING *;`);
-        console.log('Deleted:', res.rows[0]);
     }
 
     /**

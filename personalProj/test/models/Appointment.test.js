@@ -119,6 +119,34 @@ describe('Get appointments array from DB records', () => {
     });
 });
 
+describe('Insert an appointment to DB', () => {
+    test('should return an object with appointment\'s id', async () => {
+        const user1 = new User(userFields.firstName, userFields.lastName, '555555666666',
+            userFields.password, userFields.age, userFields.sex);
+
+        const existing1 = await User.getUserByPhone('555555666666');
+        if (existing1) await existing1.deleteUser();
+        await user1.insertUser();
+        const doctor = new Doctor(user1, doctorFields.specialization, doctorFields.patientLoad,
+            doctorFields.workdayStart, doctorFields.workdayEnd);
+        user1Id = (await doctor.insertDoctor()).id;
+
+        const user2 = new User(userFields.firstName, userFields.lastName, '555555555555',
+            userFields.password, userFields.age, userFields.sex);
+        const existing2 = await User.getUserByPhone('555555555555');
+        if (existing2) await existing2.deleteUser();
+        await user2.insertUser();
+        const patient = new Patient(user2, patientFields.insuranceNumber, patientFields.insuranceProvider);
+        user2Id = (await patient.insertPatient()).id;
+
+        const appointment = new Appointment(patient, doctor, appointmentFields.time,
+            appointmentFields.duration, appointmentFields.description);
+        const id = (await appointment.insertAppointment()).id;
+        appointmentId = id;
+        expect(id).toBeTruthy();
+    });
+});
+
 describe('Get all appointments from DB', () => {
     test('should return array of Appointment objects', async () => {
         const appointments = await Appointment.getAppointments();
@@ -150,34 +178,6 @@ describe('Get all appointments from DB', () => {
 
     });
 
-});
-
-describe('Insert an appointment to DB', () => {
-    test('should return an object with appointment\'s id', async () => {
-        const user1 = new User(userFields.firstName, userFields.lastName, '555555666666',
-            userFields.password, userFields.age, userFields.sex);
-
-        const existing1 = await User.getUserByPhone('555555666666');
-        if (existing1) await existing1.deleteUser();
-        await user1.insertUser();
-        const doctor = new Doctor(user1, doctorFields.specialization, doctorFields.patientLoad,
-            doctorFields.workdayStart, doctorFields.workdayEnd);
-        user1Id = (await doctor.insertDoctor()).id;
-
-        const user2 = new User(userFields.firstName, userFields.lastName, '555555555555',
-            userFields.password, userFields.age, userFields.sex);
-        const existing2 = await User.getUserByPhone('555555555555');
-        if (existing2) await existing2.deleteUser();
-        await user2.insertUser();
-        const patient = new Patient(user2, patientFields.insuranceNumber, patientFields.insuranceProvider);
-        user2Id = (await patient.insertPatient()).id;
-
-        const appointment = new Appointment(patient, doctor, appointmentFields.time,
-            appointmentFields.duration, appointmentFields.description);
-        const id = (await appointment.insertAppointment()).id;
-        appointmentId = id;
-        expect(id).toBeTruthy();
-    });
 });
 
 describe('Get appointment by id from DB', () => {

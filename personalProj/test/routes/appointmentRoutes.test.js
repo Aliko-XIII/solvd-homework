@@ -57,31 +57,6 @@ let specializationId = null;
 let appointmentId = null;
 let appointmentProperties = [];
 
-describe('GET /appointments', () => {
-    const testUser1 = new User(userFields.firstName, userFields.lastName, userFields.phone1,
-        userFields.password, userFields.age, userFields.sex);
-    const testSpecialization = new Specialization(specializationFields.name,
-        specializationFields.description);
-    const testDoctor = new Doctor(testUser1, testSpecialization, doctorFields.patientLoad,
-        doctorFields.workdayStart, doctorFields.workdayEnd);
-    const testUser2 = new User(userFields.firstName, userFields.lastName, userFields.phone2,
-        userFields.password, userFields.age, userFields.sex);
-    const testPatient = new Patient(testUser2, patientFields.insuranceNumber,
-        patientFields.insuranceProvider);
-    const testAppointments = new Appointment(testPatient, testDoctor, appointmentFields.time,
-        appointmentFields.duration, appointmentFields.description);
-    appointmentProperties = Object.getOwnPropertyNames(testAppointments).filter(prop =>
-        typeof testAppointments[prop] !== 'function');
-    test('should return an array of appointments', async () => {
-        const res = await request(app).get('/api/appointments');
-        expect(res.statusCode).toEqual(200);
-
-        res.body.forEach(appointment => {
-            appointmentProperties.forEach(prop => expect(appointment).toHaveProperty(prop));
-        });
-    });
-});
-
 describe('POST /appointments', () => {
     test('should insert a doctor object to DB', async () => {
 
@@ -142,6 +117,32 @@ describe('POST /appointments', () => {
         appointmentProperties.forEach(prop => expect(resAppointment.body).toHaveProperty(prop));
     });
 });
+
+describe('GET /appointments', () => {
+    const testUser1 = new User(userFields.firstName, userFields.lastName, userFields.phone1,
+        userFields.password, userFields.age, userFields.sex);
+    const testSpecialization = new Specialization(specializationFields.name,
+        specializationFields.description);
+    const testDoctor = new Doctor(testUser1, testSpecialization, doctorFields.patientLoad,
+        doctorFields.workdayStart, doctorFields.workdayEnd);
+    const testUser2 = new User(userFields.firstName, userFields.lastName, userFields.phone2,
+        userFields.password, userFields.age, userFields.sex);
+    const testPatient = new Patient(testUser2, patientFields.insuranceNumber,
+        patientFields.insuranceProvider);
+    const testAppointments = new Appointment(testPatient, testDoctor, appointmentFields.time,
+        appointmentFields.duration, appointmentFields.description);
+    appointmentProperties = Object.getOwnPropertyNames(testAppointments).filter(prop =>
+        typeof testAppointments[prop] !== 'function');
+    test('should return an array of appointments', async () => {
+        const res = await request(app).get('/api/appointments');
+        expect(res.statusCode).toEqual(200);
+
+        res.body.forEach(appointment => {
+            appointmentProperties.forEach(prop => expect(appointment).toHaveProperty(prop));
+        });
+    });
+});
+
 
 
 describe('DELETE /appointments/:id', () => {

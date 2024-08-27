@@ -42,31 +42,15 @@ const updateAppointment = async (req, res) => {
         const { appointmentId } = req.params;
         const { time, duration, description, patientId, doctorId } = req.body;
 
-        if (!appointmentId) {
-            return res.status(400).json({ error: 'Appointment ID is required' });
-        }
-
-        if (duration && typeof duration !== 'string') {
-            return res.status(400).json({ error: 'Invalid duration format' });
-        }
-
-        if (patientId && typeof patientId !== 'string') {
-            return res.status(400).json({ error: 'Invalid patient ID' });
-        }
-
-        if (doctorId && typeof doctorId !== 'string') {
-            return res.status(400).json({ error: 'Invalid doctor ID' });
-        }
-
+        if (!appointmentId) return res.status(400).json({ error: 'Appointment ID is required' });
+        if (duration && typeof duration !== 'string') return res.status(400).json({ error: 'Invalid duration format' });
+        if (patientId && typeof patientId !== 'string') res.status(400).json({ error: 'Invalid patient ID' });
+        if (doctorId && typeof doctorId !== 'string') return res.status(400).json({ error: 'Invalid doctor ID' });
         const updates = { time, duration, description, patientId, doctorId };
         const hasParams = Object.values(updates).some(value => value !== undefined);
-
-        if (!hasParams) {
-            return res.status(400).json({ error: 'No parameters to update' });
-        }
+        if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
         const updated = await Appointment.updateAppointment(updates);
-
         res.status(200).json(updated);
     } catch (error) {
         console.error(error);
