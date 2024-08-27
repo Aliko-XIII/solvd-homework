@@ -90,6 +90,19 @@ describe('Get doctors array from DB records', () => {
     });
 });
 
+describe('Insert a doctor to DB', () => {
+    test('should return an object with doctor\'s id', async () => {
+        const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
+            userFields.password, userFields.age, userFields.sex);
+        await user.insertUser();
+        const doctor = new Doctor(user, doctorFields.specialization, doctorFields.patientLoad,
+            doctorFields.workdayStart, doctorFields.workdayEnd)
+        const id = (await doctor.insertDoctor()).id;
+        doctorId = id;
+        expect(id.length > 0).toBeTruthy();
+    });
+});
+
 describe('Get all doctors from DB', () => {
     test('should return array of Doctor objects', async () => {
         const doctors = await Doctor.getDoctors();
@@ -118,18 +131,6 @@ describe('Get all doctors from DB', () => {
     });
 });
 
-describe('Insert a doctor to DB', () => {
-    test('should return an object with doctor\'s id', async () => {
-        const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
-            userFields.password, userFields.age, userFields.sex);
-        await user.insertUser();
-        const doctor = new Doctor(user, doctorFields.specialization, doctorFields.patientLoad,
-            doctorFields.workdayStart, doctorFields.workdayEnd)
-        const id = (await doctor.insertDoctor()).id;
-        doctorId = id;
-        expect(id.length > 0).toBeTruthy();
-    });
-});
 
 describe('Get doctor by id from DB', () => {
     test('should return a Doctor object', async () => {

@@ -72,15 +72,11 @@ class Doctor extends Role {
     static async getDoctorsFromData(rows, nestUser = false, nestSpecialization = false) {
         if (rows.length === 0) { return []; }
         const doctors = rows.map(async row => {
-            let user;
-            if (nestUser) user = (await User.getUsersFromData([row]))[0];
-            else user = { id: row.user_id };
-
-            let specialization;
-            if (nestSpecialization) specialization = (await Specialization
-                .getSpecializationsByIds([row.specialization_id]))[0];
-            else specialization = { id: row.specialization_id };
-
+            let user = nestUser ? (await User.getUsersFromData([row]))[0] :
+                { id: row.user_id };
+            let specialization = nestSpecialization ? (await Specialization
+                .getSpecializationsByIds([row.specialization_id]))[0] :
+                { id: row.specialization_id } ;
             const doctor = new Doctor(user, specialization, row.patient_load,
                 row.workday_start, row.workday_end);
             return doctor;
@@ -95,7 +91,8 @@ class Doctor extends Role {
      * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor instances.
      */
     static async getDoctors({ nestUser, nestSpecialization } = {}) {
-        const res = await query(`SELECT * FROM doctors 
+        const res = await query(`SELECT doctors.user_id, specialization_id, patient_load, workday_start,
+            workday_end, first_name, last_name, age, sex, pass, phone FROM doctors 
         INNER JOIN users ON users.user_id = doctors.user_id;`);
         return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);
     }
@@ -110,7 +107,8 @@ class Doctor extends Role {
      */
     static async getDoctorsByIds(ids, nestUser = false, nestSpecialization = false) {
         const idArr = ids.map(id => `'${id}'`).join(',');
-        const res = await query(`SELECT * FROM doctors
+        const res = await query(`SELECT doctors.user_id, specialization_id, patient_load, workday_start,
+            workday_end, first_name, last_name, age, sex, pass, phone FROM doctors
         INNER JOIN users ON users.user_id = doctors.user_id
         WHERE doctors.user_id IN (${idArr});`);
         return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);
@@ -125,7 +123,6 @@ class Doctor extends Role {
             VALUES (${this.specialization.id}, '${this.workdayStart}',
             '${this.workdayEnd}', '${this.user.id}', ${this.patientLoad}) RETURNING *;`);
         this.id = res.rows[0].user_id;
-        console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
 
@@ -157,7 +154,6 @@ class Doctor extends Role {
         queryStr += ` WHERE user_id = '${id}' RETURNING *;`;
 
         const res = await query(queryStr);
-        console.log('Updated:', res.rows[0]);
         const updated = (await Doctor.getDoctorsFromData(res.rows))[0];
         return updated;
     }
@@ -168,7 +164,6 @@ class Doctor extends Role {
      */
     async deleteDoctor() {
         const res = await query(`DELETE FROM doctors WHERE user_id = '${this.user.id}' RETURNING *;`);
-        console.log('Deleted:', res.rows[0]);
     }
 }
 

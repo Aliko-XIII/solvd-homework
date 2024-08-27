@@ -35,25 +35,15 @@ const specializationFields = {
 };
 let specializationId = null;
 
-describe('GET /doctors', () => {
-    const testUser = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex);
-    const testSpecialization = new Specialization(specializationFields.name,
-        specializationFields.description);
-    const testDoctor = new Doctor(testUser, testSpecialization, doctorFields.patientLoad,
-        doctorFields.workdayStart, doctorFields.workdayEnd);
-    doctorPropertiesProperties = Object.getOwnPropertyNames(testDoctor).filter(prop =>
-        typeof testDoctor[prop] !== 'function'
-    );
-    test('should return an array of doctors', async () => {
-        const res = await request(app).get('/api/doctors');
-        expect(res.statusCode).toEqual(200);
-
-        res.body.forEach(doctor => {
-            doctorProperties.forEach(prop => expect(doctor).toHaveProperty(prop));
-        });
-    });
-});
+const testUser = new User(userFields.firstName, userFields.lastName, userFields.phone,
+    userFields.password, userFields.age, userFields.sex);
+const testSpecialization = new Specialization(specializationFields.name,
+    specializationFields.description);
+const testDoctor = new Doctor(testUser, testSpecialization, doctorFields.patientLoad,
+    doctorFields.workdayStart, doctorFields.workdayEnd);
+doctorPropertiesProperties = Object.getOwnPropertyNames(testDoctor).filter(prop =>
+    typeof testDoctor[prop] !== 'function'
+);
 
 describe('POST /doctors', () => {
     test('should insert a doctor object to DB', async () => {
@@ -87,6 +77,16 @@ describe('POST /doctors', () => {
 
 });
 
+describe('GET /doctors', () => {
+    test('should return an array of doctors', async () => {
+        const res = await request(app).get('/api/doctors');
+        expect(res.statusCode).toEqual(200);
+
+        res.body.forEach(doctor => {
+            doctorProperties.forEach(prop => expect(doctor).toHaveProperty(prop));
+        });
+    });
+});
 
 describe('DELETE /doctors/:id', () => {
     test('should delete a doctor from DB', async () => {
