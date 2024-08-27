@@ -76,7 +76,7 @@ class Doctor extends Role {
                 { id: row.user_id };
             let specialization = nestSpecialization ? (await Specialization
                 .getSpecializationsByIds([row.specialization_id]))[0] :
-                { id: row.specialization_id } ;
+                { id: row.specialization_id };
             const doctor = new Doctor(user, specialization, row.patient_load,
                 row.workday_start, row.workday_end);
             return doctor;
@@ -86,14 +86,17 @@ class Doctor extends Role {
 
     /**
      * Retrieves all doctors from the database with optional nesting.
+     * @param {number} [specializationId] - What specialization id should doctors have.
      * @param {boolean} [nestUser=false] - Whether to include nested user records.
      * @param {boolean} [nestSpecialization=false] - Whether to include nested specialization records.
      * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor instances.
      */
-    static async getDoctors({ nestUser, nestSpecialization } = {}) {
-        const res = await query(`SELECT doctors.user_id, specialization_id, patient_load, workday_start,
+    static async getDoctors({ specializationId, nestUser, nestSpecialization } = {}) {
+        let queryStr = `SELECT doctors.user_id, specialization_id, patient_load, workday_start,
             workday_end, first_name, last_name, age, sex, pass, phone FROM doctors 
-        INNER JOIN users ON users.user_id = doctors.user_id;`);
+        INNER JOIN users ON users.user_id = doctors.user_id`
+        queryStr += specializationId ? `WHERE specialization_id=${specializationId};` : ';';
+        const res = await query(queryStr);
         return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);
     }
 
