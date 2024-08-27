@@ -184,7 +184,7 @@ class Specialization {
             }
 
             console.log('Updated Specialization:', id);
-            return (await Specialization.getSpecializationsByIds(id))[0];
+            return (await Specialization.getSpecializationsByIds([id]))[0];
         } catch (err) {
             console.error('Error updating specialization:', err);
             throw err;
