@@ -70,7 +70,7 @@ class Doctor extends Role {
      * @returns {Promise<Doctor[]>} A promise that resolves to an array of Doctor objects.
      */
     static async getDoctorsFromData(rows, nestUser = false, nestSpecialization = false) {
-        if (rows.length === 0) { return []; }
+        if (rows.length === 0) return [];
         const doctors = rows.map(async row => {
             let user = nestUser ? (await User.getUsersFromData([row]))[0] :
                 { id: row.user_id };
