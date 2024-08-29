@@ -2,11 +2,12 @@ const { Specialization } = require('../models/Specialization');
 
 const getSpecialization = async (req, res) => {
     try {
+        const id = Number.parseInt(req.params.id);
         const nestOrgans = req.query.nestOrgans === 'true';
         const nestSymptoms = req.query.nestSymptoms === 'true';
 
         const specialization = await Specialization.getSpecializationById(
-            req.params.id,
+            id,
             nestOrgans,
             nestSymptoms
         );
@@ -14,10 +15,10 @@ const getSpecialization = async (req, res) => {
         if (specialization) {
             res.status(200).send(specialization);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'Specialization not found.' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
@@ -34,7 +35,7 @@ const getAllSpecializations = async (req, res) => {
 
         res.status(200).send(specializations);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
@@ -45,28 +46,28 @@ const createSpecialization = async (req, res) => {
         await specialization.insertSpecialization();
         res.status(201).send(specialization);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
 const deleteSpecialization = async (req, res) => {
     try {
-        const specialization = (await Specialization.getSpecializationsByIds([req.params.id]))[0];
+        const id = Number.parseInt(req.params.id);
+        const specialization = await Specialization.getSpecializationById(id);
         if (specialization) {
             await specialization.deleteSpecialization();
             res.sendStatus(204);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'Specialization not found.' });
         }
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
 const updateSpecialization = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = Number.parseInt(req.params.id);
         const { name, description, symptoms, organs } = req.body;
 
         if (!id) {
@@ -85,7 +86,6 @@ const updateSpecialization = async (req, res) => {
         const updated = await Specialization.updateSpecialization(id, updates);
         res.status(200).json(updated);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the specialization' });
     }
 };
