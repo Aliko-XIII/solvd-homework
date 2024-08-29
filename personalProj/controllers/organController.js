@@ -2,7 +2,8 @@ const { Organ } = require('../models/Organ');
 
 const getOrgan = async (req, res) => {
     try {
-        const organ = await Organ.getOrganById(req.params.id);
+        const id = Number.parseInt(req.params.id);
+        const organ = await Organ.getOrganById(id);
         if (organ) {
             res.status(200).json(organ);
         } else {
@@ -39,7 +40,7 @@ const createOrgan = async (req, res) => {
 
 const updateOrgan = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = Number.parseInt(req.params.id);
         const { name, description } = req.body;
 
         if (!id) return res.status(400).json({ error: 'Organ ID is required' });
@@ -60,7 +61,8 @@ const updateOrgan = async (req, res) => {
 
 const deleteOrgan = async (req, res) => {
     try {
-        const organ = await Organ.getOrganById(req.params.id);
+        const id = Number.parseInt(req.params.id);
+        const organ = await Organ.getOrganById(id);
         if (organ) {
             await organ.deleteOrgan();
             res.sendStatus(204);
