@@ -176,7 +176,7 @@ async function updateRefresh(user_id, refresh_token) {
  * @returns {Promise<boolean>} - true if the refresh token is valid, false otherwise
  */
 async function isRefreshValid(user_id, refresh_token) {
-    const res = await query(`SELECT * FROM refresh_tokens
+    const res = await query(`SELECT user_id, refresh_token, expires_at FROM refresh_tokens
         WHERE user_id = '${user_id}'
         AND expires_at > NOW();`);
     return res.rows.length !== 0 && refresh_token === res.rows[0].refresh_token;
