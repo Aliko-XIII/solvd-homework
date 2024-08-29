@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14' 
+          node-version: '20' 
 
       - name: Navigate to project directory
         run: cd personalProj
@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd personalProj
-          npm install
+          npm ci
 
       - name: Run tests
         run: |
