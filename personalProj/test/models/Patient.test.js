@@ -1,157 +1,179 @@
 const { Patient } = require('../../models/Patient');
 const { User } = require('../../models/User');
+const { query } = require('../../config/database');
 
-const userFields = {
-    firstName: 'John',
-    lastName: 'Black',
-    phone: '9999999999',
-    password: 'pass1234324',
-    age: 25,
-    sex: 'M',
-    id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12'
-};
+jest.mock('../../config/database');
 
-const patientFields = {
-    insuranceNumber: 'INS-123456',
-    insuranceProvider: 'HealthCare Inc.',
-};
-
-let patientId = null;
-
-describe('Patient constructor', () => {
-    const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex, userFields.id);
-    const patient = new Patient(user, patientFields.insuranceNumber, patientFields.insuranceProvider);
-
-    test('should return instance of Patient', () => {
-        expect(patient).toBeInstanceOf(Patient);
-    });
-
-    test('should return object with corresponding fields', () => {
-        expect(patient.insuranceNumber).toEqual(patientFields.insuranceNumber);
-        expect(patient.insuranceProvider).toEqual(patientFields.insuranceProvider);
-        expect(patient.user).toEqual(user);
-    });
-
-    test('should throw an error for invalid insuranceNumber', () => {
-        expect(() => {
-            const invalidPatient = new Patient(user, 12345, patientFields.insuranceProvider);
-        }).toThrow(Error);
-    });
-
-    test('should throw an error for invalid insuranceProvider', () => {
-        expect(() => {
-            const invalidPatient = new Patient(user, patientFields.insuranceNumber, 12345);
-        }).toThrow(Error);
-    });
-});
-
-describe('Get patients array from DB records', () => {
-    test('should return array of Patient objects', async () => {
-        const patients = await Patient.getPatientsFromData([
-            {
-                insurance_number: 'INS-123456',
-                insurance_provider: 'HealthCare Inc.',
-                user_id: userFields.id,
-                first_name: userFields.firstName,
-                last_name: userFields.lastName,
-                phone: userFields.phone,
-                pass: userFields.password,
-                age: userFields.age,
-                sex: userFields.sex
-            },
-            {
-                insurance_number: 'INS-654321',
-                insurance_provider: 'MediCare Corp.',
-                user_id: 'another-user-id',
-                first_name: 'Jane',
-                last_name: 'Doe',
-                phone: '0000000000',
-                pass: 'securepass',
-                age: 28,
-                sex: 'F'
-            }
-        ]);
-        expect(patients).toBeInstanceOf(Array);
-        patients.forEach(patient => {
-            expect(patient).toBeInstanceOf(Patient);
+describe('Patient Class', () => {
+    describe('Patient constructor', () => {
+        test('should create a valid Patient instance', () => {
+            const user = new User('Jane', 'Smith', '5551234', 'password', 22, 'F');
+            const patient = new Patient(user, 'INS123456', 'HealthCare Inc.');
+            expect(patient.insuranceNumber).toBe('INS123456');
+            expect(patient.insuranceProvider).toBe('HealthCare Inc.');
         });
-    });
-});
 
-describe('Get all patients from DB', () => {
-    test('should return array of Patient objects', async () => {
-        const patients = await Patient.getPatients();
-        expect(patients).toBeInstanceOf(Array);
-        patients.forEach(patient => {
-            expect(patient).toBeInstanceOf(Patient);
+        test('should throw error for invalid insurance number', () => {
+            const user = new User('Jane', 'Smith', '5551234', 'password', 22, 'F');
+            expect(() => new Patient(user, '', 'HealthCare Inc.')).toThrow(Error);
+        });
+
+        test('should throw error for invalid insurance provider', () => {
+            const user = new User('Jane', 'Smith', '5551234', 'password', 22, 'F');
+            expect(() => new Patient(user, 'INS123456', '')).toThrow(Error);
         });
     });
 
-    test('should return array with insuranceNumber filter applied', async () => {
-        const patients = await Patient.getPatients({ insuranceNumber: '1' });
-        expect(patients).toBeInstanceOf(Array);
-        patients.forEach(patient => {
-            expect(patient).toBeInstanceOf(Patient);
-            expect(patient.insuranceNumber.indexOf('1') !== -1).toBeTruthy();
+    describe('Get patients array from DB records', () => {
+        test('should return an array of Patient objects', async () => {
+            const patients = await Patient.getPatientsFromData([
+                {
+                    user_id: 'user1',
+                    insurance_number: 'INS123',
+                    insurance_provider: 'Provider A',
+                    user_id: 'user1',
+                    first_name: 'John',
+                    last_name: 'Doe',
+                    phone: '123-456-7890',
+                    age: 30,
+                    sex: 'M',
+                    pass: 'password'
+
+                },
+                {
+                    user_id: 'user2',
+                    insurance_number: 'INS456',
+                    insurance_provider: 'Provider B',
+                    user_id: 'user2',
+                    first_name: 'Jane',
+                    last_name: 'Smith',
+                    phone: '098-765-4321',
+                    age: 25,
+                    sex: 'F',
+                    pass: 'securepass'
+                }
+            ], true);
+
+            expect(patients).toBeInstanceOf(Array);
+            patients.forEach(patient => {
+                expect(patient).toBeInstanceOf(Patient);
+            });
         });
     });
 
-    test('should return array with insuranceProvider filter applied', async () => {
-        const patients = await Patient.getPatients({ insuranceProvider: 'Care' });
-        expect(patients).toBeInstanceOf(Array);
-        patients.forEach(patient => {
-            expect(patient).toBeInstanceOf(Patient);
-            expect(patient.insuranceProvider.indexOf('Care') !== -1).toBeTruthy();
+    describe('Insert a patient into DB', () => {
+        test('should insert a new patient', async () => {
+            query.mockResolvedValue({
+                rows: [{ user_id: '3' }],
+            });
+
+            const user = new User('Jane', 'Smith', '5551234', 'password', 22, 'F');
+            const patient = new Patient(user, 'INS789', 'Provider C');
+            const { id } = await patient.insertPatient();
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO patients'));
+            expect(id).toBe('3');
+            expect(patient.id).toBe('3');
         });
     });
-});
 
-describe('Insert a patient to DB', () => {
-    beforeEach(async () => {
-        const userOld = await User.getUserByPhone(userFields.phone);
-        if (userOld) await userOld.deleteUser();
-    });
-    test('should return an object with patient\'s id', async () => {
-        const user = new User(userFields.firstName, userFields.lastName, userFields.phone,
-            userFields.password, userFields.age, userFields.sex);
-        await user.insertUser();
-        const patient = new Patient(user, patientFields.insuranceNumber, patientFields.insuranceProvider);
-        const id = (await patient.insertPatient()).id;
-        patientId = id;
-        expect(id.length > 0).toBeTruthy();
-    });
-});
+    describe('Get patient by id from DB', () => {
+        test('should return a patient by ID', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    {
+                        user_id: '2',
+                        insurance_number: 'INS456',
+                        insurance_provider: 'Provider B',
+                        first_name: 'Jane',
+                        last_name: 'Smith',
+                        phone: '098-765-4321',
+                        age: 25,
+                        sex: 'F',
+                        pass: 'securepass'
+                    }
+                ],
+            });
 
-describe('Get patient by id from DB', () => {
-    test('should return a Patient object', async () => {
-        const patient = await Patient.getPatientById(patientId);
-        expect(patient).toBeInstanceOf(Patient);
-        expect(patient.user.id).toEqual(patientId);
-    });
-});
-
-describe('Update patient by id in DB', () => {
-    test('should return a patient with updated insuranceProvider', async () => {
-        const updated = await Patient.updatePatient(patientId, { insuranceProvider: 'NewHealth Inc.' });
-        expect(updated.insuranceProvider).toEqual('NewHealth Inc.');
-        const patient = await Patient.getPatientById(patientId);
-        expect(patient.insuranceProvider).toEqual('NewHealth Inc.');
+            const patient = await Patient.getPatientById('2', true);
+            expect(patient).toBeInstanceOf(Patient);
+            expect(patient.insuranceNumber).toBe('INS456');
+        });
     });
 
-    test('should return a patient with updated insuranceNumber', async () => {
-        const updated = await Patient.updatePatient(patientId, { insuranceNumber: 'INS-987654' });
-        expect(updated.insuranceNumber).toEqual('INS-987654');
-        const patient = await Patient.getPatientById(patientId);
-        expect(patient.insuranceNumber).toEqual('INS-987654');
-    });
-});
+    describe('Get all patients from DB', () => {
+        test('should call query with proper filters', async () => {
+            query.mockResolvedValue({ rows: [] });
+            await Patient.getPatients({ insuranceNumber: 'INS123', insuranceProvider: 'Provider A' });
 
-describe('Remove patient from DB', () => {
-    test('should remove patient from DB', async () => {
-        const patient = await Patient.getPatientById(patientId);
-        expect(async () => { await patient.deletePatient() }).not.toThrow();
-        const user = await User.getUserById(patientId);
-        await user.deleteUser()
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("insurance_number LIKE '%INS123%'"));
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("insurance_provider LIKE '%Provider A%'"));
+        });
+
+        test('should return an array of Patient instances', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    {
+                        user_id: '1',
+                        insurance_number: 'INS123',
+                        insurance_provider: 'Provider A',
+                        first_name: 'John',
+                        last_name: 'Doe',
+                        phone: '123-456-7890',
+                        age: 30,
+                        sex: 'M',
+                        pass: 'password'
+                    }
+                ],
+            });
+
+            const patients = await Patient.getPatients();
+            expect(patients).toHaveLength(1);
+            expect(patients[0]).toBeInstanceOf(Patient);
+            expect(patients[0].insuranceNumber).toBe('INS123');
+        });
+    });
+
+    describe('Update patient by id in DB', () => {
+        test('should throw an error if no updates are provided', async () => {
+            await expect(Patient.updatePatient('1', {})).rejects.toThrow('No parameters to update.');
+        });
+
+        test('should update patient information', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    {
+                        user_id: '1',
+                        insurance_number: 'INS789',
+                        insurance_provider: 'Provider D',
+                        first_name: 'John',
+                        last_name: 'Doe',
+                        phone: '123-456-7890',
+                        age: 30,
+                        sex: 'M',
+                        pass: 'password'
+                    }
+                ],
+            });
+
+            const updatedPatient = await Patient.updatePatient('1', { insuranceNumber: 'INS789', insuranceProvider: 'Provider D' });
+            expect(query).toHaveBeenCalledWith(expect.stringContaining('UPDATE patients SET'));
+            expect(updatedPatient.insuranceNumber).toBe('INS789');
+            expect(updatedPatient.insuranceProvider).toBe('Provider D');
+        });
+    });
+
+    describe('Delete patient from DB', () => {
+        test('should delete a patient', async () => {
+            query.mockResolvedValue({
+                rows: [{ user_id: '1' }],
+            });
+
+            const user = new User('John', 'Doe', '123456789', 'password', 30, 'M', '1');
+            const patient = new Patient(user, 'INS123', 'Provider A');
+            await patient.deletePatient();
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM patients WHERE user_id = '1'"));
+        });
     });
 });

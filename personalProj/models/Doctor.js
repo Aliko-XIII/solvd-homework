@@ -166,7 +166,7 @@ class Doctor extends Role {
      * Method to delete the doctor from the database.
      */
     async deleteDoctor() {
-        const res = await query(`DELETE FROM doctors WHERE user_id = '${this.user.id}' RETURNING *;`);
+        await query(`DELETE FROM doctors WHERE user_id = '${this.user.id}' RETURNING *;`);
     }
 }
 

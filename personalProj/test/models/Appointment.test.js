@@ -1,225 +1,108 @@
 const { Appointment } = require('../../models/Appointment');
-const { Doctor } = require('../../models/Doctor');
 const { Patient } = require('../../models/Patient');
-const { User } = require('../../models/User');
+const { Doctor } = require('../../models/Doctor');
+const { query } = require('../../config/database');
 
-const userFields = {
-    firstName: 'John',
-    lastName: 'Black',
-    phone: '1324234532',
-    password: 'pass1234324',
-    age: 25,
-    sex: 'M',
-    id1: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-    id2: 'gkodfmg-543jdfnkz-32jfdsnkvk-12czx',
-};
+jest.mock('../../config/database', () => ({
+    query: jest.fn(),
+}));
 
-const doctorFields = {
-    specialization: { id: 1 },
-    patientLoad: 3,
-    workdayStart: '08:59:00',
-    workdayEnd: '16:56:00',
-};
+describe('Appointment Class', () => {
 
-const patientFields = {
-    insuranceNumber: 'INS-123456',
-    insuranceProvider: 'HealthCare Inc.',
-};
+    // Constructor Tests
+    describe('Constructor', () => {
+        it('should create a valid Appointment instance', () => {
+            const patient = new Patient({ id: 'patient-uuid' }, '12345', 'Provider A');
+            const doctor = new Doctor({ id: 'doctor-uuid' }, 'Cardiology', 10, '09:00', '17:00');
+            const appointment = new Appointment(patient, doctor, '18.08.2024 13:15:00', '01:35:00', 'General checkup');
 
-const appointmentFields = {
-    time: '2024-07-18 09:00:00',
-    duration: '00:30:00',
-    description: 'text description for appointment',
-    id: 1
-}
-
-let appointmentId = null;
-let user1Id = null;
-let user2Id = null;
-
-describe('Appointment constructor', () => {
-    const user1 = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex, userFields.id1);
-    const doctor = new Doctor(user1, doctorFields.specialization, doctorFields.patientLoad,
-        doctorFields.workdayStart, doctorFields.workdayEnd);
-
-    const user2 = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex, userFields.id1);
-    const patient = new Patient(user2, patientFields.insuranceNumber,
-        patientFields.insuranceProvider);
-
-    const appointment = new Appointment(patient, doctor, appointmentFields.time,
-        appointmentFields.duration, appointmentFields.description, appointmentFields.id);
-
-    test('should return instance of Appointment', () => {
-        expect(appointment).toBeInstanceOf(Appointment);
-    });
-
-    test('should return object with corresponding fields', () => {
-        expect(appointment.patient).toEqual(patient);
-        expect(appointment.doctor).toEqual(doctor);
-        expect(appointment.time).toEqual(appointmentFields.time);
-        expect(appointment.duration).toEqual(appointmentFields.duration);
-        expect(appointment.description).toEqual(appointmentFields.description);
-        expect(appointment.id).toEqual(appointmentFields.id);
-    });
-
-    test('should throw an error for invalid description', () => {
-        expect(() => {
-            const invalidAppointment = new Appointment(patient, doctor, appointmentFields.time,
-                appointmentFields.duration, 123, appointmentFields.id);
-        }).toThrow(Error);
-    });
-
-});
-
-describe('Get appointments array from DB records', () => {
-    const user1 = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex, userFields.id1);
-    const doctor = new Doctor(user1, doctorFields.specialization, doctorFields.patientLoad,
-        doctorFields.workdayStart, doctorFields.workdayEnd);
-
-    const user2 = new User(userFields.firstName, userFields.lastName, userFields.phone,
-        userFields.password, userFields.age, userFields.sex, userFields.id2);
-    const patient = new Patient(user2, patientFields.insuranceNumber,
-        patientFields.insuranceProvider);
-
-    test('should return array of appointment objects', async () => {
-        const appointments = await Appointment.getAppointmentsFromData([
-            {
-                patient_id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-                doctor_id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-                appointment_time: '08:59:00',
-                appointment_duration: '00:30:00',
-                additional_info: 'text description',
-                appointment_id: 1
-            },
-            {
-                patient_id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-                doctor_id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-                appointment_time: '18:59:00',
-                appointment_duration: '00:45:00',
-                additional_info: 'text description',
-                appointment_id: 2
-            },
-            {
-                patient_id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-                doctor_id: 'fsdfsda-23jnrewj1-vdvjdsn132-sdv12',
-                appointment_time: '09:59:00',
-                appointment_duration: '00:50:00',
-                additional_info: 'text description',
-                appointment_id: 3
-            }]);
-        expect(appointments).toBeInstanceOf(Array);
-        appointments.forEach(appointment => {
-            expect(appointment).toBeInstanceOf(Appointment)
-        });
-
-
-    });
-});
-
-describe('Insert an appointment to DB', () => {
-    test('should return an object with appointment\'s id', async () => {
-        const user1 = new User(userFields.firstName, userFields.lastName, '555555666666',
-            userFields.password, userFields.age, userFields.sex);
-
-        const existing1 = await User.getUserByPhone('555555666666');
-        if (existing1) await existing1.deleteUser();
-        await user1.insertUser();
-        const doctor = new Doctor(user1, doctorFields.specialization, doctorFields.patientLoad,
-            doctorFields.workdayStart, doctorFields.workdayEnd);
-        user1Id = (await doctor.insertDoctor()).id;
-
-        const user2 = new User(userFields.firstName, userFields.lastName, '555555555555',
-            userFields.password, userFields.age, userFields.sex);
-        const existing2 = await User.getUserByPhone('555555555555');
-        if (existing2) await existing2.deleteUser();
-        await user2.insertUser();
-        const patient = new Patient(user2, patientFields.insuranceNumber, patientFields.insuranceProvider);
-        user2Id = (await patient.insertPatient()).id;
-
-        const appointment = new Appointment(patient, doctor, appointmentFields.time,
-            appointmentFields.duration, appointmentFields.description);
-        const id = (await appointment.insertAppointment()).id;
-        appointmentId = id;
-        expect(id).toBeTruthy();
-    });
-});
-
-describe('Get all appointments from DB', () => {
-    test('should return array of Appointment objects', async () => {
-        const appointments = await Appointment.getAppointments();
-        expect(appointments).toBeInstanceOf(Array);
-        appointments.forEach(appointment => {
             expect(appointment).toBeInstanceOf(Appointment);
+            expect(appointment.description).toBe('General checkup');
+            expect(appointment.patient).toBe(patient);
+            expect(appointment.doctor).toBe(doctor);
+        });
+
+        it('should throw an error for invalid description', () => {
+            const patient = new Patient({ id: 'patient-uuid' }, '12345', 'Provider A');
+            const doctor = new Doctor({ id: 'doctor-uuid' }, 'Cardiology', 10, '09:00', '17:00');
+
+            expect(() => new Appointment(patient, doctor, '18.08.2024 13:15:00', '01:35:00', 12345))
+                .toThrow('Description is not valid');
         });
     });
 
-    test('should return array with nested doctor objects', async () => {
-        const appointments = await Appointment.getAppointments({ nestDoctor: true });
-        expect(appointments).toBeInstanceOf(Array);
-        appointments.forEach(appointment => {
-            expect(appointment).toBeInstanceOf(Appointment);
-            expect(appointment.doctor == null ||
-                Object.keys(appointment.doctor).length > 1).toBeTruthy();
+    // Database Interaction Tests
+    describe('Database Interactions', () => {
+
+        // Insert Tests
+        describe('insertAppointment', () => {
+            beforeEach(() => {
+                query.mockReset();
+            });
+
+            it('should insert a new appointment and return the inserted ID', async () => {
+                const patient = { user: { id: 'patient-uuid' } };
+                const doctor = { user: { id: 'doctor-uuid' }, patientLoad: 10 };
+                const appointment = new Appointment(patient, doctor, '18.08.2024 13:15:00', '01:35:00', 'General checkup');
+
+                // Mocking the queries for isAvailable method
+                query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date
+                query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date, time, duration
+                query.mockResolvedValueOnce({ rows: [] }); // Mock getPatientAppointments for date, time, duration
+                query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, patient_id: 'patient-uuid', doctor_id: 'doctor-uuid', appointment_time: '18.08.2024 13:15:00', appointment_duration: '01:35:00', additional_info: 'General checkup' }] }); // Mock getPatientAppointments for date, time, duration
+
+                const result = await appointment.insertAppointment();
+                expect(result.id).toBe(1);
+            });
         });
 
-    });
+        // Fetch Tests
+        describe('getAppointments', () => {
+            beforeEach(() => {
+                query.mockReset();
+            });
+            it('should fetch appointments with the correct filters', async () => {
+                query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, patient_id: 'patient-uuid', doctor_id: 'doctor-uuid', appointment_time: '18.08.2024 13:15:00', appointment_duration: '01:35:00', additional_info: 'General checkup' }] });
 
-    test('should return array with nested patient objects', async () => {
-        const appointments = await Appointment.getAppointments({ nestPatient: true });
-        expect(appointments).toBeInstanceOf(Array);
-        appointments.forEach(appointment => {
-            expect(appointment).toBeInstanceOf(Appointment);
-            expect(appointment.patient == null ||
-                Object.keys(appointment.patient).length > 1).toBeTruthy();
+                const result = await Appointment.getAppointments({ patientId: 'patient-uuid', doctorId: 'doctor-uuid' });
+
+                expect(result).toHaveLength(1);
+                expect(result[0]).toBeInstanceOf(Appointment);
+                expect(query).toHaveBeenCalledWith(expect.stringContaining('WHERE patient_id = \'patient-uuid\' AND doctor_id = \'doctor-uuid\''));
+            });
         });
 
-    });
+        // Update Tests
+        describe('updateAppointment', () => {
+            beforeEach(() => {
+                query.mockReset();
+            });
+            it('should update an appointment and return the updated record', async () => {
+                const updates = { time: '18.08.2024 13:15:00', duration: '02:00:00', description: 'Updated checkup' };
 
-});
+                query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, appointment_time: updates.time, appointment_duration: '02:00:00', additional_info: 'Updated checkup' }] });
 
-describe('Get appointment by id from DB', () => {
-    test('should return an appointment object', async () => {
-        const appointment = (await Appointment.getAppointmentsByIds([appointmentId]))[0];
-        expect(appointment).toBeInstanceOf(Appointment);
-        expect(appointment.id).toEqual(appointmentId);
-    });
-});
+                const updatedAppointment = await Appointment.updateAppointment(1, updates);
 
-describe('Update appointment by id in DB', () => {
-    test('should return an appointment with updated time', async () => {
-        const updated = await Appointment.updateAppointment(appointmentId,
-            { time: '2024-07-18 13:33:00' });
-        expect(Date(updated.time)).toEqual(Date('2024-07-18 13:33:00'));
-        const appointment = (await Appointment.getAppointmentsByIds([appointmentId]))[0];
-        expect(Date(appointment.time)).toEqual(Date('2024-07-18 13:33:00'));
-    });
+                expect(updatedAppointment.description).toBe('Updated checkup');
+                expect(query).toHaveBeenCalledWith(expect.stringContaining('UPDATE appointments'));
+            });
 
-    test('should return an appointment with updated description', async () => {
-        const updated = await Appointment.updateAppointment(appointmentId,
-            { description: 'new description text' });
-        expect(updated.description).toEqual('new description text');
-        const appointment = (await Appointment.getAppointmentsByIds([appointmentId]))[0];
-        expect(appointment.description).toEqual('new description text');
-    });
+            it('should throw an error if no parameters to update are provided', async () => {
+                await expect(Appointment.updateAppointment(1, {})).rejects.toThrow('No parameters to update.');
+            });
+        });
 
-});
+        // Delete Tests
+        describe('deleteAppointment', () => {
+            it('should delete an appointment and return the deleted record', async () => {
+                query.mockResolvedValueOnce({ rows: [{ appointment_id: 1 }] });
 
-describe('Remove appointment from DB', () => {
-    test('should remove appointment from DB', async () => {
-        const appointment = (await Appointment.getAppointmentsByIds([appointmentId]))[0];
-        expect(async () => { await appointment.deleteAppointment() }).not.toThrow();
+                const appointment = new Appointment({ id: 'patient-uuid' }, { id: 'doctor-uuid' }, '18.08.2024 13:15:00', '01:35:00', 'General checkup', 1);
+                await appointment.deleteAppointment();
 
-        const doctor = (await Doctor.getDoctorsByIds([user1Id]))[0];
-        await doctor.deleteDoctor();
-        const user1 = await User.getUserById(user1Id);
-        await user1.deleteUser();
-
-        const patient = await Patient.getPatientById(user2Id);
-        await patient.deletePatient();
-        const user2 = await User.getUserById(user2Id);
-        await user2.deleteUser();
+                expect(query).toHaveBeenCalledWith(expect.stringContaining('DELETE FROM appointments WHERE appointment_id = 1'));
+            });
+        });
     });
 });

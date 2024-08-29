@@ -134,8 +134,8 @@ class User {
      */
     static async updateUser(id, { firstName, lastName, age, sex, pass, phone }) {
         if (!id) throw new Error('There is no id passed to update user record.');
-        const hasParams = Object.keys({ firstName, lastName, age, sex, pass, phone })
-            .some(key => key !== undefined);
+        const hasParams = Object.values({ firstName, lastName, age, sex, pass, phone })
+            .some(value => value !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
         let queryStr = `UPDATE users SET\n`;
         const updates = [];

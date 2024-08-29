@@ -1,112 +1,113 @@
 const { Organ } = require('../../models/Organ');
+const { query } = require('../../config/database');
 
-const organFields = {
-    name: 'Heart',
-    description: 'Pumps blood throughout the body.',
-    id: 1
-};
-let organId = null;
+// Mock the query method
+jest.mock('../../config/database', () => ({
+    query: jest.fn(),
+}));
 
-describe('Organ constructor', () => {
-    const organ = new Organ(organFields.name, organFields.description, organFields.id);
-    
-    test('should return instance of Organ', () => {
-        expect(organ).toBeInstanceOf(Organ);
+describe('Organ Class', () => {
+    describe('Organ constructor', () => {
+        test('should create a valid Organ instance', () => {
+            const organ = new Organ('Heart', 'Pumps blood through the body');
+            expect(organ.name).toBe('Heart');
+            expect(organ.description).toBe('Pumps blood through the body');
+        });
+
+        test('should throw error for invalid name', () => {
+            expect(() => new Organ('', 'Pumps blood through the body')).toThrow(Error);
+        });
+
+        test('should throw error for invalid description', () => {
+            expect(() => new Organ('Heart', 123)).toThrow(Error);
+        });
     });
 
-    test('should return object with corresponding fields', () => {
-        expect(organ.name).toEqual(organFields.name);
-        expect(organ.description).toEqual(organFields.description);
-        expect(organ.id).toEqual(organFields.id);
+    describe('Insert an organ into DB', () => {
+        test('should insert a new organ', async () => {
+            query.mockResolvedValue({
+                rows: [{ organ_id: 1 }],
+            });
+
+            const organ = new Organ('Liver', 'Filters toxins from the blood');
+            const { id } = await organ.insertOrgan();
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO organs'));
+            expect(id).toBe(1);
+            expect(organ.id).toBe(1);
+        });
     });
 
-    test('should throw an error for invalid name or description', () => {
-        expect(() => {
-            new Organ(123, organFields.description);
-        }).toThrow(Error);
+    describe('Get organs from DB', () => {
+        test('should return an array of Organ objects', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    { organ_name: 'Kidney', organ_description: 'Filters waste from blood', organ_id: 1 },
+                    { organ_name: 'Lung', organ_description: 'Helps with breathing', organ_id: 2 }
+                ],
+            });
 
-        expect(() => {
-            new Organ(organFields.name, {});
-        }).toThrow(Error);
+            const organs = await Organ.getOrgans({});
+            expect(organs).toBeInstanceOf(Array);
+            organs.forEach(organ => {
+                expect(organ).toBeInstanceOf(Organ);
+            });
+        });
+
+        test('should call query with proper filters', async () => {
+            query.mockResolvedValue({ rows: [] });
+            await Organ.getOrgans({ name: 'Lung' });
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("organ_name ILIKE '%Lung%'"));
+        });
     });
-});
 
-describe('Get organs array from DB records', () => {
-    test('should return array of Organ objects', async () => {
-        const organs = await Organ.getOrgansFromData([
-            { organ_name: "Heart", organ_description: "Pumps blood throughout the body.", organ_id: 1 },
-            { organ_name: "Lung", organ_description: "Helps in breathing.", organ_id: 2 },
-        ]);
+    describe('Get organ by ID from DB', () => {
+        test('should return an organ by ID', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    { organ_name: 'Spleen', organ_description: 'Filters blood', organ_id: 3 }
+                ],
+            });
 
-        expect(organs).toBeInstanceOf(Array);
-        organs.forEach(organ => {
+            const organ = await Organ.getOrganById(3);
             expect(organ).toBeInstanceOf(Organ);
-        });
-    });
-});
-
-describe('Insert an organ to DB', () => {
-    test('should return an object with organ\'s id', async () => {
-        const organ = new Organ(organFields.name, organFields.description);
-        const result = await organ.insertOrgan();
-        organId = result.id;
-        expect(organId).toBeTruthy();
-    });
-});
-
-describe('Get all organs from DB', () => {
-    test('should return array of Organ objects', async () => {
-        const organs = await Organ.getOrgans({});
-        expect(organs).toBeInstanceOf(Array);
-        organs.forEach(organ => {
-            expect(organ).toBeInstanceOf(Organ);
+            expect(organ.name).toBe('Spleen');
         });
     });
 
-    test('should return array with name filter applied', async () => {
-        const organs = await Organ.getOrgans({ name: 'e' });
-        expect(organs).toBeInstanceOf(Array);
-        organs.forEach(organ => {
-            expect(organ.name.indexOf('e')).toBeTruthy();
+    describe('Update organ in DB', () => {
+        test('should throw an error if no ID is provided', async () => {
+            await expect(Organ.updateOrgan(null, { name: 'Liver' })).rejects.toThrow('There is no id passed to update organ record.');
+        });
+
+        test('should throw an error if no parameters to update', async () => {
+            await expect(Organ.updateOrgan(1, {})).rejects.toThrow('There are no params to update.');
+        });
+
+        test('should update organ information', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    { organ_name: 'Liver', organ_description: 'Updated description', organ_id: 1 }
+                ],
+            });
+
+            const updatedOrgan = await Organ.updateOrgan(1, { description: 'Updated description' });
+            expect(query).toHaveBeenCalledWith(expect.stringContaining('UPDATE organs SET'));
+            expect(updatedOrgan.description).toBe('Updated description');
         });
     });
 
-    test('should return array with description filter applied', async () => {
-        const organs = await Organ.getOrgans({ description: 'b' });
-        expect(organs).toBeInstanceOf(Array);
-        organs.forEach(organ => {
-            expect(organ.description.indexOf('b') !== -1).toBeTruthy();
+    describe('Delete organ from DB', () => {
+        test('should delete an organ', async () => {
+            query.mockResolvedValue({
+                rows: [{ organ_id: 1 }],
+            });
+
+            const organ = new Organ('Liver', 'Filters toxins from the blood', 1);
+            await organ.deleteOrgan();
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM organs WHERE organ_id = 1"));
         });
-    });
-});
-
-describe('Get organ by id from DB', () => {
-    test('should return an Organ object', async () => {
-        const organ = await Organ.getOrganById(organId);
-        expect(organ).toBeInstanceOf(Organ);
-        expect(organ.id).toEqual(organId);
-    });
-});
-
-describe('Update organ by id in DB', () => {
-    test('should return an organ with updated name', async () => {
-        const updatedOrgan = await Organ.updateOrgan(organId, { name: 'Liver' });
-        expect(updatedOrgan.name).toEqual('Liver');
-        const organ = await Organ.getOrganById(organId);
-        expect(organ.name).toEqual('Liver');
-    });
-
-    test('should return an organ with updated description', async () => {
-        const updatedOrgan = await Organ.updateOrgan(organId, { description: 'Detoxifies the blood.' });
-        expect(updatedOrgan.description).toEqual('Detoxifies the blood.');
-        const organ = await Organ.getOrganById(organId);
-        expect(organ.description).toEqual('Detoxifies the blood.');
-    });
-});
-
-describe('Remove organ from DB', () => {
-    test('should remove organ from DB', async () => {
-        const organ = await Organ.getOrganById(organId);
-        expect(async () => { await organ.deleteOrgan() }).not.toThrow();
     });
 });

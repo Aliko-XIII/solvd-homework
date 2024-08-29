@@ -1,211 +1,136 @@
 const { Specialization } = require('../../models/Specialization');
 const { Symptom } = require('../../models/Symptom');
 const { Organ } = require('../../models/Organ');
+const { query } = require('../../config/database');
 
-const specializationFields = {
-    name: 'TestSpecialization',
-    description: 'TestSpecialization description text.',
-    symptoms: [1, 2, 3],
-    organs: [1, 2, 3],
-    id: 13
-};
+// Mock the query method
+jest.mock('../../config/database', () => ({
+    query: jest.fn(),
+}));
 
-const organs = [
-    {
-        name: 'Heart',
-        description: 'Pumps blood throughout the body.',
-        id: 1
-    },
-    {
-        name: 'Lung',
-        description: 'Proceeds oxygen for body.',
-        id: 2
-    },
-    {
-        name: 'Kidney',
-        description: 'Cleans blood for body.',
-        id: 3
-    }
-].map(fields => new Organ(fields.name, fields.description, fields.id));
-
-const symptoms = [
-    {
-        name: 'Headache',
-        description: 'Pain in the head or upper neck.',
-        id: 1
-    },
-    {
-        name: 'Fever',
-        description: 'Body temperature above the normal range.',
-        id: 2
-    },
-    {
-        name: 'Nausea',
-        description: 'Feeling of sickness with an inclination to vomit.',
-        id: 3
-    }
-].map(fields => new Symptom(fields.name, fields.description, fields.id));
-
-let specializationId = null;
-
-describe('Specialization constructor', () => {
-    let specialization = new Specialization(specializationFields.name,
-        specializationFields.description, symptoms, organs, specializationFields.id);
-
-    test('should return instance of Specialization', () => {
-        expect(specialization).toBeInstanceOf(Specialization);
-    });
-
-    test('should return object with corresponding fields', () => {
-        expect(specialization.name).toEqual(specializationFields.name);
-        expect(specialization.description).toEqual(specializationFields.description);
-        expect(specialization.symptoms).toEqual(symptoms);
-        expect(specialization.organs).toEqual(organs);
-        expect(specialization.id).toEqual(specializationFields.id);
-    });
-
-    test('should throw an error for invalid name', () => {
-        expect(() => {
-            new Specialization(12345, specializationFields.description, [], [], specializationFields.id);
-        }).toThrow(Error);
-    });
-
-    test('should throw an error for invalid description', () => {
-        expect(() => {
-            new Specialization(specializationFields.name, 12345, [], [], specializationFields.id);
-        }).toThrow(Error);
-    });
-
-    test('should throw an error for invalid symptoms', () => {
-        expect(() => {
-            new Specialization(specializationFields.name, specializationFields.description, 12345, [], specializationFields.id);
-        }).toThrow(Error);
-    });
-
-    test('should throw an error for invalid organs', () => {
-        expect(() => {
-            new Specialization(specializationFields.name, specializationFields.description, [], 12345, specializationFields.id);
-        }).toThrow(Error);
-    });
-});
-
-describe('Get specializations array from DB records', () => {
-    test('should return array of Specialization objects', async () => {
-        const rows = [
-            {
-                specialization_name: 'Cardiology',
-                specialization_description: 'Heart-related conditions and treatments.',
-                symptoms: [1, 2],
-                organs: [1],
-                specialization_id: 1
-            },
-            {
-                specialization_name: 'Neurology',
-                specialization_description: 'Nervous system disorders.',
-                symptoms: [3],
-                organs: [2],
-                specialization_id: 2
-            }
-        ];
-
-        const specializations = await Specialization.getSpecializationsFromData(rows);
-
-        expect(specializations).toBeInstanceOf(Array);
-        expect(specializations.length).toBe(rows.length);
-
-        specializations.forEach((specialization, index) => {
-            const row = rows[index];
-            expect(specialization).toBeInstanceOf(Specialization);
-            expect(specialization.name).toEqual(row.specialization_name);
-            expect(specialization.description).toEqual(row.specialization_description);
-            expect(specialization.symptoms).toEqual(row.symptoms);
-            expect(specialization.organs).toEqual(row.organs);
-            expect(specialization.id).toEqual(row.specialization_id);
+describe('Specialization Class', () => {
+    describe('Constructor', () => {
+        test('should create a valid Specialization instance', () => {
+            const specialization = new Specialization('Cardiology', 'Heart diseases', [], []);
+            expect(specialization.name).toBe('Cardiology');
+            expect(specialization.description).toBe('Heart diseases');
+            expect(specialization.symptoms).toEqual([]);
+            expect(specialization.organs).toEqual([]);
         });
-    });
-});
 
-describe('Insert a specialization to DB', () => {
-    test('should return an object with specialization\'s id', async () => {
-        const specialization = new Specialization(
-            specializationFields.name,
-            specializationFields.description,
-            specializationFields.symptoms.map(id => { return { id: id } }),
-            specializationFields.organs.map(id => { return { id: id } })
-        );
-        const result = await specialization.insertSpecialization();
-        const id = result.id;
-        specializationId = id
-        expect(id).toBeDefined();
-        expect(id > 0).toBeTruthy();
-    });
-});
+        test('should throw error for invalid name', () => {
+            expect(() => new Specialization(123, 'Heart diseases')).toThrow(Error);
+        });
 
-describe('Get all specializations from DB', () => {
-    test('should return array of Specialization objects from getSpecializations()', async () => {
-        const specializations = await Specialization.getSpecializations();
-        expect(specializations).toBeInstanceOf(Array);
-        specializations.forEach(specialization => {
-            expect(specialization).toBeInstanceOf(Specialization);
+        test('should throw error for invalid description', () => {
+            expect(() => new Specialization('Cardiology', 123)).toThrow(Error);
+        });
+
+        test('should throw error for invalid symptoms', () => {
+            expect(() => new Specialization('Cardiology', 'Heart diseases', 'Not an array')).toThrow(Error);
+        });
+
+        test('should throw error for invalid organs', () => {
+            expect(() => new Specialization('Cardiology', 'Heart diseases', [], 'Not an array')).toThrow(Error);
         });
     });
 
-    test('should return array with name filter applied in getSpecializations()', async () => {
-        const specializations = await Specialization.getSpecializations({ name: 'l' });
-        expect(specializations).toBeInstanceOf(Array);
-        specializations.forEach(specialization => {
-            expect(specialization).toBeInstanceOf(Specialization);
-            expect(specialization.name.toLowerCase()).toContain('l');
+    describe('Insert Specialization into DB', () => {
+        test('should insert a new specialization', async () => {
+            query.mockResolvedValue({
+                rows: [{ specialization_id: 1 }],
+            });
+
+            const specialization = new Specialization('Cardiology', 'Heart diseases');
+            const { id } = await specialization.insertSpecialization();
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO specializations'));
+            expect(id).toBe(1);
+            expect(specialization.id).toBe(1);
         });
     });
 
-    test('should return array with description filter applied in getSpecializations()', async () => {
-        const specializations = await Specialization.getSpecializations({ description: 'ea' });
-        expect(specializations).toBeInstanceOf(Array);
-        specializations.forEach(specialization => {
-            expect(specialization).toBeInstanceOf(Specialization);
-            expect(specialization.description.toLowerCase()).toContain('ea');
+    describe('Get Specializations from DB', () => {
+        test('should return an array of Specialization objects', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    {
+                        specialization_name: 'Cardiology',
+                        specialization_description: 'Heart diseases',
+                        symptoms: [{ id: 1, name: 'Chest Pain' }],
+                        organs: [{ id: 1, name: 'Heart' }],
+                        specialization_id: 1,
+                    },
+                ],
+            });
+
+            const specializations = await Specialization.getSpecializations({});
+            expect(specializations).toBeInstanceOf(Array);
+            specializations.forEach(spec => {
+                expect(spec).toBeInstanceOf(Specialization);
+            });
+        });
+
+        test('should call query with proper filters', async () => {
+            query.mockResolvedValue({ rows: [] });
+            await Specialization.getSpecializations({ name: 'Cardiology' });
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("s.specialization_name ILIKE '%Cardiology%'"));
         });
     });
-});
 
-describe('Get specialization by id from DB', () => {
-    test('should return a Specialization object', async () => {
-        const specialization = await Specialization.getSpecializationsByIds([specializationId]);
-        expect(specialization).toBeInstanceOf(Array);
-        expect(specialization.length).toBeGreaterThan(0);
-        expect(specialization[0]).toBeInstanceOf(Specialization);
-        expect(specialization[0].id).toEqual(specializationId);
-    });
-});
+    describe('Get Specialization by ID from DB', () => {
+        test('should return a specialization by ID', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    {
+                        specialization_name: 'Cardiology',
+                        specialization_description: 'Heart diseases',
+                        symptoms: [{ id: 1, name: 'Chest Pain' }],
+                        organs: [{ id: 1, name: 'Heart' }],
+                        specialization_id: 1,
+                    },
+                ],
+            });
 
-describe('Update specialization by id in DB', () => {
-    test('should return a specialization with updated description', async () => {
-        const updates = { description: 'Updated description' };
-        const updatedSpecialization = await Specialization.updateSpecialization(specializationId, updates);
-
-        expect(updatedSpecialization.description).toEqual('Updated description');
-
-        const [specialization] = await Specialization.getSpecializationsByIds([specializationId]);
-        expect(specialization.description).toEqual('Updated description');
+            const specialization = await Specialization.getSpecializationById(1);
+            expect(specialization).toBeInstanceOf(Specialization);
+            expect(specialization.name).toBe('Cardiology');
+        });
     });
 
-    test('should return a specialization with updated name', async () => {
-        const updates = { name: 'Updated Specialization Name' };
-        const updatedSpecialization = await Specialization.updateSpecialization(specializationId, updates);
+    describe('Update Specialization in DB', () => {
+        test('should throw an error if no ID is provided', async () => {
+            await expect(Specialization.updateSpecialization(null, { name: 'New Name' })).rejects.toThrow('No ID provided to update specialization record.');
+        });
 
-        expect(updatedSpecialization.name).toEqual('Updated Specialization Name');
+        test('should throw an error if no parameters to update', async () => {
+            await expect(Specialization.updateSpecialization(1, {})).rejects.toThrow('No parameters to update.');
+        });
 
-        const [specialization] = await Specialization.getSpecializationsByIds([specializationId]);
-        expect(specialization.name).toEqual('Updated Specialization Name');
+        test('should update specialization information', async () => {
+            query.mockResolvedValue({
+                rows: [
+                    { specialization_name: 'Cardiology', specialization_description: 'Updated description', specialization_id: 1 }
+                ],
+            });
+
+            const updatedSpec = await Specialization.updateSpecialization(1, { description: 'Updated description' });
+            expect(query).toHaveBeenCalledWith(expect.stringContaining('UPDATE specializations SET'));
+            expect(updatedSpec.description).toBe('Updated description');
+        });
     });
-});
 
-describe('Remove specialization from DB', () => {
-    test('should remove specialization from DB', async () => {
-        const specialization = (await Specialization.getSpecializationsByIds([specializationId]))[0];
-        expect(async () => await specialization.deleteSpecialization()).not.toThrow();
-        const deletedSpecialization = await Specialization.getSpecializationsByIds([specializationId]);
-        expect(deletedSpecialization.length).toBe(0);
+    describe('Delete Specialization from DB', () => {
+        test('should delete a specialization', async () => {
+            query.mockResolvedValue({
+                rows: [{ specialization_id: 1 }],
+            });
+
+            const specialization = new Specialization('Cardiology', 'Heart diseases', [], [], 1);
+            await specialization.deleteSpecialization();
+
+            expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM specializations WHERE specialization_id = 1"));
+        });
     });
 });

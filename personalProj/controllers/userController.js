@@ -66,7 +66,6 @@ const deleteUser = async (req, res) => {
             res.status(404).json({ error: 'User not found.' });
         }
     } catch (err) {
-        console.error(err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -78,10 +77,10 @@ const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { firstName, lastName, phone, password, age, sex } = req.body;
-
         if (!id) {
             return res.status(400).json({ error: 'User ID is required' });
         }
+
 
         if (firstName && typeof firstName !== 'string') return res.status(400).json({ error: 'Invalid first name' });
         if (lastName && typeof lastName !== 'string') return res.status(400).json({ error: 'Invalid last name' });
@@ -91,10 +90,8 @@ const updateUser = async (req, res) => {
         if (sex && !['F', 'M'].includes(sex)) return res.status(400).json({ error: 'Invalid sex' });
 
         const updated = await User.updateUser(id, { firstName, lastName, phone, password, age, sex });
-
         res.status(200).json(updated);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the user' });
     }
 };

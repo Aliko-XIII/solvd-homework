@@ -111,7 +111,6 @@ class Patient extends Role {
             VALUES ('${this.insuranceNumber}', '${this.insuranceProvider}', '${this.user.id}')
             RETURNING *;`);
         this.id = res.rows[0].user_id;
-        console.log('Inserted:', res.rows[0]);
         return { id: this.id };
     }
 
@@ -126,8 +125,8 @@ class Patient extends Role {
      */
     static async updatePatient(id, { insuranceNumber, insuranceProvider }) {
         if (!id) throw new Error('No ID provided to update patient record.');
-        const hasParams = Object.keys({ insuranceNumber, insuranceProvider })
-            .some(key => key !== undefined);
+        const hasParams = Object.values({ insuranceNumber, insuranceProvider })
+            .some(value => value !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE patients SET `;
@@ -139,7 +138,6 @@ class Patient extends Role {
         }
         queryStr += ` WHERE user_id = '${id}' RETURNING *;`;
         const res = await query(queryStr);
-        console.log('Updated:', res.rows[0]);
         const updated = (await this.getPatientsFromData(res.rows))[0];
         return updated;
 
@@ -152,7 +150,6 @@ class Patient extends Role {
      */
     async deletePatient() {
         const res = await query(`DELETE FROM patients WHERE user_id = '${this.user.id}' RETURNING *;`);
-        console.log('Deleted:', res.rows[0]);
     }
 }
 

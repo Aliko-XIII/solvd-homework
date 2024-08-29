@@ -147,7 +147,8 @@ class Specialization {
     static async updateSpecialization(id, { name, description, symptoms, organs }) {
         if (!id) throw new Error('No ID provided to update specialization record.');
 
-        const hasParams = Object.keys({ name, description, symptoms, organs }).some(key => key !== undefined);
+        const hasParams = Object.values({ name, description, symptoms, organs })
+            .some(value => value !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
         let queryStr = `UPDATE specializations SET `;
@@ -183,7 +184,6 @@ class Specialization {
                 this.organs = organs;
             }
 
-            console.log('Updated Specialization:', id);
             return (await Specialization.getSpecializationsByIds([id]))[0];
         } catch (err) {
             console.error('Error updating specialization:', err);
@@ -213,7 +213,6 @@ class Specialization {
                     specialization_id, organ_id)
                 VALUES(${this.id}, ${organ.id});`);
             }
-            console.log('Inserted:', res.rows[0]);
             return { id: this.id };
         } catch (err) {
             console.error('Error inserting specialization:', err);
@@ -227,7 +226,6 @@ class Specialization {
      */
     async deleteSpecialization() {
         const res = await query(`DELETE FROM specializations WHERE specialization_id = ${this.id} RETURNING *; `);
-        console.log('Deleted:', res.rows[0]);
     }
 }
 
