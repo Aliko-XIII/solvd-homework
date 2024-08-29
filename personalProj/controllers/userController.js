@@ -41,12 +41,12 @@ const createUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, password, age, sex } = req.body;
         const user = new User(firstName, lastName, phone, password, age, sex);
-
         if (!user) {
             return res.status(400).json({ error: 'User object misses fields or their data is invalid.' });
         }
 
         await user.insertUser();
+        console.log(user);
         res.status(201).json(user);
     } catch (err) {
         res.status(500).json({ error: err.message });

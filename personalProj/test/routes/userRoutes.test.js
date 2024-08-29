@@ -86,18 +86,9 @@ describe('User Routes', () => {
         age: 25,
         sex: 'F',
       };
-      User.prototype.insertUser.mockResolvedValue({
-        id: 'mocked-user-id'
-      });
-
+      User.prototype.insertUser = jest.fn().mockResolvedValue({ id: 'mocked-user-id' });
       const response = await request(app).post('/users').send(mockUser);
-
       expect(response.status).toBe(201);
-
-      // expect(response.body).toMatchObject({
-      //   id: 'mocked-user-id'
-      // });
-
       expect(User).toHaveBeenCalledWith(
         'Jane', 'Doe', '1234567890', 'password', 25, 'F'
       );

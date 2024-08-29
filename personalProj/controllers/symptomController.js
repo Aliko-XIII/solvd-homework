@@ -2,7 +2,7 @@ const { Symptom } = require('../models/Symptom');
 
 const getSymptom = async (req, res) => {
     try {
-        const symptom = await Symptom.getSymptomById(req.params.id);
+        const symptom = await Symptom.getSymptomById(Number.parseInt(req.params.id));
         if (symptom) {
             res.status(200).json(symptom);
         } else {
@@ -42,7 +42,7 @@ const createSymptom = async (req, res) => {
  */
 const updateSymptom = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = Number.parseInt(req.params.id);
         const { name, description } = req.body;
 
         if (!id) return res.status(400).json({ error: 'Symptom ID is required' });
@@ -63,13 +63,10 @@ const updateSymptom = async (req, res) => {
 
 const deleteSymptom = async (req, res) => {
     try {
-        const symptom = (await Symptom.getSymptomsByIds([req.params.id]))[0];
-        if (symptom) {
-            await symptom.deleteSymptom();
-            res.sendStatus(204);
-        } else {
-            res.status(404).json({ error: 'Symptom not found' });
-        }
+        const symptom = await Symptom.getSymptomById(req.params.id);
+        if (!symptom) return res.status(404).json({ error: 'Symptom not found' });
+        await symptom.deleteSymptom();
+        res.status(204).send();
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
