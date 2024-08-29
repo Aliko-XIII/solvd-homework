@@ -12,28 +12,34 @@ const getDoctor = async (req, res) => {
         if (doctor) {
             res.status(200).send(doctor);
         } else {
-            res.sendStatus(404);
+            res.status(404).send({ error: "Doctor not found." });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
+
     }
 };
 
 const getAllDoctors = async (req, res) => {
     try {
-        const { nestUser = false, nestSpecialization = false } = req.query;
-        const doctors = await Doctor.getDoctors({nestUser, nestSpecialization});
+        const { specializationId, nestUser = false, nestSpecialization = false } = req.query;
+        const doctors = await Doctor.getDoctors({
+            specializationId: Number.parseInt(specializationId),
+            nestUser, nestSpecialization
+        });
         res.status(200).send(doctors);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
+
     }
 };
 
 const createDoctor = async (req, res) => {
     try {
         const { specializationId, patientLoad, userId, workdayStart, workdayEnd } = req.body;
+        if (!userId || !specializationId) return res.status(400).send({ error: 'User ID is required' });
         const user = await User.getUserById(userId);
-        const specialization = (await Specialization.getSpecializationsByIds([specializationId]))[0];
+        const specialization = await Specialization.getSpecializationById(specializationId);
         const doctor = new Doctor(user, specialization);
         if (patientLoad) doctor.patientLoad = patientLoad;
         if (workdayStart) doctor.workdayStart = workdayStart;
@@ -41,7 +47,8 @@ const createDoctor = async (req, res) => {
         await doctor.insertDoctor();
         res.status(201).send(doctor);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
+
     }
 };
 
@@ -71,10 +78,11 @@ const deleteDoctor = async (req, res) => {
             await doctor.deleteDoctor();
             res.sendStatus(204);
         } else {
-            res.sendStatus(404);
+            res.status(404).json({ error: 'Doctor not found.' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
+
     }
 };
 
@@ -83,7 +91,8 @@ const getAppointments = async (req, res) => {
         const appointments = await Appointment.getDoctorAppointments(req.params.id);
         res.status(200).send(appointments);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).json({ error: err.message });
+
     }
 }
 

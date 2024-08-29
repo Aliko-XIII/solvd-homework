@@ -58,7 +58,7 @@ const deletePatient = async (req, res) => {
 
         const patient = await Patient.getPatientById(req.params.id);
         if (patient) {
-            await patient.deletePatient(req.params.id);
+            await patient.deletePatient();
             res.sendStatus(204);
         } else {
             res.status(404).json({ error: 'Patient not found.' });

@@ -43,7 +43,6 @@ class Doctor extends Role {
     constructor(user, specialization, patientLoad = 1, workdayStart = null, workdayEnd = null) {
         // if (user.age <= 18 || user.age > 70)
         //     throw new Error('Doctor\'s age should be from 18 to 70.');
-
         if (typeof patientLoad !== 'number' || patientLoad < 0)
             throw new Error('Patient load is not valid.');
 
