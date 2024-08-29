@@ -7,7 +7,7 @@ router.get('/', appointmentController.getAllAppointments);
 
 router.get('/:id', appointmentController.getAppointment);
 
-router.put(':/id', appointmentController.updateAppointment);
+router.put('/:id', appointmentController.updateAppointment);
 
 router.post('/', appointmentController.createAppointment);
 

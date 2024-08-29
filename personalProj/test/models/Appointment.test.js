@@ -11,7 +11,7 @@ describe('Appointment Class', () => {
 
     // Constructor Tests
     describe('Constructor', () => {
-        it('should create a valid Appointment instance', () => {
+        test('should create a valid Appointment instance', () => {
             const patient = new Patient({ id: 'patient-uuid' }, '12345', 'Provider A');
             const doctor = new Doctor({ id: 'doctor-uuid' }, 'Cardiology', 10, '09:00', '17:00');
             const appointment = new Appointment(patient, doctor, '18.08.2024 13:15:00', '01:35:00', 'General checkup');
@@ -22,7 +22,7 @@ describe('Appointment Class', () => {
             expect(appointment.doctor).toBe(doctor);
         });
 
-        it('should throw an error for invalid description', () => {
+        test('should throw an error for invalid description', () => {
             const patient = new Patient({ id: 'patient-uuid' }, '12345', 'Provider A');
             const doctor = new Doctor({ id: 'doctor-uuid' }, 'Cardiology', 10, '09:00', '17:00');
 
@@ -40,7 +40,7 @@ describe('Appointment Class', () => {
                 query.mockReset();
             });
 
-            it('should insert a new appointment and return the inserted ID', async () => {
+            test('should insert a new appointment and return the inserted ID', async () => {
                 const patient = { user: { id: 'patient-uuid' } };
                 const doctor = { user: { id: 'doctor-uuid' }, patientLoad: 10 };
                 const appointment = new Appointment(patient, doctor, '18.08.2024 13:15:00', '01:35:00', 'General checkup');
@@ -61,7 +61,7 @@ describe('Appointment Class', () => {
             beforeEach(() => {
                 query.mockReset();
             });
-            it('should fetch appointments with the correct filters', async () => {
+            test('should fetch appointments with the correct filters', async () => {
                 query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, patient_id: 'patient-uuid', doctor_id: 'doctor-uuid', appointment_time: '18.08.2024 13:15:00', appointment_duration: '01:35:00', additional_info: 'General checkup' }] });
 
                 const result = await Appointment.getAppointments({ patientId: 'patient-uuid', doctorId: 'doctor-uuid' });
@@ -77,7 +77,7 @@ describe('Appointment Class', () => {
             beforeEach(() => {
                 query.mockReset();
             });
-            it('should update an appointment and return the updated record', async () => {
+            test('should update an appointment and return the updated record', async () => {
                 const updates = { time: '18.08.2024 13:15:00', duration: '02:00:00', description: 'Updated checkup' };
 
                 query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, appointment_time: updates.time, appointment_duration: '02:00:00', additional_info: 'Updated checkup' }] });
@@ -88,14 +88,14 @@ describe('Appointment Class', () => {
                 expect(query).toHaveBeenCalledWith(expect.stringContaining('UPDATE appointments'));
             });
 
-            it('should throw an error if no parameters to update are provided', async () => {
+            test('should throw an error if no parameters to update are provided', async () => {
                 await expect(Appointment.updateAppointment(1, {})).rejects.toThrow('No parameters to update.');
             });
         });
 
         // Delete Tests
         describe('deleteAppointment', () => {
-            it('should delete an appointment and return the deleted record', async () => {
+            test('should delete an appointment and return the deleted record', async () => {
                 query.mockResolvedValueOnce({ rows: [{ appointment_id: 1 }] });
 
                 const appointment = new Appointment({ id: 'patient-uuid' }, { id: 'doctor-uuid' }, '18.08.2024 13:15:00', '01:35:00', 'General checkup', 1);

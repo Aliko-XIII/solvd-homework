@@ -4,17 +4,18 @@ const { Doctor } = require('../models/Doctor');
 
 const getAppointment = async (req, res) => {
     try {
+        const id = Number.parseInt(req.params.id);
         const nestDoctor = req.query.nestDoctor === 'true';
         const nestPatient = req.query.nestPatient === 'true';
         const appointment = (await Appointment.getAppointmentsByIds(
-            [req.params.id], nestDoctor, nestPatient))[0];
+            [id], nestDoctor, nestPatient))[0];
         if (appointment) {
             res.status(200).send(appointment);
         } else {
-            res.sendStatus(404);
+            res.status(404).send({ error: 'Appointment not found' });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
@@ -33,16 +34,17 @@ const getAllAppointments = async (req, res) => {
         });
         res.status(200).send(appointments);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
 const updateAppointment = async (req, res) => {
     try {
-        const { appointmentId } = req.params;
+        const id = Number.parseInt(req.params.id);
+
         const { time, duration, description, patientId, doctorId } = req.body;
 
-        if (!appointmentId) return res.status(400).json({ error: 'Appointment ID is required' });
+        if (!id) return res.status(400).json({ error: 'Appointment ID is required' });
         if (duration && typeof duration !== 'string') return res.status(400).json({ error: 'Invalid duration format' });
         if (patientId && typeof patientId !== 'string') res.status(400).json({ error: 'Invalid patient ID' });
         if (doctorId && typeof doctorId !== 'string') return res.status(400).json({ error: 'Invalid doctor ID' });
@@ -50,7 +52,7 @@ const updateAppointment = async (req, res) => {
         const hasParams = Object.values(updates).some(value => value !== undefined);
         if (!hasParams) return res.status(400).json({ error: 'No parameters to update' });
 
-        const updated = await Appointment.updateAppointment(updates);
+        const updated = await Appointment.updateAppointment(id, updates);
         res.status(200).json(updated);
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while updating the appointment' });
@@ -66,21 +68,22 @@ const createAppointment = async (req, res) => {
         await appointment.insertAppointment();
         res.status(201).send(appointment);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
 const deleteAppointment = async (req, res) => {
     try {
-        const appointment = (await Appointment.getAppointmentsByIds([req.params.id]))[0];
+        const id = Number.parseInt(req.params.id)
+        const appointment = (await Appointment.getAppointmentsByIds([id]))[0];
         if (appointment) {
             await appointment.deleteAppointment();
             res.sendStatus(204);
         } else {
-            res.sendStatus(404);
+            res.status(404).send({ error: "Appointment not found" });
         }
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 };
 
