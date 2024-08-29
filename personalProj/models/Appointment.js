@@ -8,14 +8,14 @@ class Appointment {
      * 
      * @param {Patient} patient 
      * @param {Doctor} doctor 
-     * @param {Date} time 
-     * @param {Date} duration 
+     * @param {string} time 
+     * @param {string} duration 
      * @param {string} description 
      * @param {number} id 
      */
     constructor(patient, doctor, time, duration, description, id = -1) {
-        if (typeof description !== 'string') throw new Error('Description is not valid');
 
+        if (typeof description !== 'string') throw new Error('Description is not valid');
         this.id = id;
         this.time = time;
         this.duration = duration;
@@ -38,7 +38,7 @@ class Appointment {
         const appointments = rows.map(async row => {
             let patient = null;
             if (row.patient_id != null) {
-                patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id], true))[0] :
+                patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id]))[0] :
                     { id: row.patient_id };
             }
             let doctor = null;
@@ -46,7 +46,6 @@ class Appointment {
                 doctor = nestDoctor ? (await Doctor.getDoctorsByIds([row.doctor_id]))[0] :
                     { id: row.doctor_id };
             }
-
 
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);
@@ -56,7 +55,8 @@ class Appointment {
     }
 
     static async getAppointments({ patientId, doctorId, nestDoctor, nestPatient, startBefore, startAfter, endBefore, endAfter } = {}) {
-        let queryStr = `SELECT * FROM appointments `;
+        let queryStr = `SELECT appointment_id, patient_id, doctor_id, appointment_time,
+         appointment_duration::TEXT AS appointment_duration, additional_info FROM appointments `;
 
         const conditions = [];
         if (patientId) conditions.push(`patient_id = '${patientId}'`);
@@ -73,7 +73,8 @@ class Appointment {
 
     static async getAppointmentsByIds(ids, nestDoctor = false, nestPatient = false) {
         const idList = ids.map(id => `'${id}'`).join(',');
-        const res = await query(`SELECT * FROM appointments 
+        const res = await query(`SELECT appointment_id, patient_id, doctor_id, appointment_time,
+             appointment_duration::TEXT AS appointment_duration, additional_info FROM appointments 
             WHERE appointment_id IN (${idList});`);
         return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
     }
@@ -81,7 +82,7 @@ class Appointment {
     /**
      * Update the current Appointment object in the database.
      * @param {Object} updates - The fields to update.
-     * @param {Date|null} [updates.time] - The new appointment time.
+     * @param {string|null} [updates.time] - The new appointment time.
      * @param {string} [updates.duration] - The new appointment duration (Postgres interval).
      * @param {string} [updates.description] - The new appointment description.
      * @param {string} [updates.patientId] - The new patient ID.
@@ -90,7 +91,7 @@ class Appointment {
      */
     static async updateAppointment(id, { time, duration, description, patientId, doctorId }) {
         if (id === -1) throw new Error('No ID provided to update appointment record.');
-        const hasParams = Object.keys({ time, duration, description, patientId, doctorId })
+        const hasParams = Object.values({ time, duration, description, patientId, doctorId })
             .some(value => value !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
@@ -110,6 +111,7 @@ class Appointment {
     }
 
     async insertAppointment() {
+        if (!(await this.isAvailable())) throw new Error('This appointment time is not avaiable');
         const res = await query(`INSERT INTO appointments(
 	        appointment_time, appointment_duration, additional_info, patient_id, doctor_id)
 	        VALUES ('${this.time}', '${this.duration}', '${this.description}', 
@@ -118,29 +120,69 @@ class Appointment {
         return { id: this.id };
     }
 
+    async isAvailable() {
+        const doctorDateAppointments = await Appointment.
+            getDoctorAppointments(this.doctor.user.id, { date: this.time.split(' ')[0] });
+        console.log('doctorDateAppointments:', doctorDateAppointments);
+        if (doctorDateAppointments.length >= this.doctor.patientLoad) return false;
+        const doctorIntersectAppointments = await Appointment.
+            getDoctorAppointments(this.doctor.user.id, {
+                date: this.time.split(' ')[0],
+                time: this.time.split(' ')[1],
+                duration: this.duration
+            });
+        console.log('doctorIntersectAppointments:', doctorIntersectAppointments);
+        if (doctorIntersectAppointments.length > 0) return false;
+        const patientIntersectAppointments = await Appointment.
+            getPatientAppointments(this.patient.user.id, {
+                date: this.time.split(' ')[0],
+                time: this.time.split(' ')[1],
+                duration: this.duration
+            });
+        if (patientIntersectAppointments.length > 0) return false;
+        console.log('patientIntersectAppointments:', patientIntersectAppointments);
+
+        return true;
+
+    }
+
     async deleteAppointment() {
-        const res = await query(`DELETE FROM appointments WHERE appointment_id = ${this.id} RETURNING *;`);
+        await query(`DELETE FROM appointments WHERE appointment_id = ${this.id} RETURNING *;`);
     }
 
     /**
      *  
      * @param {Doctor} doctor 
      */
-    static async getDoctorAppointments(doctorId) {
-        const res = await query(`SELECT * FROM appointments 
-            WHERE doctor_id = '${doctorId}';`);
-        return await Appointment.getAppointmentsFromData(res.rows, true, true);
+    static async getDoctorAppointments(doctorId, { date, time, duration } = {}) {
+        let queryStr = `SELECT appointment_id, patient_id, doctor_id,
+             appointment_time, appointment_duration::TEXT AS appointment_duration, additional_info FROM appointments 
+            WHERE doctor_id = '${doctorId}' `
+        if (date) queryStr += ` AND DATE(appointment_time) = '${date} '`;
+        if (date && time && duration) queryStr += `AND appointment_time < (TIMESTAMP '${date} ${time}'
+         + INTERVAL '${duration}')
+        AND (appointment_time + appointment_duration) > TIMESTAMP '${date} ${time}'`;
+        queryStr += ';';
+        const res = await query(queryStr);
+        return await Appointment.getAppointmentsFromData(res.rows, false, false);
     }
 
     /**
      * 
      * @param {Patient} patient 
      */
-    static async getPatientAppointments(patientId) {
-        const res = await query(`SELECT * FROM appointments 
-            WHERE patient_id = '${patientId}';`);
-        return await Appointment.getAppointmentsFromData(res.rows, true, true);
+    static async getPatientAppointments(patientId, { date, time, duration } = {}) {
+        let queryStr = `SELECT appointment_id, patient_id, doctor_id, appointment_time,
+             appointment_duration::TEXT AS appointment_duration, additional_info FROM appointments 
+            WHERE patient_id = '${patientId}'`;
+        if (date && time && duration) queryStr += `AND appointment_time < (TIMESTAMP '${date} ${time}'
+            + INTERVAL '${duration}')
+           AND (appointment_time + appointment_duration) > TIMESTAMP '${date} ${time}'`;
+        queryStr += ';';
+        const res = await query(queryStr);
+        return await Appointment.getAppointmentsFromData(res.rows, false, false);
     }
 }
+
 
 module.exports = { Appointment };

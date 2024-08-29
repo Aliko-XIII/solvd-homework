@@ -53,7 +53,6 @@ const updateAppointment = async (req, res) => {
         const updated = await Appointment.updateAppointment(updates);
         res.status(200).json(updated);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the appointment' });
     }
 };
@@ -64,7 +63,6 @@ const createAppointment = async (req, res) => {
         const patient = (await Patient.getPatientsByIds([patientId]))[0];
         const doctor = (await Doctor.getDoctorsByIds([doctorId]))[0];
         const appointment = new Appointment(patient, doctor, time, duration, description);
-        console.log('Appointment:', appointment);
         await appointment.insertAppointment();
         res.status(201).send(appointment);
     } catch (err) {

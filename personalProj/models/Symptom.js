@@ -11,7 +11,7 @@ class Symptom {
      * @param {number} [id=-1] - The ID of the symptom (optional).
      */
     constructor(name, description, id = -1) {
-        if (typeof name !== 'string') throw new Error('Name should be string');
+        if (typeof name !== 'string' || name.length === 0) throw new Error('Name should be string');
         if (typeof description !== 'string') throw new Error('Description should be string');
 
         this.id = id;
@@ -99,7 +99,7 @@ class Symptom {
      */
     static async updateSymptom(id, { name, description }) {
         if (!id) throw new Error('There is no id passed to update symptom record.');
-        const hasParams = Object.keys({ name, description }).some(key => key !== undefined);
+        const hasParams = Object.values({ name, description }).some(value => value !== undefined);
         if (!hasParams) throw new Error('There are no params to update.');
 
         let queryStr = `UPDATE symptoms SET `;
