@@ -49,7 +49,7 @@ describe('Appointment Class', () => {
                 query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date
                 query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date, time, duration
                 query.mockResolvedValueOnce({ rows: [] }); // Mock getPatientAppointments for date, time, duration
-                query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, patient_id: 'patient-uuid', doctor_id: 'doctor-uuid', appointment_time: '18.08.2024 13:15:00', appointment_duration: '01:35:00', additional_info: 'General checkup' }] }); // Mock getPatientAppointments for date, time, duration
+                query.mockResolvedValueOnce({ rows: [{ appointment_id: 3, patient_id: 'patient-uuid', doctor_id: 'doctor-uuid', appointment_time: '18.08.2024 13:15:00', appointment_duration: '01:35:00', additional_info: 'General checkup' }] }); // Mock getPatientAppointments for date, time, duration
 
                 const result = await appointment.insertAppointment();
                 expect(result.id).toBe(1);
