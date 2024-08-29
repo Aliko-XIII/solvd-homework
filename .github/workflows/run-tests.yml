@@ -1,4 +1,4 @@
-name: Run Unit Tests
+name: Run Unit Tests and Linter
 
 on:
   push:
@@ -28,6 +28,11 @@ jobs:
         run: |
           cd personalProj
           npm ci
+
+      - name: Run linter
+        run: |
+          cd personalProj
+          npm run lint
 
       - name: Run tests
         run: |
