@@ -14,7 +14,8 @@ class Appointment {
      * @param {number} id 
      */
     constructor(patient, doctor, time, duration, description, id = -1) {
-
+        if(!time) throw new Error('No appointment time provided');
+        if(!duration) throw new Error('No appointment duration provided');
         if (typeof description !== 'string') throw new Error('Description is not valid');
         this.id = id;
         this.time = time;
@@ -141,9 +142,7 @@ class Appointment {
             });
         if (patientIntersectAppointments.length > 0) return false;
         console.log('patientIntersectAppointments:', patientIntersectAppointments);
-
         return true;
-
     }
 
     async deleteAppointment() {

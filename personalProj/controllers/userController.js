@@ -41,9 +41,8 @@ const createUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, password, age, sex } = req.body;
         const user = new User(firstName, lastName, phone, password, age, sex);
-        if (!user) {
-            return res.status(400).json({ error: 'User object misses fields or their data is invalid.' });
-        }
+        if (!user) return res.status(400).json(
+            { error: 'User object misses fields or their data is invalid.' });
 
         await user.insertUser();
         console.log(user);
@@ -77,10 +76,7 @@ const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { firstName, lastName, phone, password, age, sex } = req.body;
-        if (!id) {
-            return res.status(400).json({ error: 'User ID is required' });
-        }
-
+        if (!id) return res.status(400).json({ error: 'User ID is required' });
 
         if (firstName && typeof firstName !== 'string') return res.status(400).json({ error: 'Invalid first name' });
         if (lastName && typeof lastName !== 'string') return res.status(400).json({ error: 'Invalid last name' });

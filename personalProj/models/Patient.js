@@ -15,21 +15,13 @@ class Patient extends Role {
      */
     constructor(user, insuranceNumber, insuranceProvider) {
         super(user);
-        if (!this.validateString(insuranceNumber)) throw new Error('Insurance number is not valid.');
-        if (!this.validateString(insuranceProvider)) throw new Error('Insurance provider is not valid.');
+        if (typeof insuranceNumber !== 'string' || insuranceNumber.length === 0)
+            throw new Error('Insurance number is not valid.');
+        if (typeof insuranceProvider !== 'string' || insuranceProvider.length === 0)
+            throw new Error('Insurance provider is not valid.');
 
         this.insuranceNumber = insuranceNumber;
         this.insuranceProvider = insuranceProvider;
-    }
-
-    /**
-     * Validates that the input value is a non-empty string.
-     * 
-     * @param {string} value - The value to validate.
-     * @returns {boolean} - Returns true if the value is a non-empty string, otherwise false.
-     */
-    validateString(value) {
-        return typeof value === 'string' && value.length > 0;
     }
 
     /**
@@ -43,7 +35,7 @@ class Patient extends Role {
             const user = nestUser ?
                 (await User.getUsersFromData([row]))[0] :
                 { id: row.user_id };
-            const patient = new Patient(user,row.insurance_number, row.insurance_provider);
+            const patient = new Patient(user, row.insurance_number, row.insurance_provider);
             return patient;
         });
         return Promise.all(patients);
@@ -109,7 +101,7 @@ class Patient extends Role {
     async insertPatient() {
         const res = await query(`INSERT INTO patients(insurance_number, insurance_provider, user_id)
             VALUES ('${this.insuranceNumber}', '${this.insuranceProvider}', '${this.user.id}')
-            RETURNING *;`);
+            RETURNING user_id;`);
         this.id = res.rows[0].user_id;
         return { id: this.id };
     }
@@ -140,7 +132,6 @@ class Patient extends Role {
         const res = await query(queryStr);
         const updated = (await this.getPatientsFromData(res.rows))[0];
         return updated;
-
     }
 
     /**
@@ -149,7 +140,7 @@ class Patient extends Role {
      * @returns {Promise<void>} A promise that resolves when the patient is deleted.
      */
     async deletePatient() {
-        const res = await query(`DELETE FROM patients WHERE user_id = '${this.user.id}' RETURNING *;`);
+        await query(`DELETE FROM patients WHERE user_id = '${this.user.id}' RETURNING *;`);
     }
 }
 

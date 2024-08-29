@@ -37,12 +37,11 @@ class Doctor extends Role {
      * @param {User} user - The user associated with the doctor.
      * @param {Specialization} specialization - Doctor's specialization object.
      * @param {number} patientLoad - Maximum number of patients per day for the doctor.
-     * @param {Date|null} workdayStart - Start time of the workday.
-     * @param {Date|null} workdayEnd - End time of the workday.
+     * @param {string|null} workdayStart - Start time of the workday.
+     * @param {string|null} workdayEnd - End time of the workday.
      */
     constructor(user, specialization, patientLoad = 1, workdayStart = null, workdayEnd = null) {
-        // if (user.age <= 18 || user.age > 70)
-        //     throw new Error('Doctor\'s age should be from 18 to 70.');
+        if (!specialization) throw new Error('Doctor\'s specialization should be set.');
         if (typeof patientLoad !== 'number' || patientLoad < 0)
             throw new Error('Patient load is not valid.');
 

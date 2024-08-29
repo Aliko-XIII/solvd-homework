@@ -15,12 +15,18 @@ class User {
      * @param {string} password - user's password
      */
     constructor(firstName, lastName, phone, password, age, sex, id = '') {
-        if (!this.validateString(firstName)) throw new Error('First name is not valid.');
-        if (!this.validateString(lastName)) throw new Error('Last name is not valid.');
-        if (!this.validateString(phone)) throw new Error('Phone is not valid.');
-        if (!this.validateString(password)) throw new Error('Password is not valid.');
+        if (typeof firstName !== 'string' || firstName.length === 0)
+            throw new Error('First name is not valid.');
+        if (typeof lastName !== 'string' || lastName.length === 0)
+            throw new Error('Last name is not valid.');
+        if (typeof phone !== 'string' || phone.length === 0)
+            throw new Error('Phone is not valid.');
+        if (typeof password !== 'string' || password.length === 0)
+            throw new Error('Password is not valid.');
         if (typeof age !== 'number' || age <= 0) throw new Error('Age is not valid.');
-        if (!this.validateString(sex) || (sex != 'M' && sex != 'F')) throw new Error('Sex is not valid.');
+        if ((typeof sex !== 'string' || sex.length === 0)
+            || (sex != 'M' && sex != 'F'))
+            throw new Error('Sex is not valid.');
         if (typeof id !== 'string') throw new Error('User id is not valid.');
 
         this.firstName = firstName;
@@ -30,16 +36,6 @@ class User {
         this.age = age;
         this.sex = sex;
         this.id = id;
-    }
-
-    /**
-     * Validates that the input value is a non-empty string.
-     * 
-     * @param {string} value - The value to validate.
-     * @returns {boolean} - Returns true if the value is a non-empty string, otherwise false.
-     */
-    validateString(value) {
-        return typeof value === 'string' && value.length > 0;
     }
 
     /**
@@ -163,7 +159,8 @@ class User {
         const res = await query(`INSERT INTO users
             (first_name, last_name, age, sex, pass, phone)
         VALUES('${this.firstName}', '${this.lastName}', ${this.age},
-            '${this.sex}', '${this.password}', '${this.phone}') RETURNING *; `);
+            '${this.sex}', '${this.password}', '${this.phone}') 
+            RETURNING user_id; `);
         this.id = res.rows[0].user_id;
         return { id: this.id };
     }

@@ -15,7 +15,7 @@ class Specialization {
      * @param {number} [id=-1] - The ID of the specialization (optional).
      */
     constructor(name, description, symptoms = [], organs = [], id = -1) {
-        if (typeof name !== 'string') throw new Error('Name should be string');
+        if (typeof name !== 'string' || name.length === 0) throw new Error('Name should be string');
         if (typeof description !== 'string') throw new Error('Description should be string');
         if (!Array.isArray(symptoms)) throw new Error('Symptoms should be array');
         if (!Array.isArray(organs)) throw new Error('Organs should be array');

@@ -45,7 +45,7 @@ class Symptom {
      * @param {string} [filters.description] - Part of the symptom's description.
      * @returns {Promise<Symptom[]>} A promise that resolves to an array of Symptom objects.
      */
-    static async getSymptoms({ name, description }) {
+    static async getSymptoms({ name, description } = {}) {
         let queryStr = `SELECT symptom_name, symptom_description, symptom_id FROM symptoms`;
         const conditions = [];
 
@@ -62,7 +62,7 @@ class Symptom {
      * @param {number[]} id - The IDs of the symptoms.
      * @returns {Promise<Symptom[]>} A promise that resolves to an array of Symptom objects.
      */
-    static async getSymptomsByIds([ids]) {
+    static async getSymptomsByIds(ids) {
         const res = await query(`SELECT symptom_name, symptom_description, symptom_id
             FROM symptoms WHERE symptom_id IN (${ids.toString()});`);
         return this.getSymptomsFromData(res.rows);
