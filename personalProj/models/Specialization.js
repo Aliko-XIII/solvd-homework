@@ -64,7 +64,7 @@ class Specialization {
     * @param {boolean} [filters.nestSymptoms=false] - Whether to nest symptoms as full objects.
     * @returns {Promise<Specialization[]>} A promise that resolves to an array of Specialization objects.
     */
-    static async getSpecializations({ nestSymptoms, nestOrgans, name, description } = {}) {
+    static async getSpecializations({ nestSymptoms, nestOrgans, name, description, symptomId, organId } = {}) {
         let queryStr = `SELECT s.specialization_id, s.specialization_name, s.specialization_description,\n`;
 
         queryStr += !nestSymptoms
@@ -88,8 +88,16 @@ class Specialization {
         const conditions = [];
         if (name) conditions.push(`s.specialization_name ILIKE '%${name}%'`);
         if (description) conditions.push(`s.specialization_description ILIKE '%${description}%'`);
+
+        const havingConditions = [];
+        if (symptomId) havingConditions.push(`ARRAY_AGG(sy.symptom_id) @> ARRAY[${symptomId}]`);
+        if (organId) havingConditions.push(`ARRAY_AGG(o.organ_id) @> ARRAY[${organId}]`);
+
         if (conditions.length > 0) queryStr += ` WHERE ${conditions.join(' AND ')}`;
-        queryStr += ` GROUP BY s.specialization_id;`;
+        queryStr += ` GROUP BY s.specialization_id`;
+
+        if (havingConditions.length > 0) queryStr += ` HAVING ${havingConditions.join(' AND ')}`;
+        queryStr += `;`;
 
         const res = await query(queryStr);
         const specializations = await Specialization.getSpecializationsFromData(res.rows);

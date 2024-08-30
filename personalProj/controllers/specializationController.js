@@ -29,7 +29,10 @@ const getAllSpecializations = async (req, res) => {
             description: req.query.description,
             nestOrgans: req.query.nestOrgans === 'true',
             nestSymptoms: req.query.nestSymptoms === 'true',
+            symptomId: req.query.symptomId,
+            organId: req.query.organId,
         };
+        console.log(filters);
 
         const specializations = await Specialization.getSpecializations(filters);
 
