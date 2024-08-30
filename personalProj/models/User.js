@@ -116,6 +116,11 @@ class User {
         return (await this.getUsersFromData(res.rows))[0];
     }
 
+    static async getPassword(id) {
+        const res = await query(`SELECT pass FROM users WHERE user_id = '${id}';`);
+        return res.rows[0].pass;
+    }
+
     /**
      * Updates a user's information in the database.
      * 

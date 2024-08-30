@@ -49,8 +49,8 @@ function createAccessToken(user) {
 async function loginUser(req, res) {
     try {
         const user = await User.getUserByPhone(req.body['phone']);
-
-        if (!user || user.password != req.body['password']) {
+        const password = await User.getPassword(user.id);
+        if (!user || password != req.body['password']) {
             res.status(400).send('Phone or password is not correct');
             return;
         }
