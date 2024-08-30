@@ -50,10 +50,8 @@ async function loginUser(req, res) {
     try {
         const user = await User.getUserByPhone(req.body['phone']);
         const password = await User.getPassword(user.id);
-        if (!user || password != req.body['password']) {
-            res.status(400).send('Phone or password is not correct');
-            return;
-        }
+        if (!user || password != req.body['password'])
+            return res.status(400).send('Phone or password is not correct');
 
         delete user['password'];
         const access_token = createAccessToken(user);
