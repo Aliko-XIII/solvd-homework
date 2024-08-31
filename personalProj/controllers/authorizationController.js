@@ -186,24 +186,16 @@ async function isRefreshValid(user_id, refresh_token) {
 async function refreshAccessToken(req, res) {
     try {
         const refreshToken = req.body.refresh_token;
-        if (!refreshToken) {
-            res.status(400).send('No refresh token in request');
-            return;
-        }
-
+        if (!refreshToken) return res.status(400).send({ message: 'No refresh token in request' });
         const id = getTokenPayload(refreshToken).id;
         const isValid = await isRefreshValid(id, refreshToken);
-        if (!validateSignature(refreshToken) || !isValid) {
-            res.status(400).send('Refresh token is not valid');
-            return;
-        }
+        if (!validateSignature(refreshToken) || !isValid)
+            return res.status(400).send({ message: 'Refresh token is not valid' });
 
         const user = await User.getUserById(id);
-        res.status(200).send({
-            "access_token": createAccessToken(user)
-        });
+        res.status(200).send({ "access_token": createAccessToken(user) });
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: err.message });
     }
 }
 
@@ -222,8 +214,11 @@ async function validateToken(req, res, next) {
     }
 }
 
+
+
 module.exports = {
     loginUser,
     refreshAccessToken,
-    validateToken
+    validateToken,
+    createRefreshToken
 };
