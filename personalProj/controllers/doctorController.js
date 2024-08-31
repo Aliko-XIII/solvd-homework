@@ -65,7 +65,6 @@ const updateDoctor = async (req, res) => {
         const updated = await Doctor.updateDoctor(userId, updates);
         res.status(200).json(updated);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the doctor' });
     }
 };

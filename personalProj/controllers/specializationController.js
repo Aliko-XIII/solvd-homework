@@ -32,7 +32,6 @@ const getAllSpecializations = async (req, res) => {
             symptomId: req.query.symptomId,
             organId: req.query.organId,
         };
-        console.log(filters);
 
         const specializations = await Specialization.getSpecializations(filters);
 

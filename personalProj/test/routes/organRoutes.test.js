@@ -122,7 +122,6 @@ describe('Organ Routes', () => {
             Organ.getOrganById.mockResolvedValue(mockOrgan); // Mock getting the organ by ID
             Organ.prototype.deleteOrgan.mockResolvedValue();
             const response = await request(app).delete('/organs/1');
-            console.log(response.body);
             expect(response.status).toBe(204);
             expect(Organ.getOrganById).toHaveBeenCalledWith(1);
             expect(Organ.prototype.deleteOrgan).toHaveBeenCalledTimes(1);

@@ -56,7 +56,6 @@ const updateSymptom = async (req, res) => {
         const updated = await Symptom.updateSymptom(id, updates);
         res.status(200).json(updated);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the symptom' });
     }
 };

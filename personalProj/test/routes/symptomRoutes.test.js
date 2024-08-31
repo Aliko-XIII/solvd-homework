@@ -122,7 +122,6 @@ describe('Symptom Routes', () => {
             Symptom.getSymptomById.mockResolvedValue(mockSymptom); // Mock getting the symptom by ID
             Symptom.prototype.deleteSymptom.mockResolvedValue();
             const response = await request(app).delete('/symptoms/1');
-            console.log(response.body);
             expect(response.status).toBe(204);
             expect(Symptom.getSymptomById).toHaveBeenCalledWith('1');
             expect(Symptom.prototype.deleteSymptom).toHaveBeenCalledTimes(1);

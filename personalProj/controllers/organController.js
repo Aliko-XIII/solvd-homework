@@ -54,7 +54,6 @@ const updateOrgan = async (req, res) => {
         const updated = await Organ.updateOrgan(id, updates);
         res.status(200).json(updated);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'An error occurred while updating the organ' });
     }
 };

@@ -124,7 +124,6 @@ class Appointment {
     async isAvailable() {
         const doctorDateAppointments = await Appointment.
             getDoctorAppointments(this.doctor.user.id, { date: this.time.split(' ')[0] });
-        console.log('doctorDateAppointments:', doctorDateAppointments);
         if (doctorDateAppointments.length >= this.doctor.patientLoad) return false;
         const doctorIntersectAppointments = await Appointment.
             getDoctorAppointments(this.doctor.user.id, {
@@ -132,7 +131,6 @@ class Appointment {
                 time: this.time.split(' ')[1],
                 duration: this.duration
             });
-        console.log('doctorIntersectAppointments:', doctorIntersectAppointments);
         if (doctorIntersectAppointments.length > 0) return false;
         const patientIntersectAppointments = await Appointment.
             getPatientAppointments(this.patient.user.id, {
@@ -141,7 +139,6 @@ class Appointment {
                 duration: this.duration
             });
         if (patientIntersectAppointments.length > 0) return false;
-        console.log('patientIntersectAppointments:', patientIntersectAppointments);
         return true;
     }
 
