@@ -1,4 +1,4 @@
-const { query } = require("../config/database");
+const { query } = require('../config/database');
 
 /**
  * Class representing treated organs.
@@ -24,7 +24,7 @@ class Organ {
      * @returns {string} A string representation of the organ.
      */
     toString() {
-        return `Organ "${this.name}"
+        return `Organ '${this.name}'
         Description: ${this.description.length == 0 ? 'Empty.' : this.description}`;
     }
 

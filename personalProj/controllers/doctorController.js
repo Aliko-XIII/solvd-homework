@@ -7,12 +7,11 @@ const getDoctor = async (req, res) => {
     try {
         const nestUser = req.query.nestUser === 'true';
         const nestSpecialization = req.query.nestSpecialization === 'true';
-        nestSpecialization
         const doctor = (await Doctor.getDoctorsByIds([req.params.id], nestUser, nestSpecialization))[0];
         if (doctor) {
             res.status(200).send(doctor);
         } else {
-            res.status(404).send({ error: "Doctor not found." });
+            res.status(404).send({ error: 'Doctor not found.' });
         }
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -93,7 +92,7 @@ const getAppointments = async (req, res) => {
         res.status(500).json({ error: err.message });
 
     }
-}
+};
 
 module.exports = {
     getDoctor,
@@ -102,4 +101,4 @@ module.exports = {
     getAllDoctors,
     updateDoctor,
     getAppointments
-}
+};

@@ -1,6 +1,6 @@
 // DB imports
 const { User } = require('../models/User');
-const { query } = require("../config/database");
+const { query } = require('../config/database');
 
 // Encryption imports
 const crypto = require('crypto');
@@ -28,10 +28,10 @@ function validateSignature(token) {
  */
 function createAccessToken(user) {
     const accessHeader = {
-        "alg": "HS256",
-        "typ": "JWT",
-        "iat": Date(),
-        "exp": "1m"
+        'alg': 'HS256',
+        'typ': 'JWT',
+        'iat': Date(),
+        'exp': '1m'
     };
 
     const accessHeaderEncoded = Buffer.from(JSON.stringify(accessHeader)).toString('base64url');
@@ -60,8 +60,8 @@ async function loginUser(req, res) {
         await updateRefresh(user.id, refresh_token);
 
         res.status(200).send({
-            "access_token": access_token,
-            "refresh_token": refresh_token
+            'access_token': access_token,
+            'refresh_token': refresh_token
         });
     } catch (err) {
         res.status(500).send(err);
@@ -138,14 +138,14 @@ function isTokenExpired(token) {
  */
 function createRefreshToken(user) {
     const refreshHeader = {
-        "alg": "HS256",
-        "typ": "JWT",
-        "iat": (new Date()).toString(),
-        "exp": "3d"
+        'alg': 'HS256',
+        'typ': 'JWT',
+        'iat': (new Date()).toString(),
+        'exp': '3d'
     };
 
     const refreshHeaderEncoded = Buffer.from(JSON.stringify(refreshHeader)).toString('base64url');
-    const refreshPayloadEncoded = Buffer.from(JSON.stringify({ "id": user.id })).toString('base64url');
+    const refreshPayloadEncoded = Buffer.from(JSON.stringify({ 'id': user.id })).toString('base64url');
     const refreshSignature = crypto.createHmac('sha256', secret)
         .update(refreshHeaderEncoded + '.' + refreshPayloadEncoded).digest('base64url');
 
@@ -193,7 +193,7 @@ async function refreshAccessToken(req, res) {
             return res.status(400).send({ message: 'Refresh token is not valid' });
 
         const user = await User.getUserById(id);
-        res.status(200).send({ "access_token": createAccessToken(user) });
+        res.status(200).send({ 'access_token': createAccessToken(user) });
     } catch (err) {
         res.status(500).send({ error: err.message });
     }

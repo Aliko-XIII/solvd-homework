@@ -74,13 +74,13 @@ const createAppointment = async (req, res) => {
 
 const deleteAppointment = async (req, res) => {
     try {
-        const id = Number.parseInt(req.params.id)
+        const id = Number.parseInt(req.params.id);
         const appointment = (await Appointment.getAppointmentsByIds([id]))[0];
         if (appointment) {
             await appointment.deleteAppointment();
             res.sendStatus(204);
         } else {
-            res.status(404).send({ error: "Appointment not found" });
+            res.status(404).send({ error: 'Appointment not found' });
         }
     } catch (err) {
         res.status(500).send({ error: err.message });

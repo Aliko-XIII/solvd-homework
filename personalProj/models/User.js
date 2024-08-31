@@ -1,4 +1,4 @@
-const { query } = require("../config/database");
+const { query } = require('../config/database');
 
 /**
  * Class representing hosptial system's user.

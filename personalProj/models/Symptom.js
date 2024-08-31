@@ -1,4 +1,4 @@
-const { query } = require("../config/database");
+const { query } = require('../config/database');
 
 /**
  * Class representing patients' symptoms.
@@ -24,7 +24,7 @@ class Symptom {
      * @returns {string} A string representation of the symptom.
      */
     toString() {
-        return `Symptom "${this.name}"
+        return `Symptom '${this.name}'
         Description: ${this.description.length === 0 ? 'Empty.' : this.description}`;
     }
 

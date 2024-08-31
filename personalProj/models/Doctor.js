@@ -1,7 +1,7 @@
-const { Specialization } = require("./Specialization");
-const { User } = require("./User");
-const { Role } = require("./Role");
-const { query } = require("../config/database");
+const { Specialization } = require('./Specialization');
+const { User } = require('./User');
+const { Role } = require('./Role');
+const { query } = require('../config/database');
 
 /**
  * Class representing a hospital's doctor.
@@ -92,7 +92,7 @@ class Doctor extends Role {
     static async getDoctors({ specializationId, nestUser, nestSpecialization } = {}) {
         let queryStr = `SELECT doctors.user_id, specialization_id, patient_load, workday_start,
             workday_end, first_name, last_name, age, sex, pass, phone FROM doctors 
-        INNER JOIN users ON users.user_id = doctors.user_id`
+        INNER JOIN users ON users.user_id = doctors.user_id`;
         queryStr += specializationId ? `WHERE specialization_id=${specializationId};` : ';';
         const res = await query(queryStr);
         return await Doctor.getDoctorsFromData(res.rows, nestUser, nestSpecialization);

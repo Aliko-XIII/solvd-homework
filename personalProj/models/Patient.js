@@ -1,6 +1,6 @@
-const { User } = require("./User");
-const { Role } = require("./Role");
-const { query } = require("../config/database");
+const { User } = require('./User');
+const { Role } = require('./Role');
+const { query } = require('../config/database');
 
 /**
  * Class representing a hospital's patient.

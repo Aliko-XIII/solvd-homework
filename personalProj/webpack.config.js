@@ -1,13 +1,13 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
-  entry: "./frontend/src/index.jsx",
+  entry: './frontend/src/index.jsx',
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
   },
   output: {
-    path: path.resolve(__dirname, "./frontend/dist/"),
-    filename: "main.js"
+    path: path.resolve(__dirname, './frontend/dist/'),
+    filename: 'main.js'
   },
   module: {
     rules: [

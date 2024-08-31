@@ -11,7 +11,7 @@ const symptomRoutes = require('./routes/symptomRoutes');
 const organRoutes = require('./routes/organRoutes');
 const specializationRoutes = require('./routes/specializationRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
-const authorizationRoutes = require('./routes/authorizationRoutes')
+const authorizationRoutes = require('./routes/authorizationRoutes');
 
 //Additional functions
 const { validateToken } = require('./controllers/authorizationController');
@@ -57,8 +57,6 @@ app.get('*', (req, res) => {
 
 
 //Server listening port
-app.listen(process.env.PORT, () => {
-  console.log(`Hospital app listening on port ${process.env.PORT}`);
-});
+app.listen(process.env.PORT, () => { console.log(`Hospital app listening on port ${process.env.PORT}`); });
 
 

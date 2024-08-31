@@ -1,7 +1,7 @@
-const { query } = require("../config/database");
-const { Symptom } = require("./Symptom");
-const { Patient } = require("./Patient");
-const { Doctor } = require("./Doctor");
+const { query } = require('../config/database');
+const { Symptom } = require('./Symptom');
+const { Patient } = require('./Patient');
+const { Doctor } = require('./Doctor');
 
 class Appointment {
     /**
@@ -153,7 +153,7 @@ class Appointment {
     static async getDoctorAppointments(doctorId, { date, time, duration } = {}) {
         let queryStr = `SELECT appointment_id, patient_id, doctor_id,
              appointment_time, appointment_duration::TEXT AS appointment_duration, additional_info FROM appointments 
-            WHERE doctor_id = '${doctorId}' `
+            WHERE doctor_id = '${doctorId}' `;
         if (date) queryStr += ` AND DATE(appointment_time) = '${date} '`;
         if (date && time && duration) queryStr += `AND appointment_time < (TIMESTAMP '${date} ${time}'
          + INTERVAL '${duration}')

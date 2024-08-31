@@ -1,6 +1,6 @@
-const { Symptom } = require("./Symptom");
-const { Organ } = require("./Organ");
-const { query } = require("../config/database");
+const { Symptom } = require('./Symptom');
+const { Organ } = require('./Organ');
+const { query } = require('../config/database');
 
 /**
  * Class representing doctors' specializations.
@@ -32,7 +32,7 @@ class Specialization {
      * @returns {string} A string representation of the specialization.
      */
     toString() {
-        return `Specialization: "${this.name}".
+        return `Specialization: '${this.name}'.
         Description: ${this.description}.`;
     }
 
@@ -194,7 +194,6 @@ class Specialization {
 
             return (await Specialization.getSpecializationsByIds([id]))[0];
         } catch (err) {
-            console.error('Error updating specialization:', err);
             throw err;
         }
     }
@@ -223,7 +222,6 @@ class Specialization {
             }
             return { id: this.id };
         } catch (err) {
-            console.error('Error inserting specialization:', err);
             throw err;
         }
     }
