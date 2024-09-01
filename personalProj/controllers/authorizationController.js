@@ -64,7 +64,8 @@ async function loginUser(req, res) {
             'refresh_token': refresh_token
         });
     } catch (err) {
-        res.status(500).send(err);
+        
+        res.status(500).send({ error: err.message });
     }
 }
 

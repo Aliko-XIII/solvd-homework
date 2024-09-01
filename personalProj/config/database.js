@@ -29,15 +29,28 @@ function query(queryStr) {
 }
 
 async function createDatabase() {
-    const filePath = path.join(__dirname, 'createDatabase.sql');
-    const sqlScript = fs.readFileSync(filePath, 'utf-8');
+    const createPath = path.join(__dirname, 'createDatabase.sql');
+    const createScript = fs.readFileSync(createPath, 'utf-8');
 
     try {
-        await query(sqlScript);
+        await query(createScript);
         console.log('Database created successfully');
+
     } catch (err) {
         console.error('Error creating database', err.stack);
     }
+
+    // const insertPath = path.join(__dirname, 'createDatabase.sql');
+    // const insertScript = fs.readFileSync(insertPath, 'utf-8');
+
+    // try {
+    //     if ((await query('SELECT * FROM specializations')).rows.length === 0) {
+    //         await query(insertScript);
+    //         console.log('Database data inserted successfully');
+    //     }
+    // } catch (err) {
+    //     console.error('Error inserting data to database', err.stack);
+    // }
 }
 
 createDatabase().catch(err => console.error('Unexpected error', err));

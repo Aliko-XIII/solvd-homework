@@ -17,7 +17,7 @@ export default [
     }
   },
   {
-    files: ['index.js', 'config/database.js'],  
+    files: ['index.js', 'config/database.js', 'config/insertDataScript.js',],  
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
