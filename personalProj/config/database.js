@@ -39,18 +39,60 @@ async function createDatabase() {
     } catch (err) {
         console.error('Error creating database', err.stack);
     }
+    await insertTestData();
+}
 
-    // const insertPath = path.join(__dirname, 'createDatabase.sql');
-    // const insertScript = fs.readFileSync(insertPath, 'utf-8');
+async function insertTestData() {
+    const tables = [
+        {
+            name: 'specializations',
+            pk: 'specialization_id',
+            script: 'insertSpecializations.sql'
+        },
+        {
+            name: 'organs',
+            pk: 'organ_id',
+            script: 'insertOrgans.sql'
+        },
+        {
+            name: 'specializations_to_organs',
+            pk: 'record_id',
+            script: 'insertSpToOr.sql'
+        },
+        {
+            name: 'symptoms',
+            pk: 'symptom_id',
+            script: 'insertSymptoms.sql'
+        },
+        {
+            name: 'specializations_to_symptoms',
+            pk: 'record_id',
+            script: 'insertSpToSt.sql'
+        },
+        {
+            name: 'users',
+            pk: 'user_id',
+            script: 'insertUsers.sql'
+        }
+    ];
+    for (let table of tables) {
+        try {
+            if ((await query(`SELECT * FROM ${table.name};`)).rows.length !== 0) {
+                continue;
+            }
+            await query('BEGIN');
+            await query(`TRUNCATE TABLE ${table.name} RESTART IDENTITY CASCADE;`);
+            await query('COMMIT');
 
-    // try {
-    //     if ((await query('SELECT * FROM specializations')).rows.length === 0) {
-    //         await query(insertScript);
-    //         console.log('Database data inserted successfully');
-    //     }
-    // } catch (err) {
-    //     console.error('Error inserting data to database', err.stack);
-    // }
+            const insertPath = path.join(__dirname, table.script);
+            const insertScript = fs.readFileSync(insertPath, 'utf-8');
+            await query(insertScript);
+            const res = await query(insertScript);
+        } catch (err) {
+            await client.query('ROLLBACK');
+            console.error('Error inserting data to database', err.stack);
+        }
+    }
 }
 
 createDatabase().catch(err => console.error('Unexpected error', err));

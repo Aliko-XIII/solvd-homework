@@ -6,6 +6,8 @@ BEGIN
    END IF;
 END$$;
 
+BEGIN;
+
 -- Create users table
 CREATE TABLE IF NOT EXISTS users
 (
@@ -156,3 +158,5 @@ CREATE TABLE IF NOT EXISTS appointments
         ON UPDATE CASCADE
         ON DELETE SET NULL
 );
+
+COMMIT;
