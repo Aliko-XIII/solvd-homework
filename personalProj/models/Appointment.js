@@ -1,5 +1,4 @@
 const { query } = require('../config/database');
-const { Symptom } = require('./Symptom');
 const { Patient } = require('./Patient');
 const { Doctor } = require('./Doctor');
 
@@ -39,7 +38,7 @@ class Appointment {
      * @param {Array} rows - The rows of data returned from the database query.
      * @param {boolean} nestDoctor - Whether to nest the full Doctor object or just the doctor ID.
      * @param {boolean} nestPatient - Whether to nest the full Patient object or just the patient ID.
-     * @returns {Promise<Array<Appointment>>} - An array of Appointment objects.
+     * @returns {Promise<Appointment[]>} - An array of Appointment objects.
      */
     static async getAppointmentsFromData(rows, nestDoctor = false, nestPatient = false) {
         const appointments = rows.map(async row => {
@@ -64,7 +63,7 @@ class Appointment {
     /**
      * Fetches appointments from the database based on provided filters.
      * @param {Object} [filters] - Optional filters for appointments (patientId, doctorId, etc.).
-     * @returns {Promise<Array<Appointment>>} - An array of Appointment objects.
+     * @returns {Promise<Appointment[]>} - An array of Appointment objects.
      */
     static async getAppointments({ patientId, doctorId, nestDoctor, nestPatient, startBefore, startAfter, endBefore, endAfter } = {}) {
         let queryStr = `SELECT appointment_id, patient_id, doctor_id, appointment_time,
@@ -88,7 +87,7 @@ class Appointment {
      * @param {Array<string>} ids - The list of appointment IDs to fetch.
      * @param {boolean} nestDoctor - Whether to nest the full Doctor object.
      * @param {boolean} nestPatient - Whether to nest the full Patient object.
-     * @returns {Promise<Array<Appointment>>} - An array of Appointment objects.
+     * @returns {Promise<Appointment[]>} - An array of Appointment objects.
      */
     static async getAppointmentsByIds(ids, nestDoctor = false, nestPatient = false) {
         const idList = ids.map(id => `'${id}'`).join(',');
@@ -176,7 +175,7 @@ class Appointment {
      * Fetches all appointments for a specific doctor.
      * @param {string} doctorId - The doctor's ID.
      * @param {Object} [filters] - Optional filters (date, time, duration).
-     * @returns {Promise<Array<Appointment>>} - An array of appointments for the doctor.
+     * @returns {Promise<Appointment[]>} - An array of appointments for the doctor.
      */
     static async getDoctorAppointments(doctorId, { date, time, duration } = {}) {
         let queryStr = `SELECT appointment_id, patient_id, doctor_id,
@@ -195,7 +194,7 @@ class Appointment {
      * Fetches all appointments for a specific patient.
      * @param {string} patientId - The patient's ID.
      * @param {Object} [filters] - Optional filters (date, time, duration).
-     * @returns {Promise<Array<Appointment>>} - An array of appointments for the patient.
+     * @returns {Promise<Appointment[]>} - An array of appointments for the patient.
      */
     static async getPatientAppointments(patientId, { date, time, duration } = {}) {
         let queryStr = `SELECT appointment_id, patient_id, doctor_id,
