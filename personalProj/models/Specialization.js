@@ -62,9 +62,12 @@ class Specialization {
     * @param {string} [filters.description] - Part of the specialization's description.
     * @param {boolean} [filters.nestOrgans=false] - Whether to nest organs as full objects.
     * @param {boolean} [filters.nestSymptoms=false] - Whether to nest symptoms as full objects.
+    * @param {number} [filters.symptomId] - Id of symptom specialization should include.
+    * @param {number} [filters.organId] - Id of organ specialization should include.
     * @returns {Promise<Specialization[]>} A promise that resolves to an array of Specialization objects.
     */
-    static async getSpecializations({ nestSymptoms, nestOrgans, name, description, symptomId, organId } = {}) {
+    static async getSpecializations({ nestSymptoms, nestOrgans, name,
+        description, symptomId, organId } = {}) {
         let queryStr = `SELECT s.specialization_id, s.specialization_name, s.specialization_description,\n`;
 
         queryStr += !nestSymptoms

@@ -389,6 +389,11 @@ User object with first name, last name, age, sex, password.
 ```sh
     {
         "id": "e6b7b6d5-8e54-4f56-9d8e-3b8a1c64e5c3",
+        "firstName": "Sophia",
+        "lastName": "Lee",
+        "age": 19,
+        "sex": "F",
+        "phone": "+1-555-678-9012"
     }
 ```
 
@@ -609,12 +614,12 @@ Empty
 **Response body**
 ```sh
     [{
-        "user": "a3b9c5d7-8e2f-4a6b-9c3d-8e2f7a9b0c1d",
+        "user": {"id":"a3b9c5d7-8e2f-4a6b-9c3d-8e2f7a9b0c1d"},
         "insuranceNumber": "INS123456789",
         "insuranceProvider": "HealthPlus"
     },
     {
-        "user": "b4c8d6e1-9f2a-4b7c-8d9e-0a1b2c3d4e5f",
+        "user": {"id":"b4c8d6e1-9f2a-4b7c-8d9e-0a1b2c3d4e5f"},
         "insuranceNumber": "INS987654321",
         "insuranceProvider": "CareCo"
     }]
@@ -689,7 +694,7 @@ Empty
 **Response body**
 ```sh
     {
-    "user": "f9d4a1b2-3c56-4d78-a9b0-1e2f3c4d5e6f",
+    "user": {"id":"f9d4a1b2-3c56-4d78-a9b0-1e2f3c4d5e6f"},
     "insuranceNumber": "INS456789012",
     "insuranceProvider": "MedCare"
     }
@@ -754,7 +759,7 @@ Patient object with information needed for a new patient, such as user's id, ins
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "user": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
+        "userId": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
         "insuranceNumber": "INS234567890",
         "insuranceProvider": "SecureHealth"
     }'
@@ -762,7 +767,7 @@ Patient object with information needed for a new patient, such as user's id, ins
 **Response body**
 ```sh
     {
-        "user": "b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e",
+        "user": {"id":"b5e1c7d8-9f0a-4b2c-8d1e-2f3a4b5c6d7e"},
         "insuranceNumber": "INS234567890",
         "insuranceProvider": "SecureHealth"
     }
@@ -838,7 +843,7 @@ Object with patient's ID and updated information needed for a patient.
 **Response body**
 ```sh
     {
-        "user": "d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g",
+        "user": {"id":"d7e9c8f2-5a3b-4d6e-8f1a-9b0c2d3e4f5g"},
         "insuranceNumber": "INS345678901",
         "insuranceProvider": "PrimeCare"
     }
@@ -1657,10 +1662,20 @@ Empty
     <td>boolean</td>
     <td>true if returned specialization object should include organs' whole objects, false if only ids</td>
   </tr>
-   <tr>
+  <tr>
     <td><b>nestSymptoms</b></td>
     <td>boolean</td>
     <td>true if returned specialization object should include symptoms' whole objects, false if only ids</td>
+  </tr>
+  <tr>
+    <td><b>symptomId</b></td>
+    <td>number</td>
+    <td>Id of symptom specialization should include</td>
+  </tr>
+  <tr>
+    <td><b>organId</b></td>
+    <td>number</td>
+    <td>Id of organ specialization should include</td>
   </tr>
 </table>
 
@@ -2060,15 +2075,15 @@ Empty
 **Response body**
 ```sh
     [{
-        "user": "123e4567-e89b-12d3-a456-426614174000",
-        "specialization": 3,
+        "user": {"id":"123e4567-e89b-12d3-a456-426614174000"},
+        "specialization": {"id":3},
         "patientLoad": 1,
         "workdayStart": "08:00:00",
         "workdayEnd": "18:00:00"
     },
     {
-        "user": "123e4567-e89b-12d3-a456-426614174001",
-        "specialization": 1,
+        "user": {"id":"123e4567-e89b-12d3-a456-426614174001"},
+        "specialization": {"id":1},
         "patientLoad": 5,
         "workdayStart": "08:00:00",
         "workdayEnd": "17:00:00"
@@ -2149,8 +2164,8 @@ Empty
 **Response body**
 ```sh
     {
-        "user": "123e4567-e89b-12d3-a456-426614174002",
-        "specialization": 2,
+        "user":{"id":"123e4567-e89b-12d3-a456-426614174002"} ,
+        "specialization": {"id":2},
         "patientLoad": 3,
         "workdayStart": "09:00:00",
         "workdayEnd": "18:00:00"
@@ -2217,7 +2232,8 @@ Doctor object which includes user or their id, specialization or its id, patient
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "specialization": 4,
+        "userId": "123e4567-e89b-12d3-a456-426614174003",
+        "specializationId": 4,
         "patientLoad": 4,
         "workdayStart": "08:30:00",
         "workdayEnd": "17:30:00"
@@ -2226,8 +2242,8 @@ Doctor object which includes user or their id, specialization or its id, patient
 **Response body**
 ```sh
     {
-        "user": "123e4567-e89b-12d3-a456-426614174003",
-        "specialization": 4,
+        "user": {"id":"123e4567-e89b-12d3-a456-426614174003"},
+        "specialization": {"id":4},
         "patientLoad": 4,
         "workdayStart": "08:30:00",
         "workdayEnd": "17:30:00"
@@ -2298,8 +2314,8 @@ Object with doctor's ID and updated information needed for a doctor.
     -H 'Authorization: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxMjN9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' \
     -H 'Content-Type: application/json' \
     -d '{
-        "user": "123e4567-e89b-12d3-a456-426614174004",
-        "specialization": 5,
+        "userId": "123e4567-e89b-12d3-a456-426614174004",
+        "specializationId": 5,
         "patientLoad": 2,
         "workdayStart": "07:00:00",
         "workdayEnd": "15:00:00"
@@ -2308,8 +2324,8 @@ Object with doctor's ID and updated information needed for a doctor.
 **Response body**
 ```sh
      {
-        "user": "123e4567-e89b-12d3-a456-426614174004",
-        "specialization": 5,
+        "user": {"id":"123e4567-e89b-12d3-a456-426614174004"},
+        "specialization": {"id":5},
         "patientLoad": 2,
         "workdayStart": "07:00:00",
         "workdayEnd": "15:00:00"
@@ -2479,19 +2495,19 @@ Empty
 ```sh
     [{
         "id": 1,
-        "patientId": "123e4567-e89b-12d3-a456-426614174011",
-        "doctorId": "123e4567-e89b-12d3-a456-426614174012",
+        "patient":{"id": "123e4567-e89b-12d3-a456-426614174011"},
+        "doctor": {"id":"123e4567-e89b-12d3-a456-426614174012"},
         "time": "2024-07-24T09:00:00",
         "duration": "01:00:00",
-        "additionalInfo": "Regular check-up"
+        "description": "Regular check-up"
     },
     {
         "id": 2,
-        "patientId": "123e4567-e89b-12d3-a456-426614174013",
-        "doctorId": "123e4567-e89b-12d3-a456-426614174014",
+        "patient":{"id": "123e4567-e89b-12d3-a456-426614174013"},
+        "doctor": {"id":"123e4567-e89b-12d3-a456-426614174014"},
         "time": "2024-07-24T10:00:00",
         "duration": "00:30:00",
-        "additionalInfo": "Follow-up visit"
+        "description": "Follow-up visit"
     }] 
 ```
 
@@ -2573,11 +2589,11 @@ Empty
 ```sh
     {
         "id": 1,
-        "patientId": "123e4567-e89b-12d3-a456-426614174011",
-        "doctorId": "123e4567-e89b-12d3-a456-426614174012",
+        "patient": {"id":"123e4567-e89b-12d3-a456-426614174011"},
+        "doctor": {"id":"123e4567-e89b-12d3-a456-426614174012"},
         "time": "2024-07-24T09:00:00",
         "duration": "01:00:00",
-        "additionalInfo": "Regular check-up"
+        "description": "Regular check-up"
     }
 ```
 
@@ -2646,7 +2662,7 @@ Appointment record, which includes id, patient record or their id, doctor record
         "doctorId": "123e4567-e89b-12d3-a456-426614174016",
         "time": "2024-07-24T11:00:00",
         "duration": "01:00:00",
-        "additionalInfo": "Consultation for respiratory issues"
+        "description": "Consultation for respiratory issues"
     }'
 ```
 
@@ -2654,11 +2670,11 @@ Appointment record, which includes id, patient record or their id, doctor record
 ```sh
     {
         "id": 3,
-        "patientId": "123e4567-e89b-12d3-a456-426614174015",
-        "doctorId": "123e4567-e89b-12d3-a456-426614174016",
+        "patient": {"id":"123e4567-e89b-12d3-a456-426614174015"},
+        "doctor": {"id":"123e4567-e89b-12d3-a456-426614174016"},
         "time": "2024-07-24T11:00:00",
         "duration": "01:00:00",
-        "additionalInfo": "Consultation for respiratory issues"
+        "description": "Consultation for respiratory issues"
     }
 ```
 
@@ -2732,18 +2748,18 @@ Object with appointment's ID and updated information needed for an appointment.
         "doctorId": "123e4567-e89b-12d3-a456-426614174018",
         "time": "2024-07-24T12:00:00",
         "duration": "00:45:00",
-        "additionalInfo": "Kidney function tests"
+        "description": "Kidney function tests"
     }'
 ```
 **Response body**
 ```sh
     {
         "id": 4,
-        "patientId": "123e4567-e89b-12d3-a456-426614174017",
-        "doctorId": "123e4567-e89b-12d3-a456-426614174018",
+        "patient": {"id":"123e4567-e89b-12d3-a456-426614174017"},
+        "doctor": {"id":"123e4567-e89b-12d3-a456-426614174018"},
         "time": "2024-07-24T12:00:00",
         "duration": "00:45:00",
-        "additionalInfo": "Kidney function tests"
+        "description": "Kidney function tests"
     }
 ```
 
