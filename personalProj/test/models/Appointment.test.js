@@ -64,7 +64,7 @@ describe('Appointment Class', () => {
         beforeEach(() => {
             query.mockReset();
         });
-    
+
         test('should return an appointment by ID', async () => {
             query.mockResolvedValueOnce({
                 rows: [
@@ -78,18 +78,18 @@ describe('Appointment Class', () => {
                     }
                 ]
             });
-    
+
             const appointments = await Appointment.getAppointmentsByIds([1]);
-    
+
             expect(appointments).toHaveLength(1);
             expect(appointments[0]).toBeInstanceOf(Appointment);
-    
+
             expect(appointments[0].id).toBe(1);
             expect(appointments[0].time).toBe('18.08.2024 13:15:00');
             expect(appointments[0].duration).toBe('01:35:00');
             expect(appointments[0].description).toBe('General checkup');
-            expect(appointments[0].patient.id).toBe('patient-uuid');
-            expect(appointments[0].doctor.id).toBe('doctor-uuid');
+            expect(appointments[0].patient.user.id).toBe('patient-uuid');
+            expect(appointments[0].doctor.user.id).toBe('doctor-uuid');
         });
     });
 
@@ -114,6 +114,17 @@ describe('Appointment Class', () => {
         });
         test('should update an appointment and return the updated record', async () => {
             const updates = { time: '18.08.2024 13:15:00', duration: '02:00:00', description: 'Updated checkup' };
+            query.mockResolvedValueOnce({
+                rows: [{
+                    appointment_id: 1, appointment_time: updates.time,
+                    appointment_duration: '02:00:00', additional_info: 'Old checkup',
+                    patient_id: '1', doctor_id: '2'
+                }]
+            });
+            // Mocking the queries for isAvailable method
+            query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date
+            query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date, time, duration
+            query.mockResolvedValueOnce({ rows: [] }); // Mock getPatientAppointments for date, time, duration
 
             query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, appointment_time: updates.time, appointment_duration: '02:00:00', additional_info: 'Updated checkup' }] });
 

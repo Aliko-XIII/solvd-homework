@@ -45,12 +45,12 @@ class Appointment {
             let patient = null;
             if (row.patient_id != null) {
                 patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id], true))[0] :
-                    { id: row.patient_id };
+                    { user: { id: row.patient_id } };
             }
             let doctor = null;
             if (row.doctor_id != null) {
                 doctor = nestDoctor ? (await Doctor.getDoctorsByIds([row.doctor_id], true))[0] :
-                    { id: row.doctor_id };
+                    { user: { id: row.doctor_id } };
             }
 
             const appointment = new Appointment(patient, doctor, row.appointment_time,
@@ -109,6 +109,13 @@ class Appointment {
             .some(value => value !== undefined);
         if (!hasParams) throw new Error('No parameters to update.');
 
+        if (time || duration) {
+            const appointment = (await Appointment.getAppointmentsByIds([id]))[0];
+            if (time) appointment.time = time;
+            if (duration) appointment.time = duration;
+            if (!(await appointment.isAvailable())) throw new Error('Updated time is not available');
+        }
+
         const updates = [];
         let queryStr = `UPDATE appointments SET `;
         if (time) updates.push(`appointment_time = '${time}'`);
@@ -143,22 +150,23 @@ class Appointment {
      * @returns {Promise<boolean>} - Returns true if the time slot is available, otherwise false.
      */
     async isAvailable() {
-        const doctorDateAppointments = await Appointment.
-            getDoctorAppointments(this.doctor.user.id, { date: this.time.split(' ')[0] });
+        const doctorDateAppointments = (await Appointment.
+            getDoctorAppointments(this.doctor.user.id, { date: this.time.split(' ')[0] }))
+            .filter(appointment => appointment.id !== this.id);
         if (doctorDateAppointments.length >= this.doctor.patientLoad) return false;
-        const doctorIntersectAppointments = await Appointment.
+        const doctorIntersectAppointments = (await Appointment.
             getDoctorAppointments(this.doctor.user.id, {
                 date: this.time.split(' ')[0],
                 time: this.time.split(' ')[1],
                 duration: this.duration
-            });
+            })).filter(appointment => appointment.id !== this.id);
         if (doctorIntersectAppointments.length > 0) return false;
-        const patientIntersectAppointments = await Appointment.
+        const patientIntersectAppointments = (await Appointment.
             getPatientAppointments(this.patient.user.id, {
                 date: this.time.split(' ')[0],
                 time: this.time.split(' ')[1],
                 duration: this.duration
-            });
+            })).filter(appointment => appointment.id !== this.id);;
         if (patientIntersectAppointments.length > 0) return false;
         return true;
     }
@@ -206,7 +214,7 @@ class Appointment {
         AND (appointment_time + appointment_duration) > '${date} ${time}'`;
 
         const res = await query(queryStr);
-        return await this.getAppointmentsFromData(res.rows, );
+        return await this.getAppointmentsFromData(res.rows,);
     }
 }
 
