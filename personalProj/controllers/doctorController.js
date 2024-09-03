@@ -86,8 +86,15 @@ const deleteDoctor = async (req, res) => {
 
 const getAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.getDoctorAppointments(req.params.id);
-        res.status(200).send(appointments);
+        const id = req.params.id;
+        const nestUser = req.query.nestUser === 'true';
+        const appointments = await Appointment.getAppointments(
+            {
+                doctorId: id,
+                nestPatient: nestUser,
+                nestDoctor: nestUser
+            });
+        res.status(200).json(appointments);
     } catch (err) {
         res.status(500).json({ error: err.message });
 

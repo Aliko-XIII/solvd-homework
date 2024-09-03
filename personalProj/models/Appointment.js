@@ -44,12 +44,12 @@ class Appointment {
         const appointments = rows.map(async row => {
             let patient = null;
             if (row.patient_id != null) {
-                patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id]))[0] :
+                patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id], true))[0] :
                     { id: row.patient_id };
             }
             let doctor = null;
             if (row.doctor_id != null) {
-                doctor = nestDoctor ? (await Doctor.getDoctorsByIds([row.doctor_id]))[0] :
+                doctor = nestDoctor ? (await Doctor.getDoctorsByIds([row.doctor_id], true))[0] :
                     { id: row.doctor_id };
             }
 
@@ -206,7 +206,7 @@ class Appointment {
         AND (appointment_time + appointment_duration) > '${date} ${time}'`;
 
         const res = await query(queryStr);
-        return await this.getAppointmentsFromData(res.rows);
+        return await this.getAppointmentsFromData(res.rows, );
     }
 }
 

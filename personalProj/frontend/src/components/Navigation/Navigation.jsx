@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { SetStateAction, createContext, useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { HospitalContext } from "../App";
-import getUserLinks from './getLinks';
+import getUserLinks from './getLinks.mjs';
 
 const Navigation = () => {
   const { role } = useContext(HospitalContext);

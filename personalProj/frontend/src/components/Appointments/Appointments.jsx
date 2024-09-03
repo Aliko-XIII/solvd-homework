@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { HospitalContext } from '../App';
 
-function intervalToString(duration) {
-    return `${duration.hours ? duration.hours : '00'}:${duration.minutes ? duration.minutes : '00'}`;
-}
+// function intervalToString(duration) {
+//     return `${duration.hours ? duration.hours : '00'}:${duration.minutes ? duration.minutes : '00'}`;
+// }
 
 const Appointments = () => {
     const { data, user, role, setRole } = useContext(HospitalContext);
@@ -16,9 +16,9 @@ const Appointments = () => {
                 let response;
 
                 if (role.name === 'patient') {
-                    response = await data.getPatientAppointments(userId);
+                    response = await data.getPatientAppointments(userId, true);
                 } else if (role.name === 'doctor') {
-                    response = await data.getDoctorAppointments(userId);
+                    response = await data.getDoctorAppointments(userId, true);
                 }
 
                 setAppointments(response);
@@ -50,7 +50,7 @@ const Appointments = () => {
                         <tr key={appointment.id}>
                             <td>{appointment.id}</td>
                             <td>{appointment.time}</td>
-                            <td>{intervalToString(appointment.duration)}</td>
+                            <td>{appointment.duration}</td>
                             <td>{appointment.description}</td>
                             <td>
                                 {role.name === 'patient'

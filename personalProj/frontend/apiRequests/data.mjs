@@ -1,4 +1,4 @@
-import { optionalRefresh } from './refresh';
+import { optionalRefresh } from './refresh.mjs';
 const API_URL = 'http://localhost:3000/api';
 
 /**
@@ -232,10 +232,10 @@ const deletePatient = async (id) => {
  * @param {string} patientId - The ID of the patient.
  * @returns {Promise<Array>} The list of appointments.
  */
-const getPatientAppointments = async (patientId) => {
+const getPatientAppointments = async (patientId, nestUser = false) => {
     await optionalRefresh();
 
-    const response = await fetch(`${API_URL}/patients/${patientId}/appointments`, {
+    const response = await fetch(`${API_URL}/patients/${patientId}/appointments?nestUser=${nestUser}`, {
         headers: {
             'Authorization': localStorage.getItem('access_token'),
         },
@@ -356,10 +356,10 @@ const deleteDoctor = async (id) => {
  * @param {string} doctorId - The ID of the doctor.
  * @returns {Promise<Array>} The list of appointments.
  */
-const getDoctorAppointments = async (doctorId) => {
+const getDoctorAppointments = async (doctorId, nestUser = false) => {
     await optionalRefresh();
 
-    const response = await fetch(`${API_URL}/doctors/${doctorId}/appointments`, {
+    const response = await fetch(`${API_URL}/doctors/${doctorId}/appointments?nestUser=${nestUser}`, {
         headers: {
             'Authorization': localStorage.getItem('access_token'),
         },
@@ -739,6 +739,6 @@ export default {
     updateAppointment,
     deleteAppointment,
     createAppointment,
-    getPatientAppointments, 
+    getPatientAppointments,
     getDoctorAppointments
 };

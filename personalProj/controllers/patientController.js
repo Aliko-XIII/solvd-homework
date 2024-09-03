@@ -105,7 +105,14 @@ const updatePatient = async (req, res) => {
  */
 const getAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.getPatientAppointments(req.params.id);
+        const id = req.params.id;
+        const nestUser = req.query.nestUser === 'true';
+        const appointments = await Appointment.getAppointments(
+            {
+                patientId: id,
+                nestPatient: nestUser,
+                nestDoctor: nestUser
+            });
         res.status(200).json(appointments);
     } catch (err) {
         res.status(500).json({ error: err.message });
