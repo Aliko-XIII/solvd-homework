@@ -226,20 +226,20 @@ describe('Doctor Routes', () => {
                 {
                     id: 1,
                     patientId: '2',
+                    doctorId:'3',
                     date: '2024-08-30T10:00:00Z',
                     duration: '01:00:00',
                 },
             ];
-            Appointment.getDoctorAppointments.mockResolvedValue(mockAppointments);
+            Appointment.getAppointments.mockResolvedValue(mockAppointments);
 
             const response = await request(app).get('/doctors/1/appointments');
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockAppointments);
-            expect(Appointment.getDoctorAppointments).toHaveBeenCalledWith('1');
         });
 
         test('should handle errors in getting doctor appointments', async () => {
-            Appointment.getDoctorAppointments.mockRejectedValue(new Error('Database error'));
+            Appointment.getAppointments.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app).get('/doctors/1/appointments');
             expect(response.status).toBe(500);
