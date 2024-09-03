@@ -1,13 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { HospitalContext } from '../App';
-
-// function intervalToString(duration) {
-//     return `${duration.hours ? duration.hours : '00'}:${duration.minutes ? duration.minutes : '00'}`;
-// }
+import AppointmentRow from './AppointmentRow/AppointmentRow';
 
 const Appointments = () => {
     const { data, user, role, setRole } = useContext(HospitalContext);
     const [appointments, setAppointments] = useState([]);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (role.name == 'guest') {
+            navigate('/login');
+        }
+    });
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -47,18 +51,15 @@ const Appointments = () => {
                 </thead>
                 <tbody>
                     {appointments.map(appointment => (
-                        <tr key={appointment.id}>
-                            <td>{appointment.id}</td>
-                            <td>{appointment.time}</td>
-                            <td>{appointment.duration}</td>
-                            <td>{appointment.description}</td>
-                            <td>
-                                {role.name === 'patient'
-                                    ? `${appointment.doctor.user.firstName} ${appointment.doctor.user.lastName}`
-                                    : `${appointment.patient.user.firstName} ${appointment.patient.user.lastName}`}
-                            </td>
-                        </tr>
+                        <AppointmentRow key={appointment.id} appointment={appointment} role={role} />
                     ))}
+                    {/* <tr>
+                        <td>---</td>
+                        <td><input name='time' onChange={handleChange} type="text" /></td>
+                        <td><input name='duration' onChange={handleChange} type="text" /></td>
+                        <td><input name='description' onChange={handleChange} type="text" /></td>
+                        <td><select name={role.name === 'patient' ? 'Doctor' : 'Patient'ct></td>
+                    </tr> */}
                 </tbody>
             </table>
         </div>
