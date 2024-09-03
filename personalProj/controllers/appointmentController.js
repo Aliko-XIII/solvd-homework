@@ -55,7 +55,7 @@ const updateAppointment = async (req, res) => {
         const updated = await Appointment.updateAppointment(id, updates);
         res.status(200).json(updated);
     } catch (error) {
-        res.status(500).json({ error: 'An error occurred while updating the appointment' });
+        res.status(500).json({ error: error.message });
     }
 };
 

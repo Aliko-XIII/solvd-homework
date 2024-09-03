@@ -170,7 +170,7 @@ describe('Appointment Routes', () => {
     
             const response = await request(app).put('/appointments/1').send({ time: '18.08.2024 13:15:00' });
             expect(response.status).toBe(500);
-            expect(response.body).toEqual({ error: 'An error occurred while updating the appointment' });
+            expect(response.body).toEqual({ error: 'Database error' });
         });
     });
     

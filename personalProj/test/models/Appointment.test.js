@@ -6,6 +6,8 @@ const { query } = require('../../config/database');
 jest.mock('../../config/database', () => ({
     query: jest.fn(),
 }));
+jest.mock('../../models/Doctor');
+jest.mock('../../models/Patient');
 
 describe('Appointment Class', () => {
 
@@ -118,16 +120,22 @@ describe('Appointment Class', () => {
                 rows: [{
                     appointment_id: 1, appointment_time: updates.time,
                     appointment_duration: '02:00:00', additional_info: 'Old checkup',
-                    patient_id: '1', doctor_id: '2'
+                    patient_id: 'update-patient', doctor_id: 'update-doctor'
                 }]
             });
+            Patient.getPatientsByIds.mockResolvedValueOnce([{
+                user: { id: 'update-patient' },
+            }]);
+            Doctor.getDoctorsByIds.mockResolvedValueOnce([{
+                user: { id: 'update-doctor' },
+                patientLoad: 4
+            }]);
             // Mocking the queries for isAvailable method
             query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date
             query.mockResolvedValueOnce({ rows: [] }); // Mock getDoctorAppointments for date, time, duration
             query.mockResolvedValueOnce({ rows: [] }); // Mock getPatientAppointments for date, time, duration
 
             query.mockResolvedValueOnce({ rows: [{ appointment_id: 1, appointment_time: updates.time, appointment_duration: '02:00:00', additional_info: 'Updated checkup' }] });
-
             const updatedAppointment = await Appointment.updateAppointment(1, updates);
 
             expect(updatedAppointment.description).toBe('Updated checkup');

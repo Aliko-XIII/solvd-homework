@@ -43,18 +43,19 @@ class Appointment {
     static async getAppointmentsFromData(rows, nestDoctor = false, nestPatient = false) {
         const appointments = rows.map(async row => {
             let patient = null;
-            if (row.patient_id != null) {
+            if (row.patient_id) {
                 patient = nestPatient ? (await Patient.getPatientsByIds([row.patient_id], true))[0] :
                     { user: { id: row.patient_id } };
             }
             let doctor = null;
-            if (row.doctor_id != null) {
+            if (row.doctor_id) {
                 doctor = nestDoctor ? (await Doctor.getDoctorsByIds([row.doctor_id], true))[0] :
                     { user: { id: row.doctor_id } };
             }
 
             const appointment = new Appointment(patient, doctor, row.appointment_time,
                 row.appointment_duration, row.additional_info, row.appointment_id);
+
             return appointment;
         });
         return Promise.all(appointments);
@@ -91,7 +92,7 @@ class Appointment {
      */
     static async getAppointmentsByIds(ids, nestDoctor = false, nestPatient = false) {
         const idList = ids.map(id => `'${id}'`).join(',');
-        const res = await query(`SELECT appointment_id, patient_id, doctor_id, appointment_time,
+        const res = await query(`SELECT appointment_id, patient_id, doctor_id, appointment_time::TEXT AS appointment_time,
              appointment_duration::TEXT AS appointment_duration, additional_info FROM appointments 
             WHERE appointment_id IN (${idList});`);
         return await this.getAppointmentsFromData(res.rows, nestDoctor, nestPatient);
@@ -110,9 +111,9 @@ class Appointment {
         if (!hasParams) throw new Error('No parameters to update.');
 
         if (time || duration) {
-            const appointment = (await Appointment.getAppointmentsByIds([id]))[0];
+            const appointment = (await Appointment.getAppointmentsByIds([id], true, true))[0];
             if (time) appointment.time = time;
-            if (duration) appointment.time = duration;
+            if (duration) appointment.duration = duration;
             if (!(await appointment.isAvailable())) throw new Error('Updated time is not available');
         }
 
@@ -125,9 +126,8 @@ class Appointment {
         if (doctorId) updates.push(`doctor_id = '${doctorId}'`);
         if (updates.length > 0) queryStr += ` ${updates.join(', ')} `;
         queryStr += `WHERE appointment_id = ${id} RETURNING *;`;
-
         const res = await query(queryStr);
-        const updated = (await Appointment.getAppointmentsFromData(res.rows))[0];
+        const updated = (await Appointment.getAppointmentsFromData(res.rows, true, true))[0];
         return updated;
     }
 
