@@ -31,7 +31,7 @@ function createAccessToken(user) {
         'alg': 'HS256',
         'typ': 'JWT',
         'iat': Date(),
-        'exp': '1m'
+        'exp': '5m'
     };
 
     const accessHeaderEncoded = Buffer.from(JSON.stringify(accessHeader)).toString('base64url');
